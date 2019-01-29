@@ -1,0 +1,38 @@
+{
+  "name": "http-z",
+  "version": "0.0.1",
+  "description": "Parse and build HTTP message",
+  "engines": {
+    "node": ">=8"
+  },
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "src"
+  ],
+  "scripts": {
+    "lint": "eslint --ext .js src/ test/",
+    "test": "NODE_ENV=test mocha",
+    "coverage": "nyc npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlexanderMac/http-z"
+  },
+  "keywords": [
+    "http",
+    "http-utility",
+    "builder",
+    "parser",
+    "request",
+    "response"
+  ],
+  "author": "Alexander Mac",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlexanderMac/http-z/issues"
+  },
+  "homepage": "https://github.com/AlexanderMac/http-z#readme",
+  "dependencies": {},
+  "devDependencies": {}
+}

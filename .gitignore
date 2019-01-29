@@ -1,0 +1,21 @@
+# Logs & temp
+logs
+*.log
+tmp
+.tmp
+.DS_STORE
+npm-debug.log
+
+# Coverage directory used by tools like istanbul
+coverage
+.nyc_output
+
+# Dependency directory
+node_modules
+
+# Users Environment Variables
+.vscode
+.idea
+.brackets.json
+.jsbeautifyrc
+.nvmrc
