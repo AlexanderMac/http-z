@@ -34,5 +34,10 @@
   },
   "homepage": "https://github.com/AlexanderMac/http-z#readme",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^5.12.1",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
+    "should": "^13.2.3"
+  }
 }
