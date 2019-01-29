@@ -1,0 +1,19 @@
+{
+  "globals": {
+    "describe"  : true,
+    "it"        : true,
+    "before"    : true,
+    "beforeEach": true,
+    "after"     : true,
+    "afterEach" : true,
+    "inject"    : true,
+    "expect"    : true
+  },
+  "rules": {
+    "max-len": 0,
+    "max-nested-callbacks": 0,
+    "max-params": 0,
+    "max-statements": 0,
+    "no-use-before-define": [0, "nofunc"]
+  }
+}
