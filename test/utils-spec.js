@@ -7,31 +7,31 @@ describe('utils', () => {
   describe('splitIntoTwoParts', () => {
     const delimiter = ' ';
 
-    it('should return undefined when str is nil or empty', () => {
+    it('should return empty array when str is nil or empty', () => {
       let actual = utils.splitIntoTwoParts(undefined, delimiter);
-      should(actual).undefined();
+      should(actual).eql([]);
 
       actual = utils.splitIntoTwoParts(null, delimiter);
-      should(actual).undefined();
+      should(actual).eql([]);
 
       actual = utils.splitIntoTwoParts('', delimiter);
-      should(actual).undefined();
+      should(actual).eql([]);
     });
 
-    it('should return undefined when str does not contain delimiter', () => {
+    it('should return empty array when str does not contain delimiter', () => {
       let actual = utils.splitIntoTwoParts('somestring', delimiter);
-      should(actual).undefined();
+      should(actual).eql([]);
 
       actual = utils.splitIntoTwoParts('1234567890', delimiter);
-      should(actual).undefined();
+      should(actual).eql([]);
     });
 
-    it('should return undefined when str does not contain two parts', () => {
+    it('should return empty array with one empty element when str does not contain two parts', () => {
       let actual = utils.splitIntoTwoParts('somestring    ', delimiter);
-      should(actual).undefined();
+      should(actual).eql(['somestring', '']);
 
       actual = utils.splitIntoTwoParts('    somestring', delimiter);
-      should(actual).undefined();
+      should(actual).eql(['', 'somestring']);
     });
 
     it('should return array of two elems when str contains two parts', () => {

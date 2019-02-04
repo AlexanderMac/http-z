@@ -13,7 +13,7 @@ describe('parse()', () => {
     });
   });
 
-  describe('start-line', () => {
+  describe('start row', () => {
     let httpMsg = [
       'GET http://example.com/features?p1=v1 HTTP/1.1',
       'Host: example.com',
@@ -79,41 +79,19 @@ describe('parse()', () => {
       body: null
     };
 
-    it('should throw Error when start-line doesn\'t have three parts separated by space', () => {
+    it('should throw Error when start row doesn\'t have three elements separated by space', () => {
       let rm = _.cloneDeep(httpMsg);
 
       rm[0] = 'GEThttp://example.com/features?p1=v1 HTTP/1.1';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'start-line must have format: ' +
-                 '[Method] [Url] [Protocol]. Data: GEThttp://example.com/features?p1=v1 HTTP/1.1'
+        message: 'Start row must be in format: ' +
+                 'Method SP Request-URI SP HTTP-Version CRLF. Data: GEThttp://example.com/features?p1=v1 HTTP/1.1'
       });
 
       rm[0] = 'GEThttp://example.com/features?p1=v1HTTP/1.1';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'start-line must have format: ' +
-                 '[Method] [Url] [Protocol]. Data: GEThttp://example.com/features?p1=v1HTTP/1.1'
-      });
-    });
-
-    it('should throw Error when start-line has invalid url', () => {
-      let rm = _.cloneDeep(httpMsg);
-
-      rm[0] = 'GET example.com/features?p1=v1 HTTP/1.1';
-      should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Url in start-line must have format: ' +
-                 '[Protocol]://[Address]. Data: example.com/features?p1=v1'
-      });
-
-      rm[0] = 'GET http:/example.com/features?p1=v1 HTTP/1.1';
-      should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Url in start-line must have format: ' +
-                 '[Protocol]://[Address]. Data: http:/example.com/features?p1=v1'
-      });
-
-      rm[0] = 'GET www.example.com/features?p1=v1 HTTP/1.1';
-      should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Url in start-line must have format: ' +
-                 '[Protocol]://[Address]. Data: www.example.com/features?p1=v1'
+        message: 'Start row must be in format: ' +
+                 'Method SP Request-URI SP HTTP-Version CRLF. Data: GEThttp://example.com/features?p1=v1HTTP/1.1'
       });
     });
 
@@ -200,7 +178,7 @@ describe('parse()', () => {
     });
   });
 
-  describe('host line', () => {
+  describe('host row', () => {
     let httpMsg = [
       'GET http://example.com/features?p1=v1 HTTP/1.1',
       'Host: example.com',
@@ -266,29 +244,29 @@ describe('parse()', () => {
       body: null
     };
 
-    it('should throw Error when host line is invalid', () => {
+    it('should throw Error when host row is invalid', () => {
       let rm = _.cloneDeep(httpMsg);
 
       rm[1] = 'Host example.com';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Host line must have format: ' +
-                 '[Host]: [Value]. Data: Host example.com'
+        message: 'Host row must be in format: ' +
+                 'Host: Value. Data: Host example.com'
       });
 
       rm[1] = 'Host     ';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Host line must have format: ' +
-                 '[Host]: [Value]. Data: Host     '
+        message: 'Host row must be in format: ' +
+                 'Host: Value. Data: Host     '
       });
 
       rm[1] = ': example.com';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Host line must have format: ' +
-                 '[Host]: [Value]. Data: : example.com'
+        message: 'Host row must be in format: ' +
+                 'Host: Value. Data: : example.com'
       });
     });
 
-    it('should parse valid host line', () => {
+    it('should parse valid host row', () => {
       let rm = _.cloneDeep(httpMsg);
       let ro = _.cloneDeep(httpObj);
       ro.host = 'example.com';
@@ -381,20 +359,20 @@ describe('parse()', () => {
 
       rm[2] = 'Connection keep-alive';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Header line must have format: ' +
-                 '[HeaderName]: [HeaderValues]. Data: Connection keep-alive'
+        message: 'Header row must be in format: ' +
+                 'Name: Values. Data: Connection keep-alive'
       });
 
       rm[2] = 'Connection: ';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Header line must have format: ' +
-                 '[HeaderName]: [HeaderValues]. Data: Connection: '
+        message: 'Header row must be in format: ' +
+                 'Name: Values. Data: Connection: '
       });
 
       rm[2] = ' : keep-alive';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Header line must have format: ' +
-                 '[HeaderName]: [HeaderValues]. Data:  : keep-alive'
+        message: 'Header row must be in format: ' +
+                 'Name: Values. Data:  : keep-alive'
       });
     });
 
@@ -504,17 +482,17 @@ describe('parse()', () => {
       body: null
     };
 
-    it('should throw Error when cookie line is invalid', () => {
+    it('should throw Error when cookie row is invalid', () => {
       let rm = _.cloneDeep(httpMsg);
 
       rm[8] = 'Cookie: ';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Cookie line must have format: ' +
-                 'Cookie: [Name1]=[Value1].... Data: Cookie: '
+        message: 'Cookie row must be in format: ' +
+                 'Cookie: Name1=Value1;.... Data: Cookie:'
       });
     });
 
-    it('should not throw Error when cookie line is empty', () => {
+    it('should not throw Error when cookie row is empty', () => {
       let rm = _.cloneDeep(httpMsg);
       let ro = _.cloneDeep(httpObj);
 
@@ -644,10 +622,9 @@ describe('parse()', () => {
                  'Data: messageHello'
       });
 
-      rm[11] = 'id=11&message=Hello& ';
+      rm[11] = 'id=11&message=Hello&';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Invalid x-www-form-url-encode parameter. ' +
-                 'Data:  '
+        message: 'Invalid x-www-form-url-encode parameter'
       });
     });
 
@@ -682,13 +659,13 @@ describe('parse()', () => {
 
       rm[8] = 'Content-Type: multipart/form-data; boundary';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Boundary param must have format: [boundary]=[value]. ' +
+        message: 'Boundary param must be in format: boundary=value. ' +
                  'Data: boundary'
       });
 
       rm[8] = 'Content-Type: multipart/form-data; boundary=';
       should(httpZ.parse.bind(null, rm.join('\n'))).throw(Error, {
-        message: 'Boundary param must have format: [boundary]=[value]. ' +
+        message: 'Boundary param must be in format: boundary=value. ' +
                  'Data: boundary='
       });
     });

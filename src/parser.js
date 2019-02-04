@@ -20,108 +20,86 @@ class HttpZParser {
       throw utils.getErrorMessage('httpMsg must be defined');
     }
 
-    let requestMsgLines = this._parseRequestForLines();
-
-    let header = this._parseHeaderLine(requestMsgLines.header);
-    let host = this._parseHostLine(requestMsgLines.host);
-    let headers = this._parseHeadersLines(requestMsgLines.headers);
-    let cookies = this._parseCookieLine(requestMsgLines.cookies);
-
-    let contentTypeHeader = this._getContentTypeHeader(headers);
-    let body = this._parseBody(requestMsgLines.body, contentTypeHeader);
+    this._parseMessageForRows();
+    this._parseStartRow();
+    this._parseHostRow();
+    this._parseHeaderRows();
+    this._parseCookiesRow();
+    this._parseBodyRows();
 
     return {
-      method: header.method,
-      protocol: header.protocol,
-      url: header.url,
-      protocolVersion: header.protocolVersion,
-      host,
-      headers,
-      cookies,
-      body
+      method: this.method,
+      protocol: this.protocol,
+      url: this.url,
+      protocolVersion: this.protocolVersion,
+      host: this.host,
+      headers: this.headers,
+      cookies: this.cookies,
+      body: this.body
     };
   }
 
-  _parseRequestForLines() {
-    let headersAndBodySeparator = this.eol + this.eol;
-    let headersAndBodySeparatorIndex = this.httpMsg.indexOf(headersAndBodySeparator);
-    if (headersAndBodySeparatorIndex === -1) {
+  // eslint-disable-next-line max-statements
+  _parseMessageForRows() {
+    let eol2x = this.eol + this.eol;
+    let [headers, body] = utils.splitIntoTwoParts(this.httpMsg, eol2x);
+    if (_.isNil(headers) || _.isNil(body)) {
       throw utils.getErrorMessage(
-        'Request must contain headers and body, separated by two break lines');
+        'HTTP message must contain headers and body, separated by two break lines');
     }
 
-    let headers = this.httpMsg.substr(0, headersAndBodySeparatorIndex);
-    let body = this.httpMsg.substr(headersAndBodySeparatorIndex + headersAndBodySeparator.length);
-
-    let headersLines = _.split(headers, this.eol);
-    if (headersLines.length === 0) {
+    let headerRows = _.split(headers, this.eol);
+    if (headerRows.length === 0) {
       throw utils.getErrorMessage('No headers');
     }
-
-    let cookieIndex = _.findIndex(headersLines, (line) => {
-      return _.startsWith(line, 'Cookie:');
+    let cookiesIndex = _.findIndex(headerRows, (row) => {
+      return _.startsWith(row, 'Cookie:');
     });
-    let cookieLine;
-    if (cookieIndex !== -1) {
-      cookieLine = headersLines[cookieIndex];
-      headersLines.splice(cookieIndex, 1);
+    let cookiesRow;
+    if (cookiesIndex !== -1) {
+      cookiesRow = headerRows[cookiesIndex];
+      headerRows.splice(cookiesIndex, 1);
     }
 
-    return {
-      header: headersLines[0],
-      host: headersLines[1],
-      headers: headersLines.splice(2),
-      cookies: cookieLine,
-      body: body
-    };
+    this.startRow = headerRows[0];
+    this.hostRow = headerRows[1];
+    this.headerRows = headerRows.splice(2);
+    this.cookiesRow = cookiesRow;
+    this.bodyRows = body;
   }
 
-  _parseHeaderLine(line) {
-    let methodUrlProtocolVer = _.split(line, ' ');
-    if (methodUrlProtocolVer.length !== 3) {
-      throw utils.getErrorMessage('start-line must have format: [Method] [Url] [Protocol]', line);
+  _parseStartRow() {
+    if (!consts.regexps.startRow.test(this.startRow)) {
+      throw utils.getErrorMessage('Start row must be in format: Method SP Request-URI SP HTTP-Version CRLF', this.startRow);
     }
 
-    let protocolAndUrl = utils.splitIntoTwoParts(methodUrlProtocolVer[1], '://');
-    if (!protocolAndUrl) {
-      throw utils.getErrorMessage(
-        'Url in start-line must have format: [Protocol]://[Address]',
-        methodUrlProtocolVer[1]
-      );
-    }
-
-    return {
-      method: methodUrlProtocolVer[0].toUpperCase(),
-      protocol: protocolAndUrl[0].toUpperCase(),
-      url: protocolAndUrl[1].toLowerCase(),
-      protocolVersion: methodUrlProtocolVer[2].toUpperCase()
-    };
+    let rowElems = this.startRow.split(' ');
+    this.method = rowElems[0].toUpperCase();
+    let url = rowElems[1];
+    this.url = url.replace(consts.regexps.httpProtocolWithTwoSlash, '');
+    this.protocol = url.match(consts.regexps.httpProtocol)[0].toUpperCase();
+    this.protocolVersion = rowElems[2];
   }
 
-  _parseHostLine(line) {
-    let headerAndValue = utils.splitIntoTwoParts(line, ':');
-    if (!headerAndValue) {
-      throw utils.getErrorMessage('Host line must have format: [Host]: [Value]', line);
+  _parseHostRow() {
+    let [name, value] = utils.splitIntoTwoParts(this.hostRow, ':');
+    if (!name || !value) {
+      throw utils.getErrorMessage('Host row must be in format: Host: Value', this.hostRow);
     }
-
-    return headerAndValue[1];
+    this.host = value;
   }
 
-  _parseHeadersLines(lines) {
+  _parseHeaderRows() {
     // TODO: add check for duplicate headers
-
-    return _.map(lines, line => {
-      let headerAndValues = utils.splitIntoTwoParts(line, ':');
-      if (!headerAndValues) {
-        throw utils.getErrorMessage('Header line must have format: [HeaderName]: [HeaderValues]', line);
+    this.headers = _.map(this.headerRows, hRow => {
+      let [headerName, values] = utils.splitIntoTwoParts(hRow, ':');
+      if (!headerName || !values) {
+        throw utils.getErrorMessage('Header row must be in format: Name: Values', hRow);
       }
-
-      let headerName = headerAndValues[0];
-      let values = _.split(headerAndValues[1], ',');
+      values = _.split(values, ',');
       if (!headerName || values.length === 0 || _.some(values, val => _.isEmpty(val))) {
-        throw utils.getErrorMessage('Header line must have format: [HeaderName]: [HeaderValues]', line);
+        throw utils.getErrorMessage('Header row must be in format: Name: Values', hRow);
       }
-
       let valuesAndParams = _.map(values, (value) => {
         let valueAndParams = _.split(value, ';');
         return {
@@ -137,22 +115,23 @@ class HttpZParser {
     });
   }
 
-  _parseCookieLine(line) {
-    if (!line) {
-      return null;
+  _parseCookiesRow() {
+    if (!this.cookiesRow) {
+      this.cookies = null;
+      return;
     }
 
-    let headerAndValues = utils.splitIntoTwoParts(line, ':');
-    if (!headerAndValues) {
-      throw utils.getErrorMessage('Cookie line must have format: Cookie: [Name1]=[Value1]...', line);
+    let [header, values] = utils.splitIntoTwoParts(this.cookiesRow, ':');
+    if (!header || !values) {
+      throw utils.getErrorMessage('Cookie row must be in format: Cookie: Name1=Value1;...', this.cookiesRow);
     }
 
-    let nameValuePairs = _.split(headerAndValues[1], ';');
+    let nameValuePairs = _.split(values, ';');
     if (nameValuePairs.length === 0) {
-      throw utils.getErrorMessage('Cookie line must have format: Cookie: [Name1]=[Value1]...', line);
+      throw utils.getErrorMessage('Cookie pair must be in format: Name1=Value1;...', values);
     }
 
-    return _.chain(nameValuePairs)
+    this.cookies = _.chain(nameValuePairs)
       .map((nameValuePair) => {
         let nameValue = _.split(nameValuePair, '=');
         return !nameValue[0] ?
@@ -166,46 +145,42 @@ class HttpZParser {
       .value();
   }
 
-  _parseBody(lines, contentTypeHeader) {
-    if (!lines) {
-      return null;
+  _parseBodyRows() {
+    if (!this.bodyRows) {
+      this.body = null;
+      return;
     }
 
-    let body = {};
-
-    if (!contentTypeHeader) {
-      this._parsePlainBody(lines, body);
-      return body;
+    let contentTypeHeaderValue = _.get(this._getContentTypeHeader(), 'value');
+    this.body = {};
+    if (contentTypeHeaderValue) {
+      this.body.contentType = contentTypeHeaderValue;
     }
 
-    body.contentType = contentTypeHeader.value;
-    switch (body.contentType) {
+    switch (this.body.contentType) {
       case consts.http.contentTypes.formData:
-        this._parseFormDataBody(lines, body, contentTypeHeader.params);
+        this._parseFormDataBody();
         break;
-
       case consts.http.contentTypes.xWwwFormUrlencoded:
-        this._parseXwwwFormUrlencodedBody(lines, body);
+        this._parseXwwwFormUrlencodedBody();
         break;
-
       case consts.http.contentTypes.json:
-        this._parseJsonBody(lines, body);
+        this._parseJsonBody();
         break;
-
       default:
-        this._parsePlainBody(lines, body);
+        this._parsePlainBody();
         break;
     }
-
-    return body;
   }
 
-  _parseFormDataBody(lines, body, contentTypeHeadeParams) {
-    body.boundary = this._getBoundaryParameter(contentTypeHeadeParams);
+  _parseFormDataBody() {
+    let contentTypeHeader = this._getContentTypeHeader();
 
-    let params = _.split(lines, `-----------------------${body.boundary}`);
+    this.body.boundary = this._getBoundaryParameter(contentTypeHeader.params);
 
-    body.formDataParams = _.chain(params)
+    let params = _.split(this.bodyRows, `-----------------------${this.body.boundary}`);
+
+    this.body.formDataParams = _.chain(params)
       .slice(1, params.length - 1)
       .map(param => {
         let paramMatch = param.match(consts.regexps.param);
@@ -215,12 +190,12 @@ class HttpZParser {
 
         let paramNameMatch = paramMatch.toString().match(consts.regexps.paramName); // TODO: refactor to remove toString
         if (!paramNameMatch) {
-          throw utils.getErrorMessage('formData parameter name must have format: [Name]="[Value]"', param);
+          throw utils.getErrorMessage('formData parameter name must be in format: Name="Value"', param);
         }
 
         let paramNameParts = _.split(paramNameMatch, '=');
         if (paramNameParts.length !== 2) {
-          throw utils.getErrorMessage('formData parameter name must have format: [Name]="[Value]"', param);
+          throw utils.getErrorMessage('formData parameter name must be in format: Name="Value"', param);
         }
         let paramName = paramNameParts[1];
         let paramValue = param.replace(paramMatch, '').trim(this.eol);
@@ -233,10 +208,9 @@ class HttpZParser {
       .value();
   }
 
-  _parseXwwwFormUrlencodedBody(lines, body) {
-    let params = _.split(lines, '&');
-
-    body.formDataParams = _.chain(params)
+  _parseXwwwFormUrlencodedBody() {
+    this.body.formDataParams = _.chain(this.bodyRows)
+      .split('&')
       .map(param => {
         let paramValue = _.split(param, '=');
         if (paramValue.length !== 2) {
@@ -254,40 +228,41 @@ class HttpZParser {
       .value();
   }
 
-  _parseJsonBody(lines, body) {
-    body.json = lines;
+  _parseJsonBody() {
+    this.body.json = this.bodyRows;
   }
 
-  _parsePlainBody(lines, body) {
-    body.plain = lines;
+  _parsePlainBody() {
+    this.body.plain = this.bodyRows;
   }
 
-  _getContentTypeHeader(headers) {
-    let contentTypeHeader = _.find(headers, { name: consts.http.headers.contentType });
+  _getContentTypeHeader() {
+    let contentTypeHeader = _.find(this.headers, { name: consts.http.headers.contentType });
     if (!contentTypeHeader) {
       return null;
     }
     return contentTypeHeader.values[0];
   }
 
-  _getBoundaryParameter(contentTypeHeaderParams) {
-    if (!contentTypeHeaderParams) {
+  _getBoundaryParameter() {
+    let contentTypeHeader = this._getContentTypeHeader();
+    if (!contentTypeHeader || !contentTypeHeader.params) {
       throw utils.getErrorMessage('Request with ContentType=FormData must have a header with boundary');
     }
 
-    let boundaryMatch = contentTypeHeaderParams.match(consts.regexps.boundary);
+    let boundaryMatch = contentTypeHeader.params.match(consts.regexps.boundary);
     if (!boundaryMatch) {
-      throw utils.getErrorMessage('Boundary param must have format: [boundary]=[value]', contentTypeHeaderParams);
+      throw utils.getErrorMessage('Boundary param must be in format: boundary=value', contentTypeHeader.params);
     }
 
     let boundaryAndValue = _.split(boundaryMatch, '=');
     if (boundaryAndValue.length !== 2) {
-      throw utils.getErrorMessage('Boundary param must have format: [boundary]=[value]', contentTypeHeaderParams);
+      throw utils.getErrorMessage('Boundary param must be in format: boundary=value', contentTypeHeader.params);
     }
 
     let boundaryValue =  _.trim(boundaryAndValue[1]);
     if (!boundaryValue) {
-      throw utils.getErrorMessage('Boundary param must have format: [boundary]=[value]', contentTypeHeaderParams);
+      throw utils.getErrorMessage('Boundary param must be in format: boundary=value', contentTypeHeader.params);
     }
     return boundaryValue;
   }

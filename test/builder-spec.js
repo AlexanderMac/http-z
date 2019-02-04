@@ -5,15 +5,7 @@ const should = require('should');
 const httpZ  = require('../');
 
 describe('build()', () => {
-  describe('httpObj', () => {
-    it('should throw error when httpObj is undefined', () => {
-      should(httpZ.build.bind(httpZ, null)).throw(Error, {
-        message: 'httpObj must be defined'
-      });
-    });
-  });
-
-  describe('start-line', () => {
+  describe('start-row', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
@@ -64,7 +56,7 @@ describe('build()', () => {
       });
     });
 
-    it('should build start-line when method and url and protocol and protocolVersion aren\'t empty', () => {
+    it('should build start-row when method and url and protocol and protocolVersion aren\'t empty', () => {
       let ro = _.cloneDeep(httpObj);
       let rm = _.cloneDeep(httpMsg);
 
@@ -73,7 +65,7 @@ describe('build()', () => {
     });
   });
 
-  describe('host-line', () => {
+  describe('host-row', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
@@ -98,7 +90,7 @@ describe('build()', () => {
       ''
     ];
 
-    it('should build host-line when url is valid', () => {
+    it('should build host-row when url is valid', () => {
       let ro = _.cloneDeep(httpObj);
       let rm = _.cloneDeep(httpMsg);
 
@@ -190,17 +182,17 @@ describe('build()', () => {
 
       ro.headers = null;
       should(httpZ.build.bind(null, ro)).throw(Error, {
-        message: 'Headers must be defined'
+        message: 'Headers must be not empty array'
       });
 
       ro.headers = {};
       should(httpZ.build.bind(null, ro)).throw(Error, {
-        message: 'Headers must be defined'
+        message: 'Headers must be not empty array'
       });
 
       ro.headers = [];
       should(httpZ.build.bind(null, ro)).throw(Error, {
-        message: 'Headers must be defined'
+        message: 'Headers must be not empty array'
       });
     });
 
@@ -242,7 +234,7 @@ describe('build()', () => {
       });
     });
 
-    it('should build header-lines when headers list is valid', () => {
+    it('should build header-rows when headers list is valid', () => {
       let ro = _.cloneDeep(httpObj);
       let rm = _.cloneDeep(httpMsg);
 
@@ -325,12 +317,12 @@ describe('build()', () => {
 
       ro.cookies = [];
       should(httpZ.build.bind(null, ro)).throw(Error, {
-        message: 'Cookie name-value pairs must be defined'
+        message: 'Cookies must be not empty array'
       });
 
       ro.cookies = {};
       should(httpZ.build.bind(null, ro)).throw(Error, {
-        message: 'Cookie name-value pairs must be defined'
+        message: 'Cookies must be not empty array'
       });
     });
 
@@ -367,7 +359,7 @@ describe('build()', () => {
       actual.should.be.eql(rm.join('\n'));
     });
 
-    it('should build cookie-line when cookies is valid', () => {
+    it('should build cookie-row when cookies is valid', () => {
       let ro = _.cloneDeep(httpObj);
       let rm = _.cloneDeep(httpMsg);
 
@@ -523,7 +515,7 @@ describe('build()', () => {
         ]
       };
       should(httpZ.build.bind(null, ro)).throw(Error, {
-        message: 'Body with ContentType=multipart/form-data must have boundary in ContentType header'
+        message: 'Body with ContentType=multipart/form-data must have boundary'
       });
     });
 
@@ -649,11 +641,11 @@ describe('build()', () => {
       }];
       ro.body = {
         contentType: 'application/json',
-        json: '{{"p1": "v1"}, {"p2": "v2"}}'
+        json: { p1: 'v1', p2: 'v2' }
       };
 
       rm[8] = 'Content-Type: application/json';
-      rm[11] = '{{"p1": "v1"}, {"p2": "v2"}}';
+      rm[11] = '{"p1":"v1","p2":"v2"}';
 
       let actual = httpZ.build(ro);
       actual.should.be.eql(rm.join('\n'));

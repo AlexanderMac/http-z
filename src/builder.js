@@ -1,7 +1,6 @@
 'use strict';
 
 const _      = require('lodash');
-const os     = require('os');
 const consts = require('./consts');
 const utils  = require('./utils');
 
@@ -11,31 +10,26 @@ class HttpZBuilder {
     return instance.build();
   }
 
-  constructor(httpObj) {
-    this.httpObj = httpObj;
+  constructor({ method, url, protocol, protocolVersion, headers, cookies, body }) {
+    this.method = method;
+    this.url = url;
+    this.protocol = protocol;
+    this.protocolVersion = protocolVersion;
+    this.headers = headers;
+    this.cookies = cookies;
+    this.body = body;
   }
 
   build() {
-    if (!this.httpObj) {
-      throw utils.getErrorMessage('httpObj must be defined');
-    }
-    this.method = this.httpObj.method;
-    this.url = this.httpObj.url;
-    this.protocol = this.httpObj.protocol;
-    this.protocolVersion = this.httpObj.protocolVersion;
-    this.headers = this.httpObj.headers;
-    this.cookies = this.httpObj.cookies;
-    this.body = this.httpObj.body;
-
     return '' +
-      this._generateStartLine() +
-      this._generateHostLine() +
-      this._generateHeaders() +
-      this._generateCookies() +
-      this._generateBody();
+      this._generateStartRow() +
+      this._generateHostRow() +
+      this._generateHeaderRows() +
+      this._generateCookieRows() +
+      this._generateBodyRows();
   }
 
-  _generateStartLine() {
+  _generateStartRow() {
     if (!this.method) {
       throw utils.getErrorMessage('Method must be defined');
     }
@@ -48,121 +42,122 @@ class HttpZBuilder {
     if (!this.protocolVersion) {
       throw utils.getErrorMessage('ProtocolVersion must be defined');
     }
-    let newUrl = _.trimStart(this.url, '/');
-    return `${this.method} ${this.protocol.toLowerCase()}://${newUrl} ${this.protocolVersion}\n`;
+
+    let protocol = _.toLower(this.protocol);
+    let url = _.trimStart(this.url, '/');
+    return `${this.method} ${protocol}://${url} ${this.protocolVersion}\n`;
   }
 
-  _generateHostLine() {
+  _generateHostRow() {
     let host = this._getHostName();
     return `HOST: ${host}\n`;
   }
 
-  _generateHeaders() {
-    if (!this.headers || !_.isArray(this.headers) || !this.headers.length) {
-      throw utils.getErrorMessage('Headers must be defined');
+  _generateHeaderRows() {
+    if (!this.headers || !_.isArray(this.headers) || this.headers.length === 0) {
+      throw utils.getErrorMessage('Headers must be not empty array');
     }
 
-    let headerLines = _.map(this.headers, (header) => {
+    let headerRows = _.map(this.headers, (header) => {
       if (!header.name) {
         throw utils.getErrorMessage('Header name must be defined', JSON.stringify(header));
       }
-
-      if (!header.values || !_.isArray(header.values) || !header.values.length) {
+      if (!header.values || !_.isArray(header.values) || header.values.length === 0) {
         throw utils.getErrorMessage('Header values must be defined', JSON.stringify(header));
       }
 
-      let hvs = _.map(header.values, (headerValue) => {
-        let hv = headerValue.value;
-        if (!hv) {
+      let hvsStr = _.map(header.values, (headerValue) => {
+        let hvStr = headerValue.value;
+        if (!hvStr) {
           throw utils.getErrorMessage('Header value must be defined', JSON.stringify(header));
         }
-
         if (headerValue.params) {
-          hv += ';' + headerValue.params;
+          hvStr += ';' + headerValue.params;
         }
-        return hv;
+        return hvStr;
       });
 
-      return header.name + ': ' + hvs.join(', ');
+      return header.name + ': ' + hvsStr.join(', ');
     });
 
-    return headerLines.join(os.EOL) + os.EOL;
+    return headerRows.join('\n') + '\n';
   }
 
-  _generateCookies() {
+  _generateCookieRows() {
     if (!this.cookies) {
       return '';
     }
 
-    if (!_.isArray(this.cookies) || !this.cookies.length) {
-      throw utils.getErrorMessage('Cookie name-value pairs must be defined');
+    if (!_.isArray(this.cookies) || this.cookies.length === 0) {
+      throw utils.getErrorMessage('Cookies must be not empty array');
     }
 
-    let nameValuePairs = _.map(this.cookies, (nameValuePair) => {
+    let cookiesStr = _.map(this.cookies, (nameValuePair) => {
       if (!nameValuePair.name || !nameValuePair.value) {
         throw utils.getErrorMessage('Cookie name or value must be defined', JSON.stringify(nameValuePair));
       }
-
       return nameValuePair.name + '=' + nameValuePair.value;
     });
 
-    return 'Cookie: ' + nameValuePairs.join('; ') + os.EOL;
+    return 'Cookie: ' + cookiesStr.join('; ') + '\n';
   }
 
-  _generateBody() {
+  _generateBodyRows() {
     if (!this.body) {
-      return os.EOL;
+      return '\n';
     }
 
-    let formDataParams;
     switch (this.body.contentType) {
       case consts.http.contentTypes.formData:
-        if (!this.body.boundary) {
-          throw utils.getErrorMessage(
-            'Body with ContentType=multipart/form-data must have boundary in ContentType header');
-        }
-
-        if (!this.body.formDataParams || !_.isArray(this.body.formDataParams) || !this.body.formDataParams.length) {
-          throw utils.getErrorMessage('Body with ContentType=multipart/form-data must have parameters');
-        }
-
-        formDataParams = _.map(this.body.formDataParams, (dataParam) => {
-          if (!dataParam.name || !dataParam.value) {
-            throw utils.getErrorMessage('FormData parameter must have name and value', JSON.stringify(dataParam));
-          }
-          return [
-            '-----------------------' + this.body.boundary,
-            os.EOL,
-            `Content-Disposition: form-data; name="${dataParam.name}"`,
-            os.EOL,
-            os.EOL,
-            dataParam.value,
-            os.EOL
-          ].join('');
-        }).join('');
-
-        return `\n${formDataParams}-----------------------${this.body.boundary}--`;
-
+        return '\n' + this._buildFormDataBody();
       case consts.http.contentTypes.xWwwFormUrlencoded:
-        if (!this.body.formDataParams || !_.isArray(this.body.formDataParams) || !this.body.formDataParams.length) {
-          throw utils.getErrorMessage('Body with ContentType=application/x-www-form-urlencoded must have parameters');
-        }
-
-        formDataParams = _.map(this.body.formDataParams, (dataParam) => {
-          if (!dataParam.name || !dataParam.value) {
-            throw utils.getErrorMessage('FormData parameter must have name and value', JSON.stringify(dataParam));
-          }
-          return dataParam.name + '=' + dataParam.value;
-        }).join('&');
-
-        return `\n${formDataParams}`;
-
+        return '\n' + this._buildXwwwFormUrlencodedBody();
       case consts.http.contentTypes.json:
-        return '\n' + this.body.json;
-
+        return '\n' + JSON.stringify(this.body.json);
       default:
-        return `\n${this.body.plain}`;
+        return '\n' + this.body.plain;
     }
+  }
+
+  _buildFormDataBody() {
+    if (!this.body.boundary) {
+      throw utils.getErrorMessage('Body with ContentType=multipart/form-data must have boundary');
+    }
+    if (!this.body.formDataParams || !_.isArray(this.body.formDataParams) || this.body.formDataParams.length === 0) {
+      throw utils.getErrorMessage('Body with ContentType=multipart/form-data must have parameters');
+    }
+
+    let formDataParamsStr = _.map(this.body.formDataParams, (dataParam) => {
+      if (!dataParam.name || !dataParam.value) {
+        throw utils.getErrorMessage('FormData parameter must have name and value', JSON.stringify(dataParam));
+      }
+      return [
+        '-----------------------' + this.body.boundary,
+        '\n',
+        `Content-Disposition: form-data; name="${dataParam.name}"`,
+        '\n',
+        '\n',
+        dataParam.value,
+        '\n'
+      ].join('');
+    }).join('');
+
+    return `${formDataParamsStr}-----------------------${this.body.boundary}--`;
+  }
+
+  _buildXwwwFormUrlencodedBody() {
+    if (!this.body.formDataParams || !_.isArray(this.body.formDataParams) || this.body.formDataParams.length === 0) {
+      throw utils.getErrorMessage('Body with ContentType=application/x-www-form-urlencoded must have parameters');
+    }
+
+    let formDataParamsStr = _.map(this.body.formDataParams, (dataParam) => {
+      if (!dataParam.name || !dataParam.value) {
+        throw utils.getErrorMessage('FormData parameter must have name and value', JSON.stringify(dataParam));
+      }
+      return dataParam.name + '=' + dataParam.value;
+    }).join('&');
+
+    return formDataParamsStr;
   }
 
   _getHostName() {
