@@ -31,37 +31,37 @@ describe('build()', () => {
     ];
 
     it('should throw Error when method or url or protocol or protocolVersion are empty', () => {
-      let ro = _.cloneDeep(httpObj);
-      ro.method = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      let httpObjClone = _.cloneDeep(httpObj);
+      httpObjClone.method = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Method must be defined'
       });
 
-      ro = _.cloneDeep(httpObj);
-      ro.url = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone = _.cloneDeep(httpObj);
+      httpObjClone.url = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Url must be defined'
       });
 
-      ro = _.cloneDeep(httpObj);
-      ro.protocol = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone = _.cloneDeep(httpObj);
+      httpObjClone.protocol = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Protocol must be defined'
       });
 
-      ro = _.cloneDeep(httpObj);
-      ro.protocolVersion = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone = _.cloneDeep(httpObj);
+      httpObjClone.protocolVersion = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'ProtocolVersion must be defined'
       });
     });
 
     it('should build start-row when method and url and protocol and protocolVersion aren\'t empty', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      let actual = httpZ.build(ro);
-      should(actual).eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      should(actual).eql(httpMsgClone.join('\n'));
     });
   });
 
@@ -91,24 +91,24 @@ describe('build()', () => {
     ];
 
     it('should build host-row when url is valid', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      ro.url = '/app.com/features?p1=v1';
-      rm[1] = 'HOST: app.com';
-      let actual = httpZ.build(ro);
-      should(actual).eql(rm.join('\n'));
+      httpObjClone.url = '/app.com/features?p1=v1';
+      httpMsgClone[1] = 'HOST: app.com';
+      let actual = httpZ.build(httpObjClone);
+      should(actual).eql(httpMsgClone.join('\n'));
 
-      ro.url = '//app.com/features?p1=v1';
-      rm[1] = 'HOST: app.com';
-      actual = httpZ.build(ro);
-      should(actual).eql(rm.join('\n'));
+      httpObjClone.url = '//app.com/features?p1=v1';
+      httpMsgClone[1] = 'HOST: app.com';
+      actual = httpZ.build(httpObjClone);
+      should(actual).eql(httpMsgClone.join('\n'));
 
-      ro.url = 'www.app.com/features?p1=v1';
-      rm[0] = 'GET http://www.app.com/features?p1=v1 HTTP/1.1',
-      rm[1] = 'HOST: app.com';
-      actual = httpZ.build(ro);
-      should(actual).eql(rm.join('\n'));
+      httpObjClone.url = 'www.app.com/features?p1=v1';
+      httpMsgClone[0] = 'GET http://www.app.com/features?p1=v1 HTTP/1.1',
+      httpMsgClone[1] = 'HOST: app.com';
+      actual = httpZ.build(httpObjClone);
+      should(actual).eql(httpMsgClone.join('\n'));
     });
   });
 
@@ -178,68 +178,68 @@ describe('build()', () => {
     ];
 
     it('should throw Error when headers list is empty or invalid', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.headers = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.headers = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Headers must be not empty array'
       });
 
-      ro.headers = {};
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.headers = {};
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Headers must be not empty array'
       });
 
-      ro.headers = [];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.headers = [];
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Headers must be not empty array'
       });
     });
 
     it('should throw Error when header is invalid', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.headers[0].name = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.headers[0].name = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Header name must be defined. ' +
-                 'Data: ' + JSON.stringify(ro.headers[0])
+                 'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
 
-      ro = _.cloneDeep(httpObj);
-      ro.headers[0].values = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone = _.cloneDeep(httpObj);
+      httpObjClone.headers[0].values = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Header values must be defined. ' +
-                 'Data: ' + JSON.stringify(ro.headers[0])
+                 'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
 
-      ro.headers[0].values = {};
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.headers[0].values = {};
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Header values must be defined. ' +
-                 'Data: ' + JSON.stringify(ro.headers[0])
+                 'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
 
-      ro.headers[0].values = [];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.headers[0].values = [];
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Header values must be defined. ' +
-                 'Data: ' + JSON.stringify(ro.headers[0])
+                 'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
 
-      ro.headers[0].values = [
+      httpObjClone.headers[0].values = [
         { value: 'keep-alive' },
         { value: null }
       ];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Header value must be defined. ' +
-                 'Data: ' + JSON.stringify(ro.headers[0])
+                 'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
     });
 
     it('should build header-rows when headers list is valid', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      let actual = httpZ.build(ro);
-      should(actual).eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      should(actual).eql(httpMsgClone.join('\n'));
     });
   });
 
@@ -313,58 +313,58 @@ describe('build()', () => {
     ];
 
     it('should throw Error when cookies has invalid type', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.cookies = [];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.cookies = [];
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Cookies must be not empty array'
       });
 
-      ro.cookies = {};
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.cookies = {};
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Cookies must be not empty array'
       });
     });
 
     it('should throw Error when cookies is invalid', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.cookies = [
+      httpObjClone.cookies = [
         { name: '', value: '123abc' },
         { name: 'sessionid', value: '456def' }
       ];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Cookie name or value must be defined. ' +
-                 'Data: ' + JSON.stringify(ro.cookies[0])
+                 'Data: ' + JSON.stringify(httpObjClone.cookies[0])
       });
 
-      ro.cookies = [
+      httpObjClone.cookies = [
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', value: '' }
       ];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Cookie name or value must be defined. ' +
-                 'Data: ' + JSON.stringify(ro.cookies[1])
+                 'Data: ' + JSON.stringify(httpObjClone.cookies[1])
       });
     });
 
     it('should not throw Error when cookies is empty', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      ro.cookies = null;
-      rm.splice(8, 1);
+      httpObjClone.cookies = null;
+      httpMsgClone.splice(8, 1);
 
-      let actual = httpZ.build(ro);
-      actual.should.be.eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
     it('should build cookie-row when cookies is valid', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      let actual = httpZ.build(ro);
-      actual.should.be.eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      actual.should.be.eql(httpMsgClone.join('\n'));
     });
   });
 
@@ -447,146 +447,146 @@ describe('build()', () => {
     ];
 
     it('should throw Error when ContentType=application/x-www-form-urlencoded and formDataParams list is empty or invalid type ', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'application/x-www-form-urlencoded'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'application/x-www-form-urlencoded',
       };
 
-      ro.body.formDataParams = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.body.formDataParams = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
       });
 
-      ro.body.formDataParams = {};
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.body.formDataParams = {};
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
       });
 
-      ro.body.formDataParams = [];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.body.formDataParams = [];
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
       });
     });
 
     it('should throw Error when ContentType=application/x-www-form-urlencoded and formDataParams list is invalid', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'application/x-www-form-urlencoded'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'application/x-www-form-urlencoded',
       };
 
-      ro.body.formDataParams = [
+      httpObjClone.body.formDataParams = [
         { name: '', value: '11' },
         { name: 'message', value: 'Hello' }
       ];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'FormData parameter must have name and value. ' +
-                 'Data: ' + JSON.stringify(ro.body.formDataParams[0])
+                 'Data: ' + JSON.stringify(httpObjClone.body.formDataParams[0])
       });
 
-      ro.body.formDataParams = [
+      httpObjClone.body.formDataParams = [
         { name: '', value: '11' },
         { name: 'message', value: '' }
       ];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'FormData parameter must have name and value. ' +
-                 'Data: ' + JSON.stringify(ro.body.formDataParams[0])
+                 'Data: ' + JSON.stringify(httpObjClone.body.formDataParams[0])
       });
     });
 
     it('should throw Error when ContentType=multipart/form-data and boundary is empty', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'multipart/form-data'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'multipart/form-data',
         formDataParams: [
           { name: '', value: '11' },
           { name: 'message', value: 'Hello' }
         ]
       };
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=multipart/form-data must have boundary'
       });
     });
 
     it('should throw Error when ContentType=multipart/form-data and formDataParams list is empty or invalid type', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'multipart/form-data',
         params: 'boundary=------11136253119209'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'multipart/form-data',
         boundary: '------11136253119209'
       };
 
-      ro.body.formDataParams = null;
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.body.formDataParams = null;
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=multipart/form-data must have parameters'
       });
 
-      ro.body.formDataParams = {};
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.body.formDataParams = {};
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=multipart/form-data must have parameters'
       });
 
-      ro.body.formDataParams = [];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      httpObjClone.body.formDataParams = [];
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=multipart/form-data must have parameters'
       });
     });
 
     it('should throw Error when ContentType=multipart/form-data and formDataParams list is invalid', () => {
-      let ro = _.cloneDeep(httpObj);
+      let httpObjClone = _.cloneDeep(httpObj);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'multipart/form-data',
         params: 'boundary=------11136253119209'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'multipart/form-data',
         boundary: '------11136253119209'
       };
 
-      ro.body.formDataParams = [
+      httpObjClone.body.formDataParams = [
         { name: '', value: '11' },
         { name: 'message', value: 'Hello' }
       ];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'FormData parameter must have name and value. ' +
-                 'Data: ' + JSON.stringify(ro.body.formDataParams[0])
+                 'Data: ' + JSON.stringify(httpObjClone.body.formDataParams[0])
       });
 
-      ro.body.formDataParams = [
+      httpObjClone.body.formDataParams = [
         { name: '', value: '11' },
         { name: 'message', value: '' }
       ];
-      should(httpZ.build.bind(null, ro)).throw(Error, {
+      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
         message: 'FormData parameter must have name and value. ' +
-                 'Data: ' + JSON.stringify(ro.body.formDataParams[0])
+                 'Data: ' + JSON.stringify(httpObjClone.body.formDataParams[0])
       });
     });
 
     it('should build body when ContentType=application/x-www-form-urlencoded', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'application/x-www-form-urlencoded',
         params: 'charset=UTF-8'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'application/x-www-form-urlencoded',
         formDataParams: [
           { name: 'id', value: '11' },
@@ -594,21 +594,21 @@ describe('build()', () => {
         ]
       };
 
-      rm[11] = 'id=11&message=Hello';
+      httpMsgClone[11] = 'id=11&message=Hello';
 
-      let actual = httpZ.build(ro);
-      actual.should.be.eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
     it('should build body when ContentType=multipart/form-data', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'multipart/form-data',
         params: 'boundary=------11136253119209'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'multipart/form-data',
         boundary: '------11136253119209',
         formDataParams: [
@@ -617,81 +617,81 @@ describe('build()', () => {
         ]
       };
 
-      rm[8] = 'Content-Type: multipart/form-data;boundary=------11136253119209';
-      rm[11] = '-----------------------------11136253119209';
-      rm[12] = 'Content-Disposition: form-data; name="Name"';
-      rm[13] = '';
-      rm[14] = 'Ivanov';
-      rm[15] = '-----------------------------11136253119209';
-      rm[16] = 'Content-Disposition: form-data; name="Age"';
-      rm[17] = '';
-      rm[18] = '25';
-      rm[19] = '-----------------------------11136253119209--';
+      httpMsgClone[8] = 'Content-Type: multipart/form-data;boundary=------11136253119209';
+      httpMsgClone[11] = '-----------------------------11136253119209';
+      httpMsgClone[12] = 'Content-Disposition: form-data; name="Name"';
+      httpMsgClone[13] = '';
+      httpMsgClone[14] = 'Ivanov';
+      httpMsgClone[15] = '-----------------------------11136253119209';
+      httpMsgClone[16] = 'Content-Disposition: form-data; name="Age"';
+      httpMsgClone[17] = '';
+      httpMsgClone[18] = '25';
+      httpMsgClone[19] = '-----------------------------11136253119209--';
 
-      let actual = httpZ.build(ro);
-      actual.should.be.eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
     it('should build body when ContentType=application/json', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'application/json'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'application/json',
         json: { p1: 'v1', p2: 'v2' }
       };
 
-      rm[8] = 'Content-Type: application/json';
-      rm[11] = '{"p1":"v1","p2":"v2"}';
+      httpMsgClone[8] = 'Content-Type: application/json';
+      httpMsgClone[11] = '{"p1":"v1","p2":"v2"}';
 
-      let actual = httpZ.build(ro);
-      actual.should.be.eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
     it('should build body when ContentType=text/plain', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'text/plain'
       }];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'text/plain',
         plain: 'Plain text'
       };
 
-      rm[8] = 'Content-Type: text/plain';
-      rm[11] = 'Plain text';
+      httpMsgClone[8] = 'Content-Type: text/plain';
+      httpMsgClone[11] = 'Plain text';
 
-      let actual = httpZ.build(ro);
-      actual.should.be.eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
     it('should build body when ContentType=text/plain and cookie is not empty', () => {
-      let ro = _.cloneDeep(httpObj);
-      let rm = _.cloneDeep(httpMsg);
+      let httpObjClone = _.cloneDeep(httpObj);
+      let httpMsgClone = _.cloneDeep(httpMsg);
 
-      ro.headers[6].values = [{
+      httpObjClone.headers[6].values = [{
         value: 'text/plain'
       }];
-      ro.cookies = [
+      httpObjClone.cookies = [
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', value: '456def' }
       ];
-      ro.body = {
+      httpObjClone.body = {
         contentType: 'text/plain',
         plain: 'Plain text'
       };
 
-      rm[8] = 'Content-Type: text/plain';
-      rm[10] = 'Cookie: csrftoken=123abc; sessionid=456def';
-      rm[12] = 'Plain text';
+      httpMsgClone[8] = 'Content-Type: text/plain';
+      httpMsgClone[10] = 'Cookie: csrftoken=123abc; sessionid=456def';
+      httpMsgClone[12] = 'Plain text';
 
-      let actual = httpZ.build(ro);
-      actual.should.be.eql(rm.join('\n'));
+      let actual = httpZ.build(httpObjClone);
+      actual.should.be.eql(httpMsgClone.join('\n'));
     });
   });
 });
