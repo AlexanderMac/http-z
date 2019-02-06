@@ -1,15 +1,10 @@
 'use strict';
 
 const _      = require('lodash');
-const consts = require('./consts');
-const utils  = require('./utils');
+const consts = require('../consts');
+const utils  = require('../utils');
 
-class HttpZParser {
-  static parse(params) {
-    let instance = new HttpZParser(params);
-    return instance.parse();
-  }
-
+class HttpZBaseParser {
   constructor(httpMsg, eol = '\n') {
     this.httpMsg = httpMsg;
     this.eol = eol;
@@ -19,27 +14,8 @@ class HttpZParser {
     if (!this.httpMsg) {
       throw utils.getErrorMessage('httpMsg must be defined');
     }
-
-    this._parseMessageForRows();
-    this._parseStartRow();
-    this._parseHostRow();
-    this._parseHeaderRows();
-    this._parseCookiesRow();
-    this._parseBodyRows();
-
-    return {
-      method: this.method,
-      protocol: this.protocol,
-      url: this.url,
-      protocolVersion: this.protocolVersion,
-      host: this.host,
-      headers: this.headers,
-      cookies: this.cookies,
-      body: this.body
-    };
   }
 
-  // eslint-disable-next-line max-statements
   _parseMessageForRows() {
     let eol2x = this.eol + this.eol;
     let [headers, body] = utils.splitIntoTwoParts(this.httpMsg, eol2x);
@@ -61,32 +37,7 @@ class HttpZParser {
       headerRows.splice(cookiesIndex, 1);
     }
 
-    this.startRow = headerRows[0];
-    this.hostRow = headerRows[1];
-    this.headerRows = headerRows.splice(2);
-    this.cookiesRow = cookiesRow;
-    this.bodyRows = body;
-  }
-
-  _parseStartRow() {
-    if (!consts.regexps.startRow.test(this.startRow)) {
-      throw utils.getErrorMessage('Start row must be in format: Method SP Request-URI SP HTTP-Version CRLF', this.startRow);
-    }
-
-    let rowElems = this.startRow.split(' ');
-    this.method = rowElems[0].toUpperCase();
-    let url = rowElems[1];
-    this.url = url.replace(consts.regexps.httpProtocolWithTwoSlash, '');
-    this.protocol = url.match(consts.regexps.httpProtocol)[0].toUpperCase();
-    this.protocolVersion = rowElems[2];
-  }
-
-  _parseHostRow() {
-    let [name, value] = utils.splitIntoTwoParts(this.hostRow, ':');
-    if (!name || !value) {
-      throw utils.getErrorMessage('Host row must be in format: Host: Value', this.hostRow);
-    }
-    this.host = value;
+    return { headerRows, cookiesRow, bodyRows: body };
   }
 
   _parseHeaderRows() {
@@ -229,7 +180,10 @@ class HttpZParser {
   }
 
   _parseJsonBody() {
-    this.body.json = this.bodyRows;
+    let json = _.attempt(JSON.parse.bind(null, this.bodyRows));
+    this.body.json = _.isError(json) ?
+      { success: false, message: 'Invalid JSON' } :
+      json;
   }
 
   _parsePlainBody() {
@@ -268,4 +222,4 @@ class HttpZParser {
   }
 }
 
-module.exports = HttpZParser;
+module.exports = HttpZBaseParser;
