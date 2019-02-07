@@ -45,7 +45,6 @@ describe('parser / request', () => {
         'Header3:',
         'Cookie:',
         '',
-        '',
         'Body'
       ].join('\n');
       let parser = getParserInstance(requestMsg);
@@ -249,7 +248,7 @@ describe('parser / request', () => {
 
     it('should parse request with body and contentType=text/plain', () => {
       let requestMsg = [
-        'GET http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features?p1=v1 HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -259,12 +258,11 @@ describe('parser / request', () => {
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        '',
         'Plain text'
       ].join('\n');
 
       let requestObj = {
-        method: 'GET',
+        method: 'POST',
         protocol: 'HTTP',
         url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
@@ -332,7 +330,7 @@ describe('parser / request', () => {
 
     it('should parse request with body and contentType=application/json', () => {
       let requestMsg = [
-        'GET http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features?p1=v1 HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -342,12 +340,11 @@ describe('parser / request', () => {
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        '',
         '{"p1":"v1","p2":"v2"}'
       ].join('\n');
 
       let requestObj = {
-        method: 'GET',
+        method: 'POST',
         protocol: 'HTTP',
         url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
@@ -415,7 +412,7 @@ describe('parser / request', () => {
 
     it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
       let requestMsg = [
-        'GET http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features?p1=v1 HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -425,12 +422,11 @@ describe('parser / request', () => {
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        '',
         'id=11&message=Hello'
       ].join('\n');
 
       let requestObj = {
-        method: 'GET',
+        method: 'POST',
         protocol: 'HTTP',
         url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
@@ -501,7 +497,7 @@ describe('parser / request', () => {
 
     it('should parse request with body and contentType=multipart/form-data', () => {
       let requestMsg = [
-        'GET http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features?p1=v1 HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -510,7 +506,6 @@ describe('parser / request', () => {
         'Content-Type: multipart/form-data; boundary=------11136253119209',
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
-        '',
         '',
         '-----------------------------11136253119209',
         'Content-Disposition: form-data; name="Name"',
@@ -524,7 +519,7 @@ describe('parser / request', () => {
       ].join('\n');
 
       let requestObj = {
-        method: 'GET',
+        method: 'POST',
         protocol: 'HTTP',
         url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',

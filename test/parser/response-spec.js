@@ -39,7 +39,6 @@ describe('parser / response', () => {
         'Header2:',
         'Header3:',
         '',
-        '',
         'Body'
       ].join('\n');
       let parser = getParserInstance(responseMsg);
@@ -154,7 +153,6 @@ describe('parser / response', () => {
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        '',
         'Plain text'
       ].join('\n');
 
@@ -214,7 +212,6 @@ describe('parser / response', () => {
         'Content-Type: application/json; charset=UTF-8',
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
-        '',
         '',
         '{"p1":"v1","p2":"v2"}'
       ].join('\n');
