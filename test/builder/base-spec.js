@@ -92,18 +92,13 @@ describe('builder / base', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       let httpMsgClone = _.cloneDeep(httpMsg);
 
-      httpObjClone.url = '/example.com/features?p1=v1';
+      httpObjClone.url = 'example.com/features?p1=v1';
       httpMsgClone[1] = 'Host: example.com';
       let actual = httpZ.buildRequest(httpObjClone);
       should(actual).eql(httpMsgClone.join('\n'));
 
-      httpObjClone.url = '//example.com/features?p1=v1';
-      httpMsgClone[1] = 'Host: example.com';
-      actual = httpZ.buildRequest(httpObjClone);
-      should(actual).eql(httpMsgClone.join('\n'));
-
       httpObjClone.url = 'www.example.com/features?p1=v1';
-      httpMsgClone[0] = 'GET http://www.example.com/features?p1=v1 HTTP/1.1',
+      httpMsgClone[0] = 'GET http://www.example.com/features?p1=v1 HTTP/1.1';
       httpMsgClone[1] = 'Host: www.example.com';
       actual = httpZ.buildRequest(httpObjClone);
       should(actual).eql(httpMsgClone.join('\n'));

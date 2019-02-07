@@ -50,15 +50,7 @@ class HttpZRequestBuilder extends Base {
   }
 
   _generateHostRow() {
-    let host = '';
-    try {
-      // TODO: how to get host for relative urls
-      host = new URL(this.protocol + '://' + this.url).host;
-    } catch (err) {
-      if (err.code !== 'ERR_INVALID_URL') {
-        throw err;
-      }
-    }
+    let host = utils.getHostname(this.url);
     return `Host: ${host}\n`;
   }
 

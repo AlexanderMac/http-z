@@ -81,7 +81,7 @@ describe('builder / request', () => {
   });
 
   describe('_generateHostRow', () => {
-    it.skip('should build hostRow with empty host when url does not contain host', () => {
+    it('should build hostRow with empty host when url does not contain host', () => {
       let builder = getBuilderInstance({ url: '/features' });
 
       let expected = 'Host: \n';
@@ -90,7 +90,7 @@ describe('builder / request', () => {
     });
 
     it('should build hostRow with host when url contains host', () => {
-      let builder = getBuilderInstance({ url: 'example.com/features' });
+      let builder = getBuilderInstance({ url: 'https://example.com/features' });
 
       let expected = 'Host: example.com\n';
       let actual = builder._generateHostRow();
