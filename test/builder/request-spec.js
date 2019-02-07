@@ -166,7 +166,7 @@ describe('builder / request', () => {
   });
 
   describe('functional tests', () => {
-    it('should build request message without body', () => {
+    it('should build request message without body (header names in lower case)', () => {
       let requestObj = {
         method: 'GET',
         protocol: 'HTTP',
@@ -175,25 +175,25 @@ describe('builder / request', () => {
         host: 'example.com',
         headers: [
           {
-            name: 'Connection',
+            name: 'connection',
             values: [
               { value: 'keep-alive', params: null }
             ]
           },
           {
-            name: 'Cache-Control',
+            name: 'cache-Control',
             values: [
               { value: 'no-cache', params: null }
             ]
           },
           {
-            name: 'Content-Type',
+            name: 'Content-type',
             values: [
               { value: 'text/plain', params: 'charset=UTF-8' }
             ]
           },
           {
-            name: 'Content-Encoding',
+            name: 'content-encoding',
             values: [
               { value: 'gzip', params: null },
               { value: 'deflate', params: null }

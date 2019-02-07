@@ -34,7 +34,7 @@ class HttpZBaseBuilder {
         return hvStr;
       });
 
-      return header.name + ': ' + hvsStr.join(', ');
+      return utils.getHeaderName(header.name) + ': ' + hvsStr.join(', ');
     });
 
     return headerRows.join('\n') + '\n';

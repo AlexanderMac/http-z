@@ -30,6 +30,7 @@ exports.getErrorMessage = (msg, data) => {
   return err;
 };
 
+// TODO: test it
 exports.getHostname = (url) => {
   let hostname;
 
@@ -44,4 +45,12 @@ exports.getHostname = (url) => {
   hostname = hostname.split('?')[0];
 
   return hostname;
+};
+
+exports.getHeaderName = (name) => {
+  return _.chain(name)
+    .split('-')
+    .map(_.capitalize)
+    .join('-')
+    .value();
 };

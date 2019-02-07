@@ -45,4 +45,31 @@ describe('utils', () => {
       should(actual).eql(['partOne', 'partTwo partThree']);
     });
   });
+
+  describe('getHeaderName', () => {
+    function test(name, expected) {
+      let actual = utils.getHeaderName(name);
+      should(actual).eql(expected);
+    }
+
+    it('should return empty string when name is null', () => {
+      test(null, '');
+    });
+
+    it('should return name as is when it does not contain elements', () => {
+      test('Cookie', 'Cookie');
+    });
+
+    it('should return capitalized name when it does not contain elements', () => {
+      test('cookie', 'Cookie');
+    });
+
+    it('should return capitalized name when it contain two elements', () => {
+      test('set-cookie', 'Set-Cookie');
+    });
+
+    it('should return capitalized name when it contain three elements', () => {
+      test('x-Server-version', 'X-Server-Version');
+    });
+  });
 });

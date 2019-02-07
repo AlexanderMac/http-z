@@ -94,13 +94,13 @@ describe('parser / response', () => {
   });
 
   describe('functional tests', () => {
-    it('should parse response without body', () => {
+    it('should parse response without body (header names in lower case)', () => {
       let responseMsg = [
-        'HTTP/1.1 201 Created',
-        'Connection: keep-alive',
-        'Cache-Control: no-cache',
-        'Content-Type: text/plain; charset=UTF-8',
-        'Content-Encoding: gzip,deflate',
+        'http/1.1 201 Created',
+        'connection: keep-alive',
+        'cache-Control: no-cache',
+        'Content-type: text/plain; charset=UTF-8',
+        'content-encoding: gzip,deflate',
         '',
         ''
       ].join('\n');

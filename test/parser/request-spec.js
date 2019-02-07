@@ -128,14 +128,14 @@ describe('parser / request', () => {
   });
 
   describe('functional tests', () => {
-    it('should parse request without body', () => {
+    it('should parse request without body (header names in lower case)', () => {
       let requestMsg = [
-        'GET http://example.com/features?p1=v1 HTTP/1.1',
-        'Host: example.com',
-        'Connection: keep-alive',
-        'Accept: */*',
-        'Accept-Encoding: gzip,deflate',
-        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'get http://example.com/features?p1=v1 http/1.1',
+        'host: example.com',
+        'connection: keep-alive',
+        'accept: */*',
+        'accept-Encoding: gzip,deflate',
+        'accept-language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         '',
         ''
       ].join('\n');

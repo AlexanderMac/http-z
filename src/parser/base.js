@@ -43,12 +43,12 @@ class HttpZBaseParser {
   _parseHeaderRows() {
     // TODO: add check for duplicate headers
     this.headers = _.map(this.headerRows, hRow => {
-      let [headerName, values] = utils.splitIntoTwoParts(hRow, ':');
-      if (!headerName || !values) {
+      let [name, values] = utils.splitIntoTwoParts(hRow, ':');
+      if (!name || !values) {
         throw utils.getErrorMessage('Header row must be in format: Name: Values', hRow);
       }
       values = _.split(values, ',');
-      if (!headerName || values.length === 0 || _.some(values, val => _.isEmpty(val))) {
+      if (!name || values.length === 0 || _.some(values, val => _.isEmpty(val))) {
         throw utils.getErrorMessage('Header row must be in format: Name: Values', hRow);
       }
       let valuesAndParams = _.map(values, (value) => {
@@ -60,7 +60,7 @@ class HttpZBaseParser {
       });
 
       return {
-        name: headerName,
+        name: utils.getHeaderName(name),
         values: valuesAndParams
       };
     });
