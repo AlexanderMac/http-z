@@ -1,56 +1,13 @@
 'use strict';
 
 const _      = require('lodash');
-const consts = require('./consts');
-const utils  = require('./utils');
+const consts = require('../consts');
+const utils  = require('../utils');
 
-class HttpZBuilder {
-  static build(params) {
-    let instance = new HttpZBuilder(params);
-    return instance.build();
-  }
-
-  constructor({ method, url, protocol, protocolVersion, headers, cookies, body }) {
-    this.method = method;
-    this.url = url;
-    this.protocol = protocol;
-    this.protocolVersion = protocolVersion;
+class HttpZBaseBuilder {
+  constructor({ headers, body }) {
     this.headers = headers;
-    this.cookies = cookies;
     this.body = body;
-  }
-
-  build() {
-    return '' +
-      this._generateStartRow() +
-      this._generateHostRow() +
-      this._generateHeaderRows() +
-      this._generateCookieRows() +
-      this._generateBodyRows();
-  }
-
-  _generateStartRow() {
-    if (!this.method) {
-      throw utils.getErrorMessage('Method must be defined');
-    }
-    if (!this.url) {
-      throw utils.getErrorMessage('Url must be defined');
-    }
-    if (!this.protocol) {
-      throw utils.getErrorMessage('Protocol must be defined');
-    }
-    if (!this.protocolVersion) {
-      throw utils.getErrorMessage('ProtocolVersion must be defined');
-    }
-
-    let protocol = _.toLower(this.protocol);
-    let url = _.trimStart(this.url, '/');
-    return `${this.method} ${protocol}://${url} ${this.protocolVersion}\n`;
-  }
-
-  _generateHostRow() {
-    let host = this._getHostName();
-    return `HOST: ${host}\n`;
   }
 
   _generateHeaderRows() {
@@ -83,28 +40,9 @@ class HttpZBuilder {
     return headerRows.join('\n') + '\n';
   }
 
-  _generateCookieRows() {
-    if (!this.cookies) {
-      return '';
-    }
-
-    if (!_.isArray(this.cookies) || this.cookies.length === 0) {
-      throw utils.getErrorMessage('Cookies must be not empty array');
-    }
-
-    let cookiesStr = _.map(this.cookies, (nameValuePair) => {
-      if (!nameValuePair.name || !nameValuePair.value) {
-        throw utils.getErrorMessage('Cookie name or value must be defined', JSON.stringify(nameValuePair));
-      }
-      return nameValuePair.name + '=' + nameValuePair.value;
-    });
-
-    return 'Cookie: ' + cookiesStr.join('; ') + '\n';
-  }
-
   _generateBodyRows() {
     if (!this.body) {
-      return '\n';
+      return '';
     }
 
     switch (this.body.contentType) {
@@ -159,13 +97,6 @@ class HttpZBuilder {
 
     return formDataParamsStr;
   }
-
-  _getHostName() {
-    let match = this.url.match(/(www[0-9]?\.)?(.[^/]+)/i);
-    if (match && match.length > 2) {
-      return _.trimStart(match[2], '/');
-    }
-  }
 }
 
-module.exports = HttpZBuilder;
+module.exports = HttpZBaseBuilder;

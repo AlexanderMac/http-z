@@ -2,16 +2,16 @@
 
 const _      = require('lodash');
 const should = require('should');
-const httpZ  = require('../');
+const httpZ  = require('../../');
 
-describe('build()', () => {
+describe('builder / base', () => {
   describe('start-row', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'app.com/features?p1=v1',
+      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
-      host: 'app.com',
+      host: 'example.com',
       headers: [
         {
           name: 'Connection',
@@ -23,36 +23,35 @@ describe('build()', () => {
     };
 
     let httpMsg = [
-      'GET http://app.com/features?p1=v1 HTTP/1.1',
-      'HOST: app.com',
+      'GET http://example.com/features?p1=v1 HTTP/1.1',
+      'Host: example.com',
       'Connection: keep-alive',
-      '',
       ''
     ];
 
-    it('should throw Error when method or url or protocol or protocolVersion are empty', () => {
+    it('should throw error when method or url or protocol or protocolVersion are empty', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.method = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
-        message: 'Method must be defined'
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
+        message: 'method must be defined'
       });
 
       httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.url = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
-        message: 'Url must be defined'
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
+        message: 'url must be defined'
       });
 
       httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.protocol = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
-        message: 'Protocol must be defined'
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
+        message: 'protocol must be defined'
       });
 
       httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.protocolVersion = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
-        message: 'ProtocolVersion must be defined'
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
+        message: 'protocolVersion must be defined'
       });
     });
 
@@ -60,7 +59,7 @@ describe('build()', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       let httpMsgClone = _.cloneDeep(httpMsg);
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       should(actual).eql(httpMsgClone.join('\n'));
     });
   });
@@ -69,9 +68,9 @@ describe('build()', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'app.com/features?p1=v1',
+      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
-      host: 'app.com',
+      host: 'example.com',
       headers: [
         {
           name: 'Connection',
@@ -83,10 +82,9 @@ describe('build()', () => {
     };
 
     let httpMsg = [
-      'GET http://app.com/features?p1=v1 HTTP/1.1',
-      'HOST: app.com',
+      'GET http://example.com/features?p1=v1 HTTP/1.1',
+      'Host: example.com',
       'Connection: keep-alive',
-      '',
       ''
     ];
 
@@ -94,20 +92,20 @@ describe('build()', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       let httpMsgClone = _.cloneDeep(httpMsg);
 
-      httpObjClone.url = '/app.com/features?p1=v1';
-      httpMsgClone[1] = 'HOST: app.com';
-      let actual = httpZ.build(httpObjClone);
+      httpObjClone.url = '/example.com/features?p1=v1';
+      httpMsgClone[1] = 'Host: example.com';
+      let actual = httpZ.buildRequest(httpObjClone);
       should(actual).eql(httpMsgClone.join('\n'));
 
-      httpObjClone.url = '//app.com/features?p1=v1';
-      httpMsgClone[1] = 'HOST: app.com';
-      actual = httpZ.build(httpObjClone);
+      httpObjClone.url = '//example.com/features?p1=v1';
+      httpMsgClone[1] = 'Host: example.com';
+      actual = httpZ.buildRequest(httpObjClone);
       should(actual).eql(httpMsgClone.join('\n'));
 
-      httpObjClone.url = 'www.app.com/features?p1=v1';
-      httpMsgClone[0] = 'GET http://www.app.com/features?p1=v1 HTTP/1.1',
-      httpMsgClone[1] = 'HOST: app.com';
-      actual = httpZ.build(httpObjClone);
+      httpObjClone.url = 'www.example.com/features?p1=v1';
+      httpMsgClone[0] = 'GET http://www.example.com/features?p1=v1 HTTP/1.1',
+      httpMsgClone[1] = 'Host: www.example.com';
+      actual = httpZ.buildRequest(httpObjClone);
       should(actual).eql(httpMsgClone.join('\n'));
     });
   });
@@ -116,9 +114,9 @@ describe('build()', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'app.com/features?p1=v1',
+      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
-      host: 'app.com',
+      host: 'example.com',
       headers: [
         {
           name: 'Connection',
@@ -165,61 +163,60 @@ describe('build()', () => {
     };
 
     let httpMsg = [
-      'GET http://app.com/features?p1=v1 HTTP/1.1',
-      'HOST: app.com',
+      'GET http://example.com/features?p1=v1 HTTP/1.1',
+      'Host: example.com',
       'Connection: keep-alive',
       'Cache-Control: no-cache',
       'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
       'Accept: */*, text/plain',
       'Accept-Encoding: gzip, deflate',
       'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-      '',
       ''
     ];
 
-    it('should throw Error when headers list is empty or invalid', () => {
+    it('should throw error when headers list is empty or invalid', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.headers = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Headers must be not empty array'
       });
 
       httpObjClone.headers = {};
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Headers must be not empty array'
       });
 
       httpObjClone.headers = [];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Headers must be not empty array'
       });
     });
 
-    it('should throw Error when header is invalid', () => {
+    it('should throw error when header is invalid', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.headers[0].name = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Header name must be defined. ' +
                  'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
 
       httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.headers[0].values = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Header values must be defined. ' +
                  'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
 
       httpObjClone.headers[0].values = {};
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Header values must be defined. ' +
                  'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
 
       httpObjClone.headers[0].values = [];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Header values must be defined. ' +
                  'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
@@ -228,7 +225,7 @@ describe('build()', () => {
         { value: 'keep-alive' },
         { value: null }
       ];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Header value must be defined. ' +
                  'Data: ' + JSON.stringify(httpObjClone.headers[0])
       });
@@ -238,7 +235,7 @@ describe('build()', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       let httpMsgClone = _.cloneDeep(httpMsg);
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       should(actual).eql(httpMsgClone.join('\n'));
     });
   });
@@ -247,9 +244,9 @@ describe('build()', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'app.com/features?p1=v1',
+      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
-      host: 'app.com',
+      host: 'example.com',
       headers: [
         {
           name: 'Connection',
@@ -299,8 +296,8 @@ describe('build()', () => {
     };
 
     let httpMsg = [
-      'GET http://app.com/features?p1=v1 HTTP/1.1',
-      'HOST: app.com',
+      'GET http://example.com/features?p1=v1 HTTP/1.1',
+      'Host: example.com',
       'Connection: keep-alive',
       'Cache-Control: no-cache',
       'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
@@ -308,33 +305,32 @@ describe('build()', () => {
       'Accept-Encoding: gzip, deflate',
       'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
       'Cookie: csrftoken=123abc; sessionid=456def',
-      '',
       ''
     ];
 
-    it('should throw Error when cookies has invalid type', () => {
+    it('should throw error when cookies has invalid type', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.cookies = [];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Cookies must be not empty array'
       });
 
       httpObjClone.cookies = {};
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Cookies must be not empty array'
       });
     });
 
-    it('should throw Error when cookies is invalid', () => {
+    it('should throw error when cookies is invalid', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.cookies = [
         { name: '', value: '123abc' },
         { name: 'sessionid', value: '456def' }
       ];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
-        message: 'Cookie name or value must be defined. ' +
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
+        message: 'Cookie name and value must be defined. ' +
                  'Data: ' + JSON.stringify(httpObjClone.cookies[0])
       });
 
@@ -342,8 +338,8 @@ describe('build()', () => {
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', value: '' }
       ];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
-        message: 'Cookie name or value must be defined. ' +
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
+        message: 'Cookie name and value must be defined. ' +
                  'Data: ' + JSON.stringify(httpObjClone.cookies[1])
       });
     });
@@ -355,7 +351,7 @@ describe('build()', () => {
       httpObjClone.cookies = null;
       httpMsgClone.splice(8, 1);
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
@@ -363,7 +359,7 @@ describe('build()', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       let httpMsgClone = _.cloneDeep(httpMsg);
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       actual.should.be.eql(httpMsgClone.join('\n'));
     });
   });
@@ -372,9 +368,9 @@ describe('build()', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'app.com/features?p1=v1',
+      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
-      host: 'app.com',
+      host: 'example.com',
       headers: [
         {
           name: 'Connection',
@@ -432,8 +428,8 @@ describe('build()', () => {
     };
 
     let httpMsg = [
-      'GET http://app.com/features?p1=v1 HTTP/1.1',
-      'HOST: app.com',
+      'GET http://example.com/features?p1=v1 HTTP/1.1',
+      'Host: example.com',
       'Connection: keep-alive',
       'Cache-Control: no-cache',
       'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
@@ -442,11 +438,10 @@ describe('build()', () => {
       'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
       'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
       'Content-Length: 301',
-      '',
       ''
     ];
 
-    it('should throw Error when ContentType=application/x-www-form-urlencoded and formDataParams list is empty or invalid type ', () => {
+    it('should throw error when ContentType=application/x-www-form-urlencoded and formDataParams list is empty or invalid type ', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.headers[6].values = [{
@@ -457,22 +452,22 @@ describe('build()', () => {
       };
 
       httpObjClone.body.formDataParams = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
       });
 
       httpObjClone.body.formDataParams = {};
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
       });
 
       httpObjClone.body.formDataParams = [];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
       });
     });
 
-    it('should throw Error when ContentType=application/x-www-form-urlencoded and formDataParams list is invalid', () => {
+    it('should throw error when ContentType=application/x-www-form-urlencoded and formDataParams list is invalid', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.headers[6].values = [{
@@ -486,7 +481,7 @@ describe('build()', () => {
         { name: '', value: '11' },
         { name: 'message', value: 'Hello' }
       ];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'FormData parameter must have name and value. ' +
                  'Data: ' + JSON.stringify(httpObjClone.body.formDataParams[0])
       });
@@ -495,13 +490,13 @@ describe('build()', () => {
         { name: '', value: '11' },
         { name: 'message', value: '' }
       ];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'FormData parameter must have name and value. ' +
                  'Data: ' + JSON.stringify(httpObjClone.body.formDataParams[0])
       });
     });
 
-    it('should throw Error when ContentType=multipart/form-data and boundary is empty', () => {
+    it('should throw error when ContentType=multipart/form-data and boundary is empty', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.headers[6].values = [{
@@ -514,12 +509,12 @@ describe('build()', () => {
           { name: 'message', value: 'Hello' }
         ]
       };
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=multipart/form-data must have boundary'
       });
     });
 
-    it('should throw Error when ContentType=multipart/form-data and formDataParams list is empty or invalid type', () => {
+    it('should throw error when ContentType=multipart/form-data and formDataParams list is empty or invalid type', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.headers[6].values = [{
@@ -532,22 +527,22 @@ describe('build()', () => {
       };
 
       httpObjClone.body.formDataParams = null;
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=multipart/form-data must have parameters'
       });
 
       httpObjClone.body.formDataParams = {};
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=multipart/form-data must have parameters'
       });
 
       httpObjClone.body.formDataParams = [];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'Body with ContentType=multipart/form-data must have parameters'
       });
     });
 
-    it('should throw Error when ContentType=multipart/form-data and formDataParams list is invalid', () => {
+    it('should throw error when ContentType=multipart/form-data and formDataParams list is invalid', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.headers[6].values = [{
@@ -563,7 +558,7 @@ describe('build()', () => {
         { name: '', value: '11' },
         { name: 'message', value: 'Hello' }
       ];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'FormData parameter must have name and value. ' +
                  'Data: ' + JSON.stringify(httpObjClone.body.formDataParams[0])
       });
@@ -572,7 +567,7 @@ describe('build()', () => {
         { name: '', value: '11' },
         { name: 'message', value: '' }
       ];
-      should(httpZ.build.bind(null, httpObjClone)).throw(Error, {
+      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
         message: 'FormData parameter must have name and value. ' +
                  'Data: ' + JSON.stringify(httpObjClone.body.formDataParams[0])
       });
@@ -596,7 +591,7 @@ describe('build()', () => {
 
       httpMsgClone[11] = 'id=11&message=Hello';
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
@@ -628,7 +623,7 @@ describe('build()', () => {
       httpMsgClone[18] = '25';
       httpMsgClone[19] = '-----------------------------11136253119209--';
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
@@ -647,7 +642,7 @@ describe('build()', () => {
       httpMsgClone[8] = 'Content-Type: application/json';
       httpMsgClone[11] = '{"p1":"v1","p2":"v2"}';
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
@@ -666,7 +661,7 @@ describe('build()', () => {
       httpMsgClone[8] = 'Content-Type: text/plain';
       httpMsgClone[11] = 'Plain text';
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       actual.should.be.eql(httpMsgClone.join('\n'));
     });
 
@@ -690,7 +685,7 @@ describe('build()', () => {
       httpMsgClone[10] = 'Cookie: csrftoken=123abc; sessionid=456def';
       httpMsgClone[12] = 'Plain text';
 
-      let actual = httpZ.build(httpObjClone);
+      let actual = httpZ.buildRequest(httpObjClone);
       actual.should.be.eql(httpMsgClone.join('\n'));
     });
   });
