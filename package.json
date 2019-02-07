@@ -1,6 +1,6 @@
 {
   "name": "http-z",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Parse and build HTTP message",
   "engines": {
     "node": ">=8"
@@ -33,7 +33,9 @@
     "url": "https://github.com/AlexanderMac/http-z/issues"
   },
   "homepage": "https://github.com/AlexanderMac/http-z#readme",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.11"
+  },
   "devDependencies": {
     "eslint": "^5.12.1",
     "mocha": "^5.2.0",
