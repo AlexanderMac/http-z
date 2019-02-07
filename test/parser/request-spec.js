@@ -98,7 +98,7 @@ describe('parser / request', () => {
 
     it('should init instance fields when startRow has valid format', () => {
       let parser = getParserInstance();
-      parser.startRow = 'GET http://example.com HTTP/1.1';
+      parser.startRow = 'get http://example.com http/1.1';
 
       parser._parseStartRow();
       should(parser.method).eql('GET');

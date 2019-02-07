@@ -56,7 +56,7 @@ class HttpZRequestParser extends Base {
     let url = rowElems[1];
     this.url = url.replace(consts.regexps.httpProtocolWithTwoSlash, '');
     this.protocol = url.match(consts.regexps.httpProtocol)[0].toUpperCase();
-    this.protocolVersion = rowElems[2];
+    this.protocolVersion = rowElems[2].toUpperCase();
   }
 
   _parseHostRow() {

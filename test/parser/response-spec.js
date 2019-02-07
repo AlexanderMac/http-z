@@ -84,7 +84,7 @@ describe('parser / response', () => {
 
     it('should init instance fields when startRow has valid format', () => {
       let parser = getParserInstance();
-      parser.startRow = 'HTTP/1.1 201 Created';
+      parser.startRow = 'http/1.1 201 Created';
 
       parser._parseStartRow();
       should(parser.protocolVersion).eql('HTTP/1.1');
