@@ -79,7 +79,7 @@ describe('parser / base', () => {
       body: null
     };
 
-    it('should throw Error when start row has invalid request format', () => {
+    it('should throw error when start row has invalid format', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[0] = 'absolutely wrong string';
@@ -109,7 +109,7 @@ describe('parser / base', () => {
       should(actual).eql(httpObjClone);
     });
 
-    it('should parse HTTP protocol and URI without parameters', () => {
+    it('should parse HTTP protocol and url without parameters', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
@@ -119,7 +119,7 @@ describe('parser / base', () => {
       should(actual).eql(httpObjClone);
     });
 
-    it('should parse HTTP protocol and URI with parameters', () => {
+    it('should parse HTTP protocol and url with parameters', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
@@ -129,7 +129,7 @@ describe('parser / base', () => {
       should(actual).eql(httpObjClone);
     });
 
-    it('should parse HTTPS protocol and URI without parameters', () => {
+    it('should parse HTTPS protocol and url without parameters', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET https://example.com/features HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
@@ -140,7 +140,7 @@ describe('parser / base', () => {
       should(actual).eql(httpObjClone);
     });
 
-    it('should parse HTTPS protocol and URI with parameters', () => {
+    it('should parse HTTPS protocol and url with parameters', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET https://example.com/features?p1=v1 HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
@@ -238,7 +238,7 @@ describe('parser / base', () => {
       body: null
     };
 
-    it('should throw Error when host row is invalid', () => {
+    it('should throw error when host row is invalid', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[1] = 'Host example.com';
@@ -348,7 +348,7 @@ describe('parser / base', () => {
       body: null
     };
 
-    it('should throw Error when header has invalid format', () => {
+    it('should throw error when header has invalid format', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[2] = 'Connection keep-alive';
@@ -476,7 +476,7 @@ describe('parser / base', () => {
       body: null
     };
 
-    it('should throw Error when cookie row is invalid', () => {
+    it('should throw error when cookie row is invalid', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[8] = 'Cookie: ';
@@ -605,7 +605,7 @@ describe('parser / base', () => {
       body: null
     };
 
-    it('should throw Error when body has invalid format and ContentType=application/x-www-form-urlencoded', () => {
+    it('should throw error when body has invalid format and ContentType=application/x-www-form-urlencoded', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[8] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
@@ -622,7 +622,7 @@ describe('parser / base', () => {
       });
     });
 
-    it('should throw Error when body has invalid format and ContentType=multipart/form-data', () => {
+    it('should throw error when body has invalid format and ContentType=multipart/form-data', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[8] = 'Content-Type: multipart/form-data; boundary=------11136253119209';
@@ -641,7 +641,7 @@ describe('parser / base', () => {
       });
     });
 
-    it('should throw Error when ContentType=multipart/form-data without and boundary parameter has invalid format', () => {
+    it('should throw error when boundary parameter has invalid format and ContentType=multipart/form-data ', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[11] = 'body';

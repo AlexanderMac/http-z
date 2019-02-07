@@ -74,7 +74,7 @@ describe('parser / response', () => {
   });
 
   describe('_parseStartRow', () => {
-    it('should throw exception when startRow has invalid format', () => {
+    it('should throw error when startRow has invalid format', () => {
       let parser = getParserInstance();
       parser.startRow = 'Invalid response startRow';
 

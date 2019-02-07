@@ -88,7 +88,7 @@ describe('parser / request', () => {
   });
 
   describe('_parseStartRow', () => {
-    it('should throw exception when startRow has invalid format', () => {
+    it('should throw error when startRow has invalid format', () => {
       let parser = getParserInstance();
       parser.startRow = 'Invalid request startRow';
 
@@ -110,7 +110,7 @@ describe('parser / request', () => {
   });
 
   describe('_parseHostRow', () => {
-    it('should throw exception when hostRow has invalid format', () => {
+    it('should throw error when hostRow has invalid format', () => {
       let parser = getParserInstance();
       parser.hostRow = 'Invalid request hostRow';
 
@@ -119,7 +119,7 @@ describe('parser / request', () => {
       });
     });
 
-    it('should init instance fields when hostRow has valid format', () => {
+    it('should init instance.host when hostRow has valid format', () => {
       let parser = getParserInstance();
       parser.hostRow = 'Host: example.com';
 
