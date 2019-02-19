@@ -1,8 +1,8 @@
 'use strict';
 
-const consts = require('../consts');
-const utils  = require('../utils');
-const Base   = require('./base');
+const consts = require('../../consts');
+const utils  = require('../../utils');
+const Base   = require('../base');
 
 class HttpZResponseParser extends Base {
   static parse(params) {

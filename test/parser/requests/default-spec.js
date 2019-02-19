@@ -3,9 +3,9 @@
 const sinon         = require('sinon');
 const should        = require('should');
 const nassert       = require('n-assert');
-const RequestParser = require('../../src/parser/request');
+const RequestParser = require('../../../src/parser/requests/default');
 
-describe('parser / request', () => {
+describe('parser / requests / default', () => {
   function getParserInstance(requestMsg, eol) {
     return new RequestParser(requestMsg, eol);
   }
