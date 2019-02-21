@@ -46,16 +46,16 @@ exports.getErrorMessage = (msg, data) => {
 };
 
 // TODO: test it
-exports.genUrl = ({ protocol, host, path, basicAuth, searchParams }) => {
+exports.genUrl = ({ protocol, host, path, basicAuth, params }) => {
   let basicAuthStr = '';
   if (!_.isEmpty(basicAuth)) {
     basicAuthStr = (basicAuth.username || '') + ':' + (basicAuth.password || '') + '@';
   }
 
-  let searchParamsStr = '';
-  if (!_.isEmpty(searchParams)) {
-    let urlSPs = new URLSearchParams(searchParams);
-    searchParamsStr = '?' + urlSPs.toString();
+  let paramsStr = '';
+  if (!_.isEmpty(params)) {
+    let urlSPs = new URLSearchParams(params);
+    paramsStr = '?' + urlSPs.toString();
   }
 
   return '' +
@@ -63,7 +63,7 @@ exports.genUrl = ({ protocol, host, path, basicAuth, searchParams }) => {
     basicAuthStr +
     host +
     path +
-    searchParamsStr;
+    paramsStr;
 };
 
 exports.getHeaderName = (name) => {

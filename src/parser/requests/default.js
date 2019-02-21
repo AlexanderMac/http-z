@@ -47,7 +47,7 @@ class HttpZRequestParser extends Base {
     this.protocol = this._getProtocol(url);
     this.host = url.host;
     this.path = url.pathname;
-    this.searchParams = this._getSearchParams(url);
+    this.params = this._getParams(url);
     this.basicAuth = this._getBasicAuth(url);
   }
 
@@ -58,7 +58,7 @@ class HttpZRequestParser extends Base {
       protocolVersion: this.protocolVersion,
       host: this.host,
       path: this.path,
-      searchParams: this.searchParams,
+      params: this.params,
       basicAuth: this.basicAuth,
       headers: this.headers,
       cookies: this.cookies,
@@ -72,10 +72,10 @@ class HttpZRequestParser extends Base {
   }
 
   // TODO: test it
-  _getSearchParams(url) {
-    let searchParams = {};
-    url.searchParams.forEach((value, name) => searchParams[name] = value);
-    return searchParams;
+  _getParams(url) {
+    let params = {};
+    url.searchParams.forEach((value, name) => params[name] = value);
+    return params;
   }
 
   // TODO: test it

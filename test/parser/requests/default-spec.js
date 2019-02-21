@@ -64,7 +64,7 @@ describe('parser / requests / default', () => {
       parser.protocolVersion = 'protocolVersion';
       parser.path = 'path';
       parser.host = 'host';
-      parser.searchParams = 'searchParams';
+      parser.params = 'params';
       parser.basicAuth = 'basicAuth';
       parser.headers = 'headers';
       parser.cookies = 'cookies';
@@ -76,7 +76,7 @@ describe('parser / requests / default', () => {
         protocolVersion: 'protocolVersion',
         path: 'path',
         host: 'host',
-        searchParams: 'searchParams',
+        params: 'params',
         basicAuth: 'basicAuth',
         headers: 'headers',
         cookies: 'cookies',
@@ -108,7 +108,7 @@ describe('parser / requests / default', () => {
       should(parser.protocolVersion).eql('HTTP/1.1');
       should(parser.path).eql('/features');
       should(parser.host).eql('example.com');
-      should(parser.searchParams).eql({ p1: 'v1' });
+      should(parser.params).eql({ p1: 'v1' });
       should(parser.basicAuth).eql({});
     });
   });
@@ -128,7 +128,7 @@ describe('parser / requests / default', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        searchParams: { p1: 'v1' },
+        params: { p1: 'v1' },
         basicAuth: {
           username: 'admin',
           password: 'pass'
@@ -161,7 +161,7 @@ describe('parser / requests / default', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        searchParams: {},
+        params: {},
         basicAuth: {},
         headers: [
           {
@@ -221,7 +221,7 @@ describe('parser / requests / default', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        searchParams: {},
+        params: {},
         basicAuth: {},
         headers: [
           {
@@ -286,7 +286,7 @@ describe('parser / requests / default', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        searchParams: {},
+        params: {},
         basicAuth: {},
         headers: [
           {
@@ -370,7 +370,7 @@ describe('parser / requests / default', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        searchParams: {},
+        params: {},
         basicAuth: {},
         headers: [
           {
@@ -454,7 +454,7 @@ describe('parser / requests / default', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        searchParams: {},
+        params: {},
         basicAuth: {},
         headers: [
           {
@@ -549,7 +549,7 @@ describe('parser / requests / default', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        searchParams: {},
+        params: {},
         basicAuth: {},
         headers: [
           {

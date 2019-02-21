@@ -33,7 +33,7 @@ describe('parser / base', () => {
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
       path: '/features',
-      searchParams: { p1: 'v1' },
+      params: { p1: 'v1' },
       basicAuth: {},
       headers: [
         {
@@ -115,7 +115,7 @@ describe('parser / base', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.searchParams = {};
+      httpObjClone.params = {};
 
       let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
       should(actual).eql(httpObjClone);
@@ -125,7 +125,7 @@ describe('parser / base', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.searchParams = { p1: 'v1' };
+      httpObjClone.params = { p1: 'v1' };
 
       let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
       should(actual).eql(httpObjClone);
@@ -136,7 +136,7 @@ describe('parser / base', () => {
       httpMsgClone[0] = 'GET https://example.com/features HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.protocol = 'HTTPS';
-      httpObjClone.searchParams = {};
+      httpObjClone.params = {};
 
       let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
       should(actual).eql(httpObjClone);
@@ -184,7 +184,7 @@ describe('parser / base', () => {
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
       path: '/features',
-      searchParams: { p1: 'v1' },
+      params: { p1: 'v1' },
       basicAuth: {},
       headers: [
         {
@@ -317,7 +317,7 @@ describe('parser / base', () => {
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
       path: '/features',
-      searchParams: { p1: 'v1' },
+      params: { p1: 'v1' },
       basicAuth: {},
       headers: [
         {
@@ -439,7 +439,7 @@ describe('parser / base', () => {
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
       path: '/features',
-      searchParams: { p1: 'v1' },
+      params: { p1: 'v1' },
       basicAuth: {},
       headers: [
         {

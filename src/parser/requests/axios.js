@@ -14,7 +14,7 @@ class HttpZAxiosRequestParser extends Default {
   _generateObj() {
     return {
       method: this.method,
-      url: utils.genUrl(_.pick(this, 'protocol', 'host', 'path', 'basicAuth', 'searchParams')),
+      url: utils.genUrl(_.pick(this, 'protocol', 'host', 'path', 'basicAuth', 'params')),
       headers: this._getHeaders(),
       data: this._getBody(),
       responseType: 'text',

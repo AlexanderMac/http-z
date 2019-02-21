@@ -174,7 +174,7 @@ describe('builder / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        searchParams: { p1: 'v1' },
+        params: { p1: 'v1' },
         basicAuth: {
           username: 'admin',
           password: 'pass'
