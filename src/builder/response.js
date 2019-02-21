@@ -24,15 +24,9 @@ class HttpZResponseBuilder extends Base {
   }
 
   _generateStartRow() {
-    if (!this.protocolVersion) {
-      throw utils.getErrorMessage('protocolVersion must be defined');
-    }
-    if (!this.statusCode) {
-      throw utils.getErrorMessage('statusCode must be defined');
-    }
-    if (!this.statusMessage) {
-      throw utils.getErrorMessage('statusMessage must be defined');
-    }
+    utils.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
+    utils.validateNotZeroNumber(this.statusCode, 'statusCode');
+    utils.validateNotEmptyString(this.statusMessage, 'statusMessage');
 
     let protocolVersion = this.protocolVersion.toUpperCase();
     return `${protocolVersion} ${this.statusCode} ${this.statusMessage}\n`;

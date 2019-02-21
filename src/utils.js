@@ -20,6 +20,20 @@ exports.splitIntoTwoParts = (str, delimiter) => {
 };
 
 // TODO: test it
+exports.validateNotEmptyString = (str, name) => {
+  if (!str || !_.isString(str)) {
+    throw exports.getErrorMessage(`${name} must be not empty string`);
+  }
+};
+
+// TODO: test it
+exports.validateNotZeroNumber = (num, name) => {
+  if (!num || !_.isNumber(num) || num < 0) {
+    throw exports.getErrorMessage(`${name} must be not zero, positive number`);
+  }
+};
+
+// TODO: test it
 exports.getErrorMessage = (msg, data) => {
   if (data) {
     msg += `. Data: ${data}`;
@@ -28,23 +42,6 @@ exports.getErrorMessage = (msg, data) => {
   let err = new Error(msg);
   err.type = 'HttpZ Error';
   return err;
-};
-
-// TODO: test it
-exports.getHostname = (url) => {
-  let hostname;
-
-  if (url.indexOf('//') > -1) {
-    hostname = url.split('/')[2];
-  } else {
-    hostname = url.split('/')[0];
-  }
-
-  // remove port number and '?'
-  hostname = hostname.split(':')[0];
-  hostname = hostname.split('?')[0];
-
-  return hostname;
 };
 
 exports.getHeaderName = (name) => {

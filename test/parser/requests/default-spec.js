@@ -15,7 +15,6 @@ describe('parser / requests / default', () => {
       let parser = getParserInstance('requestMsg');
       sinon.stub(parser, '_parseMessageForRows');
       sinon.stub(parser, '_parseStartRow');
-      sinon.stub(parser, '_parseHostRow');
       sinon.stub(parser, '_parseHeaderRows');
       sinon.stub(parser, '_parseCookiesRow');
       sinon.stub(parser, '_parseBodyRows');
@@ -27,7 +26,6 @@ describe('parser / requests / default', () => {
 
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseMessageForRows', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseStartRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseHostRow', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseHeaderRows', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseCookiesRow', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseBodyRows', expectedArgs: '_without-args_' });
@@ -64,8 +62,10 @@ describe('parser / requests / default', () => {
       parser.method = 'method';
       parser.protocol = 'protocol';
       parser.protocolVersion = 'protocolVersion';
-      parser.url = 'url';
+      parser.path = 'path';
       parser.host = 'host';
+      parser.searchParams = 'searchParams';
+      parser.basicAuth = 'basicAuth';
       parser.headers = 'headers';
       parser.cookies = 'cookies';
       parser.body = 'body';
@@ -74,8 +74,10 @@ describe('parser / requests / default', () => {
         method: 'method',
         protocol: 'protocol',
         protocolVersion: 'protocolVersion',
-        url: 'url',
+        path: 'path',
         host: 'host',
+        searchParams: 'searchParams',
+        basicAuth: 'basicAuth',
         headers: 'headers',
         cookies: 'cookies',
         body: 'body'
@@ -98,39 +100,52 @@ describe('parser / requests / default', () => {
 
     it('should init instance fields when startRow has valid format', () => {
       let parser = getParserInstance();
-      parser.startRow = 'get http://example.com http/1.1';
+      parser.startRow = 'get http://example.com/features?p1=v1 http/1.1';
 
       parser._parseStartRow();
       should(parser.method).eql('GET');
-      should(parser.url).eql('example.com');
       should(parser.protocol).eql('HTTP');
       should(parser.protocolVersion).eql('HTTP/1.1');
-    });
-  });
-
-  describe('_parseHostRow', () => {
-    it('should throw error when hostRow has invalid format', () => {
-      let parser = getParserInstance();
-      parser.hostRow = 'Invalid request hostRow';
-
-      should(parser._parseHostRow.bind(parser)).throw(Error, {
-        message: 'Host row must be in format: Host: Value. Data: Invalid request hostRow'
-      });
-    });
-
-    it('should init instance.host when hostRow has valid format', () => {
-      let parser = getParserInstance();
-      parser.hostRow = 'Host: example.com';
-
-      parser._parseHostRow();
+      should(parser.path).eql('/features');
       should(parser.host).eql('example.com');
+      should(parser.searchParams).eql({ p1: 'v1' });
+      should(parser.basicAuth).eql({});
     });
   });
 
   describe('functional tests', () => {
+    it('should parse request without body and headers', () => {
+      let requestMsg = [
+        'get http://admin:pass@example.com/features?p1=v1 http/1.1',
+        'host: example.com',
+        '',
+        ''
+      ].join('\n');
+
+      let requestObj = {
+        method: 'GET',
+        protocol: 'HTTP',
+        protocolVersion: 'HTTP/1.1',
+        host: 'example.com',
+        path: '/features',
+        searchParams: { p1: 'v1' },
+        basicAuth: {
+          username: 'admin',
+          password: 'pass'
+        },
+        headers: [],
+        cookies: null,
+        body: null
+      };
+
+      let parser = getParserInstance(requestMsg);
+      let actual = parser.parse();
+      should(actual).eql(requestObj);
+    });
+
     it('should parse request without body (header names in lower case)', () => {
       let requestMsg = [
-        'get http://example.com/features?p1=v1 http/1.1',
+        'get http://example.com/features http/1.1',
         'host: example.com',
         'connection: keep-alive',
         'accept: */*',
@@ -143,9 +158,11 @@ describe('parser / requests / default', () => {
       let requestObj = {
         method: 'GET',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
+        searchParams: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -187,7 +204,7 @@ describe('parser / requests / default', () => {
 
     it('should parse request with cookies and without body', () => {
       let requestMsg = [
-        'GET http://example.com/features?p1=v1 HTTP/1.1',
+        'GET http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -201,9 +218,11 @@ describe('parser / requests / default', () => {
       let requestObj = {
         method: 'GET',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
+        searchParams: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -248,7 +267,7 @@ describe('parser / requests / default', () => {
 
     it('should parse request with body and contentType=text/plain', () => {
       let requestMsg = [
-        'POST http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -264,9 +283,11 @@ describe('parser / requests / default', () => {
       let requestObj = {
         method: 'POST',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
+        searchParams: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -330,7 +351,7 @@ describe('parser / requests / default', () => {
 
     it('should parse request with body and contentType=application/json', () => {
       let requestMsg = [
-        'POST http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -346,9 +367,11 @@ describe('parser / requests / default', () => {
       let requestObj = {
         method: 'POST',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
+        searchParams: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -412,7 +435,7 @@ describe('parser / requests / default', () => {
 
     it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
       let requestMsg = [
-        'POST http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -428,9 +451,11 @@ describe('parser / requests / default', () => {
       let requestObj = {
         method: 'POST',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
+        searchParams: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -497,7 +522,7 @@ describe('parser / requests / default', () => {
 
     it('should parse request with body and contentType=multipart/form-data', () => {
       let requestMsg = [
-        'POST http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -521,9 +546,11 @@ describe('parser / requests / default', () => {
       let requestObj = {
         method: 'POST',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
+        searchParams: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',

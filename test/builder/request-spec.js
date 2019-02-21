@@ -10,9 +10,10 @@ describe('builder / request', () => {
   function getBuilderInstance(exRequestObj) {
     let requestObj = _.extend({
       method: 'get',
-      url: 'example.com',
       protocol: 'http',
-      protocolVersion: 'http/1.1'
+      protocolVersion: 'http/1.1',
+      host: 'example.com',
+      path: '/'
     }, exRequestObj);
     return new RequestBuilder(requestObj);
   }
@@ -43,15 +44,7 @@ describe('builder / request', () => {
       let builder = getBuilderInstance({ method: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'method must be defined'
-      });
-    });
-
-    it('should throw error when url is not defined', () => {
-      let builder = getBuilderInstance({ url: null });
-
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'url must be defined'
+        message: 'method must be not empty string'
       });
     });
 
@@ -59,7 +52,7 @@ describe('builder / request', () => {
       let builder = getBuilderInstance({ protocol: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'protocol must be defined'
+        message: 'protocol must be not empty string'
       });
     });
 
@@ -67,30 +60,38 @@ describe('builder / request', () => {
       let builder = getBuilderInstance({ protocolVersion: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'protocolVersion must be defined'
+        message: 'protocolVersion must be not empty string'
+      });
+    });
+
+    it('should throw error when host is not defined', () => {
+      let builder = getBuilderInstance({ host: null });
+
+      should(builder._generateStartRow.bind(builder)).throw(Error, {
+        message: 'host must be not empty string'
+      });
+    });
+
+    it('should throw error when path is not defined', () => {
+      let builder = getBuilderInstance({ path: null });
+
+      should(builder._generateStartRow.bind(builder)).throw(Error, {
+        message: 'path must be not empty string'
       });
     });
 
     it('should build startRow when all params are valid', () => {
       let builder = getBuilderInstance();
 
-      let expected = 'GET http://example.com HTTP/1.1\n';
+      let expected = 'GET http://example.com/ HTTP/1.1\n';
       let actual = builder._generateStartRow();
       should(actual).eql(expected);
     });
   });
 
   describe('_generateHostRow', () => {
-    it('should build hostRow with empty host when url does not contain host', () => {
-      let builder = getBuilderInstance({ url: '/features' });
-
-      let expected = 'Host: \n';
-      let actual = builder._generateHostRow();
-      should(actual).eql(expected);
-    });
-
-    it('should build hostRow with host when url contains host', () => {
-      let builder = getBuilderInstance({ url: 'https://example.com/features' });
+    it('should build hostRow', () => {
+      let builder = getBuilderInstance({ host: 'example.com' });
 
       let expected = 'Host: example.com\n';
       let actual = builder._generateHostRow();
@@ -166,13 +167,41 @@ describe('builder / request', () => {
   });
 
   describe('functional tests', () => {
+    it('should build request without body and headers', () => {
+      let requestObj = {
+        method: 'GET',
+        protocol: 'HTTPS',
+        protocolVersion: 'HTTP/1.1',
+        host: 'example.com',
+        path: '/features',
+        searchParams: { p1: 'v1' },
+        basicAuth: {
+          username: 'admin',
+          password: 'pass'
+        },
+        headers: [],
+        body: null
+      };
+
+      let requestMsg = [
+        'GET https://admin:pass@example.com/features?p1=v1 HTTP/1.1',
+        'Host: example.com',
+        '',
+        ''
+      ].join('\n');
+
+      let builder = getBuilderInstance(requestObj);
+      let actual = builder.build();
+      should(actual).eql(requestMsg);
+    });
+
     it('should build request message without body (header names in lower case)', () => {
       let requestObj = {
         method: 'GET',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'connection',
@@ -204,7 +233,7 @@ describe('builder / request', () => {
       };
 
       let requestMsg = [
-        'GET http://example.com/features?p1=v1 HTTP/1.1',
+        'GET http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -222,9 +251,9 @@ describe('builder / request', () => {
       let requestObj = {
         method: 'GET',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Connection',
@@ -263,7 +292,7 @@ describe('builder / request', () => {
       };
 
       let requestMsg = [
-        'GET http://example.com/features?p1=v1 HTTP/1.1',
+        'GET http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -282,9 +311,9 @@ describe('builder / request', () => {
       let requestObj = {
         method: 'POST',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Connection',
@@ -342,7 +371,7 @@ describe('builder / request', () => {
       };
 
       let requestMsg = [
-        'POST http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -364,9 +393,9 @@ describe('builder / request', () => {
       let requestObj = {
         method: 'POST',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Connection',
@@ -424,7 +453,7 @@ describe('builder / request', () => {
       };
 
       let requestMsg = [
-        'POST http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -446,9 +475,9 @@ describe('builder / request', () => {
       let requestObj = {
         method: 'POST',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Connection',
@@ -509,7 +538,7 @@ describe('builder / request', () => {
       };
 
       let requestMsg = [
-        'POST http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -531,9 +560,9 @@ describe('builder / request', () => {
       let requestObj = {
         method: 'POST',
         protocol: 'HTTP',
-        url: 'example.com/features?p1=v1',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Connection',
@@ -595,7 +624,7 @@ describe('builder / request', () => {
       };
 
       let requestMsg = [
-        'POST http://example.com/features?p1=v1 HTTP/1.1',
+        'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',

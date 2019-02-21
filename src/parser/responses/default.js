@@ -29,16 +29,6 @@ class HttpZResponseParser extends Base {
     this.bodyRows = bodyRows;
   }
 
-  _generateObj() {
-    return {
-      protocolVersion: this.protocolVersion,
-      statusCode: this.statusCode,
-      statusMessage: this.statusMessage,
-      headers: this.headers,
-      body: this.body
-    };
-  }
-
   _parseStartRow() {
     if (!consts.regexps.responseStartRow.test(this.startRow)) {
       throw utils.getErrorMessage('HTTP-Version SP Status-Code SP Status-Message CRLF', this.startRow);
@@ -48,6 +38,16 @@ class HttpZResponseParser extends Base {
     this.protocolVersion = rowElems[0].toUpperCase();
     this.statusCode = +rowElems[1];
     this.statusMessage = rowElems.splice(2).join(' ');
+  }
+
+  _generateObj() {
+    return {
+      protocolVersion: this.protocolVersion,
+      statusCode: this.statusCode,
+      statusMessage: this.statusMessage,
+      headers: this.headers,
+      body: this.body
+    };
   }
 }
 

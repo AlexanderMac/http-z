@@ -9,9 +9,10 @@ describe('builder / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
+      searchParams: { p1: 'v1' },
       headers: [
         {
           name: 'Connection',
@@ -29,33 +30,33 @@ describe('builder / base', () => {
       ''
     ];
 
-    it('should throw error when method or url or protocol or protocolVersion are empty', () => {
+    it('should throw error when method or path or protocol or protocolVersion are empty', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.method = null;
       should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
-        message: 'method must be defined'
+        message: 'method must be not empty string'
       });
 
       httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.url = null;
+      httpObjClone.path = null;
       should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
-        message: 'url must be defined'
+        message: 'path must be not empty string'
       });
 
       httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.protocol = null;
       should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
-        message: 'protocol must be defined'
+        message: 'protocol must be not empty string'
       });
 
       httpObjClone = _.cloneDeep(httpObj);
       httpObjClone.protocolVersion = null;
       should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
-        message: 'protocolVersion must be defined'
+        message: 'protocolVersion must be not empty string'
       });
     });
 
-    it('should build start-row when method and url and protocol and protocolVersion aren\'t empty', () => {
+    it('should build start-row when method and path and protocol and protocolVersion aren\'t empty', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       let httpMsgClone = _.cloneDeep(httpMsg);
 
@@ -68,9 +69,10 @@ describe('builder / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
+      searchParams: { p1: 'v1' },
       headers: [
         {
           name: 'Connection',
@@ -88,19 +90,11 @@ describe('builder / base', () => {
       ''
     ];
 
-    it('should build host-row when url is valid', () => {
+    it('should build host-row', () => {
       let httpObjClone = _.cloneDeep(httpObj);
       let httpMsgClone = _.cloneDeep(httpMsg);
 
-      httpObjClone.url = 'example.com/features?p1=v1';
-      httpMsgClone[1] = 'Host: example.com';
       let actual = httpZ.buildRequest(httpObjClone);
-      should(actual).eql(httpMsgClone.join('\n'));
-
-      httpObjClone.url = 'www.example.com/features?p1=v1';
-      httpMsgClone[0] = 'GET http://www.example.com/features?p1=v1 HTTP/1.1';
-      httpMsgClone[1] = 'Host: www.example.com';
-      actual = httpZ.buildRequest(httpObjClone);
       should(actual).eql(httpMsgClone.join('\n'));
     });
   });
@@ -109,9 +103,10 @@ describe('builder / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
+      searchParams: { p1: 'v1' },
       headers: [
         {
           name: 'Connection',
@@ -169,22 +164,17 @@ describe('builder / base', () => {
       ''
     ];
 
-    it('should throw error when headers list is empty or invalid', () => {
+    it('should throw error when headers list is invalid', () => {
       let httpObjClone = _.cloneDeep(httpObj);
 
       httpObjClone.headers = null;
       should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
-        message: 'Headers must be not empty array'
+        message: 'Headers must be array'
       });
 
       httpObjClone.headers = {};
       should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
-        message: 'Headers must be not empty array'
-      });
-
-      httpObjClone.headers = [];
-      should(httpZ.buildRequest.bind(null, httpObjClone)).throw(Error, {
-        message: 'Headers must be not empty array'
+        message: 'Headers must be array'
       });
     });
 
@@ -239,9 +229,10 @@ describe('builder / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
+      searchParams: { p1: 'v1' },
       headers: [
         {
           name: 'Connection',
@@ -363,9 +354,9 @@ describe('builder / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
       headers: [
         {
           name: 'Connection',
@@ -423,7 +414,7 @@ describe('builder / base', () => {
     };
 
     let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
+      'GET http://example.com/features HTTP/1.1',
       'Host: example.com',
       'Connection: keep-alive',
       'Cache-Control: no-cache',

@@ -1,8 +1,9 @@
 'use strict';
 
-const consts = require('../../consts');
-const utils  = require('../../utils');
-const Base   = require('../base');
+const { URL } = require('url');
+const consts  = require('../../consts');
+const utils   = require('../../utils');
+const Base    = require('../base');
 
 class HttpZRequestParser extends Base {
   static parse(params) {
@@ -15,7 +16,6 @@ class HttpZRequestParser extends Base {
 
     this._parseMessageForRows();
     this._parseStartRow();
-    this._parseHostRow();
     this._parseHeaderRows();
     this._parseCookiesRow();
     this._parseBodyRows();
@@ -33,19 +33,6 @@ class HttpZRequestParser extends Base {
     this.bodyRows = bodyRows;
   }
 
-  _generateObj() {
-    return {
-      method: this.method,
-      protocol: this.protocol,
-      protocolVersion: this.protocolVersion,
-      url: this.url,
-      host: this.host,
-      headers: this.headers,
-      cookies: this.cookies,
-      body: this.body
-    };
-  }
-
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
       throw utils.getErrorMessage('Method SP Request-URI SP HTTP-Version CRLF', this.startRow);
@@ -53,18 +40,54 @@ class HttpZRequestParser extends Base {
 
     let rowElems = this.startRow.split(' ');
     this.method = rowElems[0].toUpperCase();
-    let url = rowElems[1];
-    this.url = url.replace(consts.regexps.httpProtocolWithTwoSlash, '');
-    this.protocol = url.match(consts.regexps.httpProtocol)[0].toUpperCase();
     this.protocolVersion = rowElems[2].toUpperCase();
+    let rawUrl = rowElems[1];
+
+    let url = new URL(rawUrl);
+    this.protocol = this._getProtocol(url);
+    this.host = url.host;
+    this.path = url.pathname;
+    this.searchParams = this._getSearchParams(url);
+    this.basicAuth = this._getBasicAuth(url);
   }
 
-  _parseHostRow() {
-    let [name, value] = utils.splitIntoTwoParts(this.hostRow, ':');
-    if (!name || !value) {
-      throw utils.getErrorMessage('Host row must be in format: Host: Value', this.hostRow);
+  _generateObj() {
+    return {
+      method: this.method,
+      protocol: this.protocol,
+      protocolVersion: this.protocolVersion,
+      host: this.host,
+      path: this.path,
+      searchParams: this.searchParams,
+      basicAuth: this.basicAuth,
+      headers: this.headers,
+      cookies: this.cookies,
+      body: this.body
+    };
+  }
+
+  // TODO: test it
+  _getProtocol(url) {
+    return (url.protocol || '').replace(':', '').toUpperCase();
+  }
+
+  // TODO: test it
+  _getSearchParams(url) {
+    let searchParams = {};
+    url.searchParams.forEach((value, name) => searchParams[name] = value);
+    return searchParams;
+  }
+
+  // TODO: test it
+  _getBasicAuth(url) {
+    let basicAuth = {};
+    if (url.username) {
+      basicAuth.username = url.username;
     }
-    this.host = value;
+    if (url.password) {
+      basicAuth.password = url.password;
+    }
+    return basicAuth;
   }
 }
 

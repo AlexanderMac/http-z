@@ -30,9 +30,11 @@ describe('parser / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
+      searchParams: { p1: 'v1' },
+      basicAuth: {},
       headers: [
         {
           name: 'Connection',
@@ -113,7 +115,7 @@ describe('parser / base', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.url = 'example.com/features';
+      httpObjClone.searchParams = {};
 
       let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
       should(actual).eql(httpObjClone);
@@ -123,29 +125,18 @@ describe('parser / base', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.url = 'example.com/features?p1=v1';
+      httpObjClone.searchParams = { p1: 'v1' };
 
       let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
       should(actual).eql(httpObjClone);
     });
 
-    it('should parse HTTPS protocol and url without parameters', () => {
+    it('should parse HTTPS protocol', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET https://example.com/features HTTP/1.1';
       let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.url = 'example.com/features';
       httpObjClone.protocol = 'HTTPS';
-
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
-    });
-
-    it('should parse HTTPS protocol and url with parameters', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      httpMsgClone[0] = 'GET https://example.com/features?p1=v1 HTTP/1.1';
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.url = 'example.com/features?p1=v1';
-      httpObjClone.protocol = 'HTTPS';
+      httpObjClone.searchParams = {};
 
       let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
       should(actual).eql(httpObjClone);
@@ -172,109 +163,6 @@ describe('parser / base', () => {
     });
   });
 
-  describe('host row', () => {
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
-      'Accept: */*',
-      'Accept-Encoding: gzip,deflate',
-      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-      '',
-      ''
-    ];
-
-    let httpObj = {
-      method: 'GET',
-      protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive', params: null }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache', params: null }
-          ]
-        },
-        {
-          name: 'User-Agent',
-          values: [
-            { value: 'Mozilla/5.0 (Windows NT 6.1 WOW64)', params: null }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*', params: null }
-          ]
-        },
-        {
-          name: 'Accept-Encoding',
-          values: [
-            { value: 'gzip', params: null },
-            { value: 'deflate', params: null }
-          ]
-        },
-        {
-          name: 'Accept-Language',
-          values: [
-            { value: 'ru-RU', params: null },
-            { value: 'ru', params: 'q=0.8' },
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
-          ]
-        }
-      ],
-      cookies: null,
-      body: null
-    };
-
-    it('should throw error when host row is invalid', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpMsgClone[1] = 'Host example.com';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
-        message: 'Host row must be in format: ' +
-                 'Host: Value. Data: Host example.com'
-      });
-
-      httpMsgClone[1] = 'Host     ';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
-        message: 'Host row must be in format: ' +
-                 'Host: Value. Data: Host     '
-      });
-
-      httpMsgClone[1] = ': example.com';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
-        message: 'Host row must be in format: ' +
-                 'Host: Value. Data: : example.com'
-      });
-    });
-
-    it('should parse valid host row', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.host = 'example.com';
-
-      httpMsgClone[1] = 'Host: example.com';
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
-
-      httpMsgClone[1] = 'Host   :  example.com';
-      actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
-    });
-  });
-
   describe('headers', () => {
     let httpMsg = [
       'GET http://example.com/features?p1=v1 HTTP/1.1',
@@ -293,9 +181,11 @@ describe('parser / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
+      searchParams: { p1: 'v1' },
+      basicAuth: {},
       headers: [
         {
           name: 'Connection',
@@ -424,9 +314,11 @@ describe('parser / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
+      searchParams: { p1: 'v1' },
+      basicAuth: {},
       headers: [
         {
           name: 'Connection',
@@ -544,9 +436,11 @@ describe('parser / base', () => {
     let httpObj = {
       method: 'GET',
       protocol: 'HTTP',
-      url: 'example.com/features?p1=v1',
       protocolVersion: 'HTTP/1.1',
       host: 'example.com',
+      path: '/features',
+      searchParams: { p1: 'v1' },
+      basicAuth: {},
       headers: [
         {
           name: 'Connection',

@@ -1,8 +1,9 @@
 'use strict';
 
-const _     = require('lodash');
-const utils = require('../utils');
-const Base  = require('./base');
+const _                   = require('lodash');
+const { URLSearchParams } = require('url');
+const utils               = require('../utils');
+const Base                = require('./base');
 
 class HttpZRequestBuilder extends Base {
   static build(params) {
@@ -10,12 +11,15 @@ class HttpZRequestBuilder extends Base {
     return instance.build();
   }
 
-  constructor({ method, url, protocol, protocolVersion, headers, cookies, body }) {
+  constructor({ method, protocol, protocolVersion, host, path, searchParams = {}, basicAuth = {}, headers, cookies, body }) {
     super({ headers, body });
     this.method = method;
-    this.url = url;
     this.protocol = protocol;
     this.protocolVersion = protocolVersion;
+    this.host = host;
+    this.path = path;
+    this.searchParams = searchParams;
+    this.basicAuth = basicAuth;
     this.cookies = cookies;
   }
 
@@ -29,29 +33,25 @@ class HttpZRequestBuilder extends Base {
   }
 
   _generateStartRow() {
-    if (!this.method) {
-      throw utils.getErrorMessage('method must be defined');
-    }
-    if (!this.url) {
-      throw utils.getErrorMessage('url must be defined');
-    }
-    if (!this.protocol) {
-      throw utils.getErrorMessage('protocol must be defined');
-    }
-    if (!this.protocolVersion) {
-      throw utils.getErrorMessage('protocolVersion must be defined');
-    }
+    utils.validateNotEmptyString(this.method, 'method');
+    utils.validateNotEmptyString(this.protocol, 'protocol');
+    utils.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
+    utils.validateNotEmptyString(this.host, 'host');
+    utils.validateNotEmptyString(this.path, 'path');
 
-    let method = this.method.toUpperCase();
-    let url = _.trimStart(this.url, '/');
-    let protocol = _.toLower(this.protocol);
-    let protocolVersion = this.protocolVersion.toUpperCase();
-    return `${method} ${protocol}://${url} ${protocolVersion}\n`;
+    return '' +
+      this.method.toUpperCase() + ' ' +
+      this.protocol.toLowerCase() + '://' +
+      this._genBasicAuth() +
+      this.host +
+      this.path +
+      this._genSearchParams() + ' ' +
+      this.protocolVersion.toUpperCase() +
+      '\n';
   }
 
   _generateHostRow() {
-    let host = utils.getHostname(this.url);
-    return `Host: ${host}\n`;
+    return `Host: ${this.host}\n`;
   }
 
   _generateCookieRows() {
@@ -71,6 +71,23 @@ class HttpZRequestBuilder extends Base {
     });
 
     return 'Cookie: ' + cookiesStr.join('; ') + '\n';
+  }
+
+  // TODO: test it
+  _genBasicAuth() {
+    if (_.isEmpty(this.basicAuth)) {
+      return '';
+    }
+    return (this.basicAuth.username || '') + ':' + (this.basicAuth.password || '') + '@';
+  }
+
+  // TODO: test it
+  _genSearchParams() {
+    if (_.isEmpty(this.searchParams)) {
+      return '';
+    }
+    let searchParams = new URLSearchParams(this.searchParams);
+    return '?' + searchParams.toString();
   }
 }
 
