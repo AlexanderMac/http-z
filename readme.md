@@ -9,11 +9,11 @@
 * Parse HTTP request/response message:
   - headers
   - cookies
-  - body (supported contentTypes: `multipart/form-data`, `application/x-www-form-urlencoded`, `text/plain`, `application/json`)
-* Build HTTP request/response message:
+  - body (supported contentTypes: `multipart/form-data`, `application/x-www-form-urlencoded`, `application/json`, `text/plain`)
+* Build HTTP request/response message from object:
   - headers
   - cookies
-  - body (supported contentTypes: `multipart/form-data`, `application/x-www-form-urlencoded`, `text/plain`, `application/json`)
+  - body (supported contentTypes: `multipart/form-data`, `application/x-www-form-urlencoded`, `application/json`, `text/plain`)
 
 ## Commands
 
@@ -44,9 +44,10 @@ console.log(JSON.stringify(requestObj, null, 2));
 { 
   method: 'GET',
   protocol: 'HTTP',
-  url: 'example.com/features?p1=v1',
   protocolVersion: 'HTTP/1.1',
   host: 'example.com',
+  path: '/features',
+  params: { p1: 'v1' },
   headers: [
     { name: 'Accept', values: [ { value: '/', params: null } ] },
     { name: 'Accept-Encoding', values: [ 
