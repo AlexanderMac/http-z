@@ -1,6 +1,7 @@
 'use strict';
 
-const _ = require('lodash');
+const _                   = require('lodash');
+const { URLSearchParams } = require('url');
 
 exports.splitIntoTwoParts = (str, delimiter) => {
   if (_.isEmpty(str)) {
@@ -42,6 +43,27 @@ exports.getErrorMessage = (msg, data) => {
   let err = new Error(msg);
   err.type = 'HttpZ Error';
   return err;
+};
+
+// TODO: test it
+exports.genUrl = ({ protocol, host, path, basicAuth, searchParams }) => {
+  let basicAuthStr = '';
+  if (!_.isEmpty(basicAuth)) {
+    basicAuthStr = (basicAuth.username || '') + ':' + (basicAuth.password || '') + '@';
+  }
+
+  let searchParamsStr = '';
+  if (!_.isEmpty(searchParams)) {
+    let urlSPs = new URLSearchParams(searchParams);
+    searchParamsStr = '?' + urlSPs.toString();
+  }
+
+  return '' +
+    protocol.toLowerCase() + '://' +
+    basicAuthStr +
+    host +
+    path +
+    searchParamsStr;
 };
 
 exports.getHeaderName = (name) => {

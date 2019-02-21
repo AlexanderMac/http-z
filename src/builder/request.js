@@ -1,9 +1,8 @@
 'use strict';
 
-const _                   = require('lodash');
-const { URLSearchParams } = require('url');
-const utils               = require('../utils');
-const Base                = require('./base');
+const _     = require('lodash');
+const utils = require('../utils');
+const Base  = require('./base');
 
 class HttpZRequestBuilder extends Base {
   static build(params) {
@@ -41,11 +40,7 @@ class HttpZRequestBuilder extends Base {
 
     return '' +
       this.method.toUpperCase() + ' ' +
-      this.protocol.toLowerCase() + '://' +
-      this._genBasicAuth() +
-      this.host +
-      this.path +
-      this._genSearchParams() + ' ' +
+      utils.genUrl(_.pick(this, 'protocol', 'host', 'path', 'basicAuth', 'searchParams')) + ' ' +
       this.protocolVersion.toUpperCase() +
       '\n';
   }
@@ -71,23 +66,6 @@ class HttpZRequestBuilder extends Base {
     });
 
     return 'Cookie: ' + cookiesStr.join('; ') + '\n';
-  }
-
-  // TODO: test it
-  _genBasicAuth() {
-    if (_.isEmpty(this.basicAuth)) {
-      return '';
-    }
-    return (this.basicAuth.username || '') + ':' + (this.basicAuth.password || '') + '@';
-  }
-
-  // TODO: test it
-  _genSearchParams() {
-    if (_.isEmpty(this.searchParams)) {
-      return '';
-    }
-    let searchParams = new URLSearchParams(this.searchParams);
-    return '?' + searchParams.toString();
   }
 }
 
