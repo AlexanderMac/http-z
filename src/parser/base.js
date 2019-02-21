@@ -25,9 +25,6 @@ class HttpZBaseParser {
     }
 
     let headerRows = _.split(headers, this.eol);
-    if (headerRows.length === 0) {
-      throw utils.getErrorMessage('No headers');
-    }
     let cookiesIndex = _.findIndex(headerRows, (row) => {
       return _.startsWith(row, 'Cookie:');
     });
@@ -41,7 +38,6 @@ class HttpZBaseParser {
   }
 
   _parseHeaderRows() {
-    // TODO: add check for duplicate headers
     this.headers = _.map(this.headerRows, hRow => {
       let [name, values] = utils.splitIntoTwoParts(hRow, ':');
       if (!name || !values) {

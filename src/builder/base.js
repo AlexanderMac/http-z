@@ -11,8 +11,8 @@ class HttpZBaseBuilder {
   }
 
   _generateHeaderRows() {
-    if (!this.headers || !_.isArray(this.headers) || this.headers.length === 0) {
-      throw utils.getErrorMessage('Headers must be not empty array');
+    if (!this.headers || !_.isArray(this.headers)) {
+      throw utils.getErrorMessage('Headers must be array');
     }
 
     let headerRows = _.map(this.headers, (header) => {
