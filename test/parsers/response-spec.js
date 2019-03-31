@@ -3,23 +3,23 @@
 const sinon          = require('sinon');
 const should         = require('should');
 const nassert        = require('n-assert');
-const ResponseParser = require('../../../src/parser/responses/default');
+const ResponseParser = require('../../src/parsers/response');
 
-describe('parser / responses / default', () => {
-  function getParserInstance(responseMsg, eol) {
-    return new ResponseParser(responseMsg, eol);
+describe('parsers / response', () => {
+  function getParserInstance(params) {
+    return new ResponseParser(params);
   }
 
   describe('parse', () => {
-    it('should call related methods and return response object', () => {
-      let parser = getParserInstance('responseMsg');
+    it('should call related methods and return response model', () => {
+      let parser = getParserInstance({ httpMessage: 'responseMsg' });
       sinon.stub(parser, '_parseMessageForRows');
       sinon.stub(parser, '_parseStartRow');
       sinon.stub(parser, '_parseHeaderRows');
       sinon.stub(parser, '_parseBodyRows');
-      sinon.stub(parser, '_generateObj').returns('responseObj');
+      sinon.stub(parser, '_generateModel').returns('responseModel');
 
-      let expected = 'responseObj';
+      let expected = 'responseModel';
       let actual = parser.parse();
       should(actual).eql(expected);
 
@@ -27,7 +27,7 @@ describe('parser / responses / default', () => {
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseStartRow', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseHeaderRows', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseBodyRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_generateObj', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_generateModel', expectedArgs: '_without-args_' });
     });
   });
 
@@ -41,7 +41,7 @@ describe('parser / responses / default', () => {
         '',
         'Body'
       ].join('\n');
-      let parser = getParserInstance(responseMsg);
+      let parser = getParserInstance({ httpMessage: responseMsg });
 
       parser._parseMessageForRows();
       should(parser.startRow).eql('start-line');
@@ -50,8 +50,8 @@ describe('parser / responses / default', () => {
     });
   });
 
-  describe('_generateObj', () => {
-    it('should generate response object using instance fields', () => {
+  describe('_generateModel', () => {
+    it('should generate response model using instance fields', () => {
       let parser = getParserInstance();
       parser.protocolVersion = 'protocolVersion';
       parser.statusCode = 'statusCode';
@@ -67,7 +67,7 @@ describe('parser / responses / default', () => {
         body: 'body'
       };
 
-      let actual = parser._generateObj();
+      let actual = parser._generateModel();
       should(actual).eql(expected);
     });
   });
@@ -105,7 +105,7 @@ describe('parser / responses / default', () => {
         ''
       ].join('\n');
 
-      let responseObj = {
+      let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 201,
         statusMessage: 'Created',
@@ -139,9 +139,9 @@ describe('parser / responses / default', () => {
         body: null
       };
 
-      let parser = getParserInstance(responseMsg);
+      let parser = getParserInstance({ httpMessage: responseMsg });
       let actual = parser.parse();
-      should(actual).eql(responseObj);
+      should(actual).eql(responseModel);
     });
 
     it('should parse response with body and contentType=text/plain', () => {
@@ -156,7 +156,7 @@ describe('parser / responses / default', () => {
         'Plain text'
       ].join('\n');
 
-      let responseObj = {
+      let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
         statusMessage: 'Ok',
@@ -199,9 +199,9 @@ describe('parser / responses / default', () => {
         }
       };
 
-      let parser = getParserInstance(responseMsg);
+      let parser = getParserInstance({ httpMessage: responseMsg });
       let actual = parser.parse();
-      should(actual).eql(responseObj);
+      should(actual).eql(responseModel);
     });
 
     it('should parse response with body and contentType=application/json', () => {
@@ -216,7 +216,7 @@ describe('parser / responses / default', () => {
         '{"p1":"v1","p2":"v2"}'
       ].join('\n');
 
-      let responseObj = {
+      let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
         statusMessage: 'Ok',
@@ -259,9 +259,9 @@ describe('parser / responses / default', () => {
         }
       };
 
-      let parser = getParserInstance(responseMsg);
+      let parser = getParserInstance({ httpMessage: responseMsg });
       let actual = parser.parse();
-      should(actual).eql(responseObj);
+      should(actual).eql(responseModel);
     });
   });
 });

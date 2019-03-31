@@ -5,20 +5,20 @@ const consts = require('../consts');
 const utils  = require('../utils');
 
 class HttpZBaseParser {
-  constructor(httpMsg, eol = '\n') {
-    this.httpMsg = httpMsg;
+  constructor({ httpMessage, eol = '\n' } = {}) {
+    this.httpMessage = httpMessage;
     this.eol = eol;
   }
 
   parse() {
-    if (!this.httpMsg) {
-      throw utils.getErrorMessage('httpMsg must be defined');
+    if (!this.httpMessage) {
+      throw utils.getErrorMessage('httpMessage must be defined');
     }
   }
 
   _parseMessageForRows() {
     let eol2x = this.eol + this.eol;
-    let [headers, body] = utils.splitIntoTwoParts(this.httpMsg, eol2x);
+    let [headers, body] = utils.splitIntoTwoParts(this.httpMessage, eol2x);
     if (_.isNil(headers) || _.isNil(body)) {
       throw utils.getErrorMessage(
         'HTTP message must contain headers and body, separated by two break lines');

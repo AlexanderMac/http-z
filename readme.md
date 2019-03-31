@@ -10,7 +10,7 @@
   - headers
   - cookies
   - body (supported contentTypes: `multipart/form-data`, `application/x-www-form-urlencoded`, `application/json`, `text/plain`)
-* Build HTTP request/response message from object:
+* Build HTTP request/response message from model:
   - headers
   - cookies
   - body (supported contentTypes: `multipart/form-data`, `application/x-www-form-urlencoded`, `application/json`, `text/plain`)
@@ -25,9 +25,9 @@ $ npm i http-z
 ## Usage
 
 ```js
-const httpZ = require('http-z');
+const HttpZ = require('http-z');
 
-let requestMsg = [
+let httpMessage = [
   'GET http://example.com/features?p1=v1 HTTP/1.1',
   'Host: example.com',
   'Accept: */*',
@@ -37,8 +37,8 @@ let requestMsg = [
   ''
 ].join('\n');
 
-let requestObj = httpZ.parseRequest(requestMsg);
-console.log(JSON.stringify(requestObj, null, 2));
+let httpModel = httpZ.parse(httpMessage);
+console.log(JSON.stringify(httpModel, null, 2));
 
 /* output:
 { 
@@ -63,31 +63,32 @@ console.log(JSON.stringify(requestObj, null, 2));
   body: null
 }
 */
+
+let newHttpMessage = httpZ.buildRequest(httpModel);
+console.log(newHttpMessage);
+
+/* output:
+GET http://example.com/features?p1=v1 HTTP/1.1
+Host: example.com
+Accept: *//*
+Accept-Encoding: gzip,deflate
+Accept-Language: en-US;q=0.6, en;q=0.4
+
+*/
 ```
 
 ## API
 
-### parseRequest(httpRequestMsg, eol)
-Parse HTTP request message and return request object.
+### parse({ httpMessage, eol })
+Parse HTTP request/response message and return model.
 
-- `httpRequestMsg` is a plain HTTP request message in string format.
+- `httpMessage` is a plain HTTP message in string format.
 - `eol` _end of line_, `\n` by default.
 
-### parseResponse(httpResponseMsg, eol)
-Parse HTTP response message and return response object.
+### build(httpModel)
+Build HTTP message from request/response model.
 
-- `httpResponseMsg` is a plain HTTP response message in string format.
-- `eol` _end of line_, `\n` by default.
-
-### buildRequest(httpRequestObj)
-Build a plain HTTP request message from request object.
-
-- `httpRequestObj` is request object.
-
-### buildResponse(httpResponseObj)
-Build a plain HTTP response message from response object.
-
-- `httpResponseObj` is response object.
+- `httpModel` is HTTP model.
 
 ## Author
 Alexander Mac

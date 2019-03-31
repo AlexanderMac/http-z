@@ -4,16 +4,16 @@ const _               = require('lodash');
 const sinon           = require('sinon');
 const should          = require('should');
 const nassert         = require('n-assert');
-const ResponseBuilder = require('../../src/builder/response');
+const ResponseBuilder = require('../../src/builders/response');
 
-describe('builder / response', () => {
-  function getBuilderInstance(exResponseObj) {
-    let responseObj = _.extend({
+describe('builders / response', () => {
+  function getBuilderInstance(exResponseModel) {
+    let responseModel = _.extend({
       protocolVersion: 'http/1.1',
       statusCode: 200,
       statusMessage: 'Ok'
-    }, exResponseObj);
-    return new ResponseBuilder(responseObj);
+    }, exResponseModel);
+    return new ResponseBuilder(responseModel);
   }
 
   describe('build', () => {
@@ -69,7 +69,7 @@ describe('builder / response', () => {
 
   describe('functional tests', () => {
     it('should build response message without body (header names in lower case)', () => {
-      let responseObj = {
+      let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 201,
         statusMessage: 'Created',
@@ -112,13 +112,13 @@ describe('builder / response', () => {
         ''
       ].join('\n');
 
-      let builder = getBuilderInstance(responseObj);
+      let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
       should(actual).eql(responseMsg);
     });
 
     it('should build response message with body and contentType=text/plain', () => {
-      let responseObj = {
+      let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
         statusMessage: 'Ok',
@@ -172,13 +172,13 @@ describe('builder / response', () => {
         'Plain text'
       ].join('\n');
 
-      let builder = getBuilderInstance(responseObj);
+      let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
       should(actual).eql(responseMsg);
     });
 
     it('should build response message with body and contentType=application/json', () => {
-      let responseObj = {
+      let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
         statusMessage: 'Ok',
@@ -232,7 +232,7 @@ describe('builder / response', () => {
         '{"p1":"v1","p2":"v2"}'
       ].join('\n');
 
-      let builder = getBuilderInstance(responseObj);
+      let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
       should(actual).eql(responseMsg);
     });

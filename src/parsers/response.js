@@ -1,8 +1,8 @@
 'use strict';
 
-const consts = require('../../consts');
-const utils  = require('../../utils');
-const Base   = require('../base');
+const consts = require('../consts');
+const utils  = require('../utils');
+const Base   = require('./base');
 
 class HttpZResponseParser extends Base {
   static parse(params) {
@@ -18,7 +18,7 @@ class HttpZResponseParser extends Base {
     this._parseHeaderRows();
     this._parseBodyRows();
 
-    return this._generateObj();
+    return this._generateModel();
   }
 
   _parseMessageForRows() {
@@ -40,7 +40,7 @@ class HttpZResponseParser extends Base {
     this.statusMessage = rowElems.splice(2).join(' ');
   }
 
-  _generateObj() {
+  _generateModel() {
     return {
       protocolVersion: this.protocolVersion,
       statusCode: this.statusCode,

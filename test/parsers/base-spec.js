@@ -4,11 +4,11 @@ const _      = require('lodash');
 const should = require('should');
 const httpZ  = require('../../');
 
-describe('parser / base', () => {
+describe('parsers / base', () => {
   describe('httpMsg', () => {
     it('should throw error when httpMsg is undefined', () => {
-      should(httpZ.parseRequest.bind(httpZ, null)).throw(Error, {
-        message: 'httpMsg must be defined'
+      should(httpZ.parse.bind(null)).throw(Error, {
+        message: 'Unknown message format'
       });
     });
   });
@@ -27,7 +27,7 @@ describe('parser / base', () => {
       ''
     ];
 
-    let httpObj = {
+    let httpModel = {
       method: 'GET',
       protocol: 'HTTP',
       protocolVersion: 'HTTP/1.1',
@@ -85,81 +85,80 @@ describe('parser / base', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[0] = 'absolutely wrong string';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
-        message: 'Method SP Request-URI SP HTTP-Version CRLF. ' +
-                 'Data: absolutely wrong string'
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
+        message: 'Unknown message format'
       });
     });
 
     it('should parse GET method', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.1';
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.method = 'GET';
+      let httpModelClone = _.cloneDeep(httpModel);
+      httpModelClone.method = 'GET';
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse DELETE method', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'DELETE http://example.com/features?p1=v1 HTTP/1.1';
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.method = 'DELETE';
+      let httpModelClone = _.cloneDeep(httpModel);
+      httpModelClone.method = 'DELETE';
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse HTTP protocol and url without parameters', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features HTTP/1.1';
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.params = {};
+      let httpModelClone = _.cloneDeep(httpModel);
+      httpModelClone.params = {};
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse HTTP protocol and url with parameters', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.1';
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.params = { p1: 'v1' };
+      let httpModelClone = _.cloneDeep(httpModel);
+      httpModelClone.params = { p1: 'v1' };
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse HTTPS protocol', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET https://example.com/features HTTP/1.1';
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.protocol = 'HTTPS';
-      httpObjClone.params = {};
+      let httpModelClone = _.cloneDeep(httpModel);
+      httpModelClone.protocol = 'HTTPS';
+      httpModelClone.params = {};
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse HTTP protocol v1.0', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.0';
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.protocolVersion = 'HTTP/1.0';
+      let httpModelClone = _.cloneDeep(httpModel);
+      httpModelClone.protocolVersion = 'HTTP/1.0';
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse HTTP protocol v2.0', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
       httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/2.0';
-      let httpObjClone = _.cloneDeep(httpObj);
-      httpObjClone.protocolVersion = 'HTTP/2.0';
+      let httpModelClone = _.cloneDeep(httpModel);
+      httpModelClone.protocolVersion = 'HTTP/2.0';
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
   });
 
@@ -178,7 +177,7 @@ describe('parser / base', () => {
       ''
     ];
 
-    let httpObj = {
+    let httpModel = {
       method: 'GET',
       protocol: 'HTTP',
       protocolVersion: 'HTTP/1.1',
@@ -242,19 +241,19 @@ describe('parser / base', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[2] = 'Connection keep-alive';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Header row must be in format: ' +
                  'Name: Values. Data: Connection keep-alive'
       });
 
       httpMsgClone[2] = 'Connection: ';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Header row must be in format: ' +
                  'Name: Values. Data: Connection: '
       });
 
       httpMsgClone[2] = ' : keep-alive';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Header row must be in format: ' +
                  'Name: Values. Data:  : keep-alive'
       });
@@ -262,37 +261,37 @@ describe('parser / base', () => {
 
     it('should parse valid headers', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjCloneo = _.cloneDeep(httpObj);
+      let httpModelCloneo = _.cloneDeep(httpModel);
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjCloneo);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelCloneo);
     });
 
     it('should parse Accept-Language header with one value', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone[7] = 'Accept-Language: ru-RU;q=0.8';
-      httpObjClone.headers[5].values = [
+      httpModelClone.headers[5].values = [
         { value: 'ru-RU', params: 'q=0.8' }
       ];
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse Accept-Language header with two values', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone[7] = 'Accept-Language: ru-RU;q=0.8, en-US';
-      httpObjClone.headers[5].values = [
+      httpModelClone.headers[5].values = [
         { value: 'ru-RU', params: 'q=0.8' },
         { value: 'en-US', params: null }
       ];
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
   });
 
@@ -311,7 +310,7 @@ describe('parser / base', () => {
       ''
     ];
 
-    let httpObj = {
+    let httpModel = {
       method: 'GET',
       protocol: 'HTTP',
       protocolVersion: 'HTTP/1.1',
@@ -372,7 +371,7 @@ describe('parser / base', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
 
       httpMsgClone[8] = 'Cookie: ';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Cookie row must be in format: ' +
                  'Cookie: Name1=Value1;.... Data: Cookie:'
       });
@@ -380,40 +379,40 @@ describe('parser / base', () => {
 
     it('should not throw Error when cookie row is empty', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone.splice(8, 1);
-      httpObjClone.cookies = null;
+      httpModelClone.cookies = null;
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse cookie with one name-value pair', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone[8] = 'Cookie: csrftoken=123abc';
-      httpObjClone.cookies = [
+      httpModelClone.cookies = [
         { name: 'csrftoken', value: '123abc' }
       ];
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse cookie with one name-value pair and parameters', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone[8] = 'Cookie: csrftoken=123abc;sessionid=456def';
-      httpObjClone.cookies = [
+      httpModelClone.cookies = [
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', value: '456def' }
       ];
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
   });
 
@@ -433,7 +432,7 @@ describe('parser / base', () => {
       ''
     ];
 
-    let httpObj = {
+    let httpModel = {
       method: 'GET',
       protocol: 'HTTP',
       protocolVersion: 'HTTP/1.1',
@@ -505,13 +504,13 @@ describe('parser / base', () => {
       httpMsgClone[8] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
 
       httpMsgClone[11] = 'id=11&messageHello';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Invalid x-www-form-url-encode parameter. ' +
                  'Data: messageHello'
       });
 
       httpMsgClone[11] = 'id=11&message=Hello&';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Invalid x-www-form-url-encode parameter'
       });
     });
@@ -529,7 +528,7 @@ describe('parser / base', () => {
       httpMsgClone[17] = '';
       httpMsgClone[18] = '25';
       httpMsgClone[19] = '-----------------------------11136253119209--';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Invalid formData parameter. ' +
                  'Data: \nContent-Disposit: form-data; name="Name"\n\nSmith\n'
       });
@@ -541,18 +540,18 @@ describe('parser / base', () => {
       httpMsgClone[11] = 'body';
 
       httpMsgClone[8] = 'Content-Type: multipart/form-data';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Request with ContentType=FormData must have a header with boundary'
       });
 
       httpMsgClone[8] = 'Content-Type: multipart/form-data; boundary';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Boundary param must be in format: boundary=value. ' +
                  'Data: boundary'
       });
 
       httpMsgClone[8] = 'Content-Type: multipart/form-data; boundary=';
-      should(httpZ.parseRequest.bind(null, httpMsgClone.join('\n'))).throw(Error, {
+      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
         message: 'Boundary param must be in format: boundary=value. ' +
                  'Data: boundary='
       });
@@ -560,26 +559,26 @@ describe('parser / base', () => {
 
     it('should not throw Error when body is empty', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
-      httpObjClone.body = null;
+      httpModelClone.body = null;
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse valid body with ContentType=application/x-www-form-urlencoded', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone[8] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
       httpMsgClone[11] = 'id=11&message=Hello';
 
-      httpObjClone.headers[6].values = [{
+      httpModelClone.headers[6].values = [{
         value: 'application/x-www-form-urlencoded',
         params: 'charset=UTF-8'
       }];
-      httpObjClone.body = {
+      httpModelClone.body = {
         contentType: 'application/x-www-form-urlencoded',
         formDataParams: [
           { name: 'id', value: '11' },
@@ -587,13 +586,13 @@ describe('parser / base', () => {
         ]
       };
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse valid body with ContentType=multipart/form-data', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone[8] = 'Content-Type: multipart/form-data; boundary=------11136253119209';
       httpMsgClone[11] = '-----------------------------11136253119209';
@@ -606,11 +605,11 @@ describe('parser / base', () => {
       httpMsgClone[18] = '25';
       httpMsgClone[19] = '-----------------------------11136253119209--';
 
-      httpObjClone.headers[6].values = [{
+      httpModelClone.headers[6].values = [{
         value: 'multipart/form-data',
         params: 'boundary=------11136253119209'
       }];
-      httpObjClone.body = {
+      httpModelClone.body = {
         contentType: 'multipart/form-data',
         boundary: '------11136253119209',
         formDataParams: [
@@ -619,48 +618,48 @@ describe('parser / base', () => {
         ]
       };
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse valid body with ContentType=application/json', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone[8] = 'Content-Type: application/json';
       httpMsgClone[11] = '{"p1":"v1","p2":"v2"}';
 
-      httpObjClone.headers[6].values = [{
+      httpModelClone.headers[6].values = [{
         value: 'application/json',
         params: null
       }];
-      httpObjClone.body = {
+      httpModelClone.body = {
         contentType: 'application/json',
         json: { p1: 'v1', p2: 'v2' }
       };
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
 
     it('should parse valid body with ContentType=text/plain', () => {
       let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpObjClone = _.cloneDeep(httpObj);
+      let httpModelClone = _.cloneDeep(httpModel);
 
       httpMsgClone[8] = 'Content-Type: text/plain';
       httpMsgClone[11] = 'Plain text';
 
-      httpObjClone.headers[6].values = [{
+      httpModelClone.headers[6].values = [{
         value: 'text/plain',
         params: null
       }];
-      httpObjClone.body = {
+      httpModelClone.body = {
         contentType: 'text/plain',
         plain: 'Plain text'
       };
 
-      let actual = httpZ.parseRequest(httpMsgClone.join('\n'));
-      should(actual).eql(httpObjClone);
+      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
+      should(actual).eql(httpModelClone);
     });
   });
 });

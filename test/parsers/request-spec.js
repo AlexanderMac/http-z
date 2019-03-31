@@ -1,176 +1,130 @@
 'use strict';
 
-const _              = require('lodash');
-const sinon          = require('sinon');
-const should         = require('should');
-const nassert        = require('n-assert');
-const RequestBuilder = require('../../src/builder/request');
+const sinon         = require('sinon');
+const should        = require('should');
+const nassert       = require('n-assert');
+const RequestParser = require('../../src/parsers/request');
 
-describe('builder / request', () => {
-  function getBuilderInstance(exRequestObj) {
-    let requestObj = _.extend({
-      method: 'get',
-      protocol: 'http',
-      protocolVersion: 'http/1.1',
-      host: 'example.com',
-      path: '/'
-    }, exRequestObj);
-    return new RequestBuilder(requestObj);
+describe('parsers / request', () => {
+  function getParserInstance(params) {
+    return new RequestParser(params);
   }
 
-  describe('build', () => {
-    it('should call related methods and return request message', () => {
-      let builder = getBuilderInstance();
-      sinon.stub(builder, '_generateStartRow').returns('startRow\n');
-      sinon.stub(builder, '_generateHostRow').returns('hostRow\n');
-      sinon.stub(builder, '_generateHeaderRows').returns('headerRows\n');
-      sinon.stub(builder, '_generateCookieRows').returns('cookieRow\n');
-      sinon.stub(builder, '_generateBodyRows').returns('bodyRows');
+  describe('parse', () => {
+    it('should call related methods and return request model', () => {
+      let parser = getParserInstance({ httpMessage: 'requestMsg' });
+      sinon.stub(parser, '_parseMessageForRows');
+      sinon.stub(parser, '_parseStartRow');
+      sinon.stub(parser, '_parseHeaderRows');
+      sinon.stub(parser, '_parseCookiesRow');
+      sinon.stub(parser, '_parseBodyRows');
+      sinon.stub(parser, '_generateModel').returns('requestModel');
 
-      let expected = 'startRow\nhostRow\nheaderRows\ncookieRow\nbodyRows';
-      let actual = builder.build();
+      let expected = 'requestModel';
+      let actual = parser.parse();
       should(actual).eql(expected);
 
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateHostRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateCookieRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseMessageForRows', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseStartRow', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseHeaderRows', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseCookiesRow', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseBodyRows', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_generateModel', expectedArgs: '_without-args_' });
     });
   });
 
-  describe('_generateStartRow', () => {
-    it('should throw error when method is not defined', () => {
-      let builder = getBuilderInstance({ method: null });
+  describe('_parseMessageForRows', () => {
+    it('should parse message for rows', () => {
+      let requestMsg = [
+        'start-line',
+        'host-line',
+        'Header1:',
+        'Header2:',
+        'Header3:',
+        'Cookie:',
+        '',
+        'Body'
+      ].join('\n');
+      let parser = getParserInstance({ httpMessage: requestMsg });
 
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'method must be not empty string'
-      });
-    });
-
-    it('should throw error when protocol is not defined', () => {
-      let builder = getBuilderInstance({ protocol: null });
-
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'protocol must be not empty string'
-      });
-    });
-
-    it('should throw error when protocolVersion is not defined', () => {
-      let builder = getBuilderInstance({ protocolVersion: null });
-
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'protocolVersion must be not empty string'
-      });
-    });
-
-    it('should throw error when host is not defined', () => {
-      let builder = getBuilderInstance({ host: null });
-
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'host must be not empty string'
-      });
-    });
-
-    it('should throw error when path is not defined', () => {
-      let builder = getBuilderInstance({ path: null });
-
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'path must be not empty string'
-      });
-    });
-
-    it('should build startRow when all params are valid', () => {
-      let builder = getBuilderInstance();
-
-      let expected = 'GET http://example.com/ HTTP/1.1\n';
-      let actual = builder._generateStartRow();
-      should(actual).eql(expected);
+      parser._parseMessageForRows();
+      should(parser.startRow).eql('start-line');
+      should(parser.hostRow).eql('host-line');
+      should(parser.headerRows).eql(['Header1:', 'Header2:', 'Header3:']);
+      should(parser.cookiesRow).eql('Cookie:');
+      should(parser.bodyRows).eql('Body');
     });
   });
 
-  describe('_generateHostRow', () => {
-    it('should build hostRow', () => {
-      let builder = getBuilderInstance({ host: 'example.com' });
+  describe('_generateModel', () => {
+    it('should generate request model using instance fields', () => {
+      let parser = getParserInstance();
+      parser.method = 'method';
+      parser.protocol = 'protocol';
+      parser.protocolVersion = 'protocolVersion';
+      parser.path = 'path';
+      parser.host = 'host';
+      parser.params = 'params';
+      parser.basicAuth = 'basicAuth';
+      parser.headers = 'headers';
+      parser.cookies = 'cookies';
+      parser.body = 'body';
 
-      let expected = 'Host: example.com\n';
-      let actual = builder._generateHostRow();
+      let expected = {
+        method: 'method',
+        protocol: 'protocol',
+        protocolVersion: 'protocolVersion',
+        path: 'path',
+        host: 'host',
+        params: 'params',
+        basicAuth: 'basicAuth',
+        headers: 'headers',
+        cookies: 'cookies',
+        body: 'body'
+      };
+
+      let actual = parser._generateModel();
       should(actual).eql(expected);
     });
   });
 
-  describe('_generateCookieRows', () => {
-    it('should return empty string when instance.cookies is undefined', () => {
-      let builder = getBuilderInstance({ cookies: null });
+  describe('_parseStartRow', () => {
+    it('should throw error when startRow has invalid format', () => {
+      let parser = getParserInstance();
+      parser.startRow = 'Invalid request startRow';
 
-      let expected = '';
-      let actual = builder._generateCookieRows();
-      should(actual).eql(expected);
-    });
-
-    it('should throw error when instance.cookies is not array', () => {
-      let builder = getBuilderInstance({ cookies: 'wrong cookies' });
-
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookies must be not empty array'
+      should(parser._parseStartRow.bind(parser)).throw(Error, {
+        message: 'Method SP Request-URI SP HTTP-Version CRLF. Data: Invalid request startRow'
       });
     });
 
-    it('should throw error when instance.cookies is empty array', () => {
-      let builder = getBuilderInstance({ cookies: [] });
+    it('should init instance fields when startRow has valid format', () => {
+      let parser = getParserInstance();
+      parser.startRow = 'get http://example.com/features?p1=v1 http/1.1';
 
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookies must be not empty array'
-      });
-    });
-
-    it('should throw error when instance.cookies contains element with undefined name', () => {
-      let builder = getBuilderInstance({
-        cookies: [
-          { name: 'c1', value: 'v1' },
-          { value: 'v2' }
-        ]
-      });
-
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookie name and value must be defined. ' +
-                 'Data: {"value":"v2"}'
-      });
-    });
-
-    it('should throw error when instance.cookies contains element with undefined value', () => {
-      let builder = getBuilderInstance({
-        cookies: [
-          { name: 'c1', value: 'v1' },
-          { name: 'c2' }
-        ]
-      });
-
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookie name and value must be defined. ' +
-                 'Data: {"name":"c2"}'
-      });
-    });
-
-    it('should build cookies row when instance.cookies are valid', () => {
-      let builder = getBuilderInstance({
-        cookies: [
-          { name: 'c1', value: 'v1' },
-          { name: 'c2', value: 'v2' }
-        ]
-      });
-
-      let expected = 'Cookie: c1=v1; c2=v2\n';
-      let actual = builder._generateCookieRows();
-      should(actual).eql(expected);
+      parser._parseStartRow();
+      should(parser.method).eql('GET');
+      should(parser.protocol).eql('HTTP');
+      should(parser.protocolVersion).eql('HTTP/1.1');
+      should(parser.path).eql('/features');
+      should(parser.host).eql('example.com');
+      should(parser.params).eql({ p1: 'v1' });
+      should(parser.basicAuth).eql({});
     });
   });
 
   describe('functional tests', () => {
-    it('should build request without body and headers', () => {
-      let requestObj = {
+    it('should parse request without body and headers', () => {
+      let requestMsg = [
+        'get http://admin:pass@example.com/features?p1=v1 http/1.1',
+        'host: example.com',
+        '',
+        ''
+      ].join('\n');
+
+      let requestModel = {
         method: 'GET',
-        protocol: 'HTTPS',
+        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
@@ -180,80 +134,95 @@ describe('builder / request', () => {
           password: 'pass'
         },
         headers: [],
+        cookies: null,
         body: null
       };
 
+      let parser = getParserInstance({ httpMessage: requestMsg });
+      let actual = parser.parse();
+      should(actual).eql(requestModel);
+    });
+
+    it('should parse request without body (header names in lower case)', () => {
       let requestMsg = [
-        'GET https://admin:pass@example.com/features?p1=v1 HTTP/1.1',
-        'Host: example.com',
+        'get http://example.com/features http/1.1',
+        'host: example.com',
+        'connection: keep-alive',
+        'accept: */*',
+        'accept-Encoding: gzip,deflate',
+        'accept-language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         '',
         ''
       ].join('\n');
 
-      let builder = getBuilderInstance(requestObj);
-      let actual = builder.build();
-      should(actual).eql(requestMsg);
-    });
-
-    it('should build request message without body (header names in lower case)', () => {
-      let requestObj = {
+      let requestModel = {
         method: 'GET',
         protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
+        params: {},
+        basicAuth: {},
         headers: [
           {
-            name: 'connection',
+            name: 'Connection',
             values: [
               { value: 'keep-alive', params: null }
             ]
           },
           {
-            name: 'cache-Control',
+            name: 'Accept',
             values: [
-              { value: 'no-cache', params: null }
+              { value: '*/*', params: null }
             ]
           },
           {
-            name: 'Content-type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
-          },
-          {
-            name: 'content-encoding',
+            name: 'Accept-Encoding',
             values: [
               { value: 'gzip', params: null },
               { value: 'deflate', params: null }
             ]
+          },
+          {
+            name: 'Accept-Language',
+            values: [
+              { value: 'ru-RU', params: null },
+              { value: 'ru', params: 'q=0.8' },
+              { value: 'en-US', params: 'q=0.6' },
+              { value: 'en', params: 'q=0.4' }
+            ]
           }
         ],
+        cookies: null,
         body: null
       };
 
+      let parser = getParserInstance({ httpMessage: requestMsg });
+      let actual = parser.parse();
+      should(actual).eql(requestModel);
+    });
+
+    it('should parse request with cookies and without body', () => {
       let requestMsg = [
         'GET http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
-        'Cache-Control: no-cache',
-        'Content-Type: text/plain;charset=UTF-8',
-        'Content-Encoding: gzip, deflate',
+        'Accept: */*',
+        'Accept-Encoding: gzip,deflate',
+        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'Cookie: csrftoken=123abc;sessionid=456def',
+        '',
         ''
       ].join('\n');
 
-      let builder = getBuilderInstance(requestObj);
-      let actual = builder.build();
-      should(actual).eql(requestMsg);
-    });
-
-    it('should parse request with cookies and without body', () => {
-      let requestObj = {
+      let requestModel = {
         method: 'GET',
         protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
+        params: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -291,29 +260,34 @@ describe('builder / request', () => {
         body: null
       };
 
-      let requestMsg = [
-        'GET http://example.com/features HTTP/1.1',
-        'Host: example.com',
-        'Connection: keep-alive',
-        'Accept: */*',
-        'Accept-Encoding: gzip, deflate',
-        'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Cookie: csrftoken=123abc; sessionid=456def',
-        ''
-      ].join('\n');
-
-      let builder = getBuilderInstance(requestObj);
-      let actual = builder.build();
-      should(actual).eql(requestMsg);
+      let parser = getParserInstance({ httpMessage: requestMsg });
+      let actual = parser.parse();
+      should(actual).eql(requestModel);
     });
 
     it('should parse request with body and contentType=text/plain', () => {
-      let requestObj = {
+      let requestMsg = [
+        'POST http://example.com/features HTTP/1.1',
+        'Host: example.com',
+        'Connection: keep-alive',
+        'Accept: */*',
+        'Accept-Encoding: gzip,deflate',
+        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Encoding: gzip,deflate',
+        'Content-Length: 301',
+        '',
+        'Plain text'
+      ].join('\n');
+
+      let requestModel = {
         method: 'POST',
         protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
+        params: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -370,32 +344,34 @@ describe('builder / request', () => {
         }
       };
 
+      let parser = getParserInstance({ httpMessage: requestMsg });
+      let actual = parser.parse();
+      should(actual).eql(requestModel);
+    });
+
+    it('should parse request with body and contentType=application/json', () => {
       let requestMsg = [
         'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
-        'Accept-Encoding: gzip, deflate',
-        'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Content-Type: text/plain;charset=UTF-8',
-        'Content-Encoding: gzip, deflate',
+        'Accept-Encoding: gzip,deflate',
+        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'Content-Type: application/json; charset=UTF-8',
+        'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        'Plain text'
+        '{"p1":"v1","p2":"v2"}'
       ].join('\n');
 
-      let builder = getBuilderInstance(requestObj);
-      let actual = builder.build();
-      should(actual).eql(requestMsg);
-    });
-
-    it('should parse request with body and contentType=application/json', () => {
-      let requestObj = {
+      let requestModel = {
         method: 'POST',
         protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
+        params: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -452,32 +428,34 @@ describe('builder / request', () => {
         }
       };
 
+      let parser = getParserInstance({ httpMessage: requestMsg });
+      let actual = parser.parse();
+      should(actual).eql(requestModel);
+    });
+
+    it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
       let requestMsg = [
         'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
-        'Accept-Encoding: gzip, deflate',
-        'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Content-Type: application/json;charset=UTF-8',
-        'Content-Encoding: gzip, deflate',
+        'Accept-Encoding: gzip,deflate',
+        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+        'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        '{"p1":"v1","p2":"v2"}'
+        'id=11&message=Hello'
       ].join('\n');
 
-      let builder = getBuilderInstance(requestObj);
-      let actual = builder.build();
-      should(actual).eql(requestMsg);
-    });
-
-    it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
-      let requestObj = {
+      let requestModel = {
         method: 'POST',
         protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
+        params: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -537,32 +515,42 @@ describe('builder / request', () => {
         }
       };
 
+      let parser = getParserInstance({ httpMessage: requestMsg });
+      let actual = parser.parse();
+      should(actual).eql(requestModel);
+    });
+
+    it('should parse request with body and contentType=multipart/form-data', () => {
       let requestMsg = [
         'POST http://example.com/features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
-        'Accept-Encoding: gzip, deflate',
-        'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
-        'Content-Encoding: gzip, deflate',
+        'Accept-Encoding: gzip,deflate',
+        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'Content-Type: multipart/form-data; boundary=------11136253119209',
+        'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        'id=11&message=Hello'
+        '-----------------------------11136253119209',
+        'Content-Disposition: form-data; name="Name"',
+        '',
+        'Smith',
+        '-----------------------------11136253119209',
+        'Content-Disposition: form-data; name="Age"',
+        '',
+        '25',
+        '-----------------------------11136253119209--'
       ].join('\n');
 
-      let builder = getBuilderInstance(requestObj);
-      let actual = builder.build();
-      should(actual).eql(requestMsg);
-    });
-
-    it('should parse request with body and contentType=multipart/form-data', () => {
-      let requestObj = {
+      let requestModel = {
         method: 'POST',
         protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
+        params: {},
+        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -623,31 +611,9 @@ describe('builder / request', () => {
         }
       };
 
-      let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
-        'Host: example.com',
-        'Connection: keep-alive',
-        'Accept: */*',
-        'Accept-Encoding: gzip, deflate',
-        'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Content-Type: multipart/form-data;boundary=------11136253119209',
-        'Content-Encoding: gzip, deflate',
-        'Content-Length: 301',
-        '',
-        '-----------------------------11136253119209',
-        'Content-Disposition: form-data; name="Name"',
-        '',
-        'Smith',
-        '-----------------------------11136253119209',
-        'Content-Disposition: form-data; name="Age"',
-        '',
-        '25',
-        '-----------------------------11136253119209--'
-      ].join('\n');
-
-      let builder = getBuilderInstance(requestObj);
-      let actual = builder.build();
-      should(actual).eql(requestMsg);
+      let parser = getParserInstance({ httpMessage: requestMsg });
+      let actual = parser.parse();
+      should(actual).eql(requestModel);
     });
   });
 });

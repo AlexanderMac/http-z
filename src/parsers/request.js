@@ -1,9 +1,9 @@
 'use strict';
 
 const { URL } = require('url');
-const consts  = require('../../consts');
-const utils   = require('../../utils');
-const Base    = require('../base');
+const consts  = require('../consts');
+const utils   = require('../utils');
+const Base    = require('./base');
 
 class HttpZRequestParser extends Base {
   static parse(params) {
@@ -20,7 +20,7 @@ class HttpZRequestParser extends Base {
     this._parseCookiesRow();
     this._parseBodyRows();
 
-    return this._generateObj();
+    return this._generateModel();
   }
 
   _parseMessageForRows() {
@@ -51,7 +51,7 @@ class HttpZRequestParser extends Base {
     this.basicAuth = this._getBasicAuth(url);
   }
 
-  _generateObj() {
+  _generateModel() {
     return {
       method: this.method,
       protocol: this.protocol,
