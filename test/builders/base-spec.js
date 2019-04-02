@@ -34,7 +34,7 @@ describe('builders / base', () => {
       let httpModelClone = _.cloneDeep(httpModel);
       httpModelClone.method = null;
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Unknown message format'
+        message: 'Unknown httpModel format'
       });
 
       httpModelClone = _.cloneDeep(httpModel);

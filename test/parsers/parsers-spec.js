@@ -60,7 +60,7 @@ describe('parsers / index', () => {
     nassert.validateCalledFn({ srvc: RequestParser, fnName: 'parse', expectedArgs });
   });
 
-  it('should call ResponseParser.parse when httpMessage is request', () => {
+  it('should call ResponseParser.parse when httpMessage is response', () => {
     let params = {
       httpMessage: 'http/1.1 200 Ok',
       eol: '\r\n'

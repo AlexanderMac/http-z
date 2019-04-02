@@ -1,15 +1,19 @@
 'use strict';
 
+const utils           = require('../utils');
 const RequestBuilder  = require('./request');
 const ResponseBuilder = require('./response');
 
-// TODO: test it
-module.exports = (params = {}) => {
-  if (params.method) {
-    return RequestBuilder.build(params);
+module.exports = (httpModel) => {
+  if (!httpModel) {
+    throw utils.getErrorMessage('httpModel is required');
   }
-  if (params.statusCode) {
-    return ResponseBuilder.build(params);
+
+  if (httpModel.method) {
+    return RequestBuilder.build(httpModel);
   }
-  throw new Error('Unknown message format');
+  if (httpModel.statusCode) {
+    return ResponseBuilder.build(httpModel);
+  }
+  throw new Error('Unknown httpModel format');
 };
