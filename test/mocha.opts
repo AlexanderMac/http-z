@@ -1,3 +1,4 @@
+--require test/index.js
 --ui bdd
 --reporter dot
 --recursive
