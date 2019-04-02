@@ -1,63 +1,115 @@
 'use strict';
 
-const _      = require('lodash');
-const should = require('should');
-const httpZ  = require('../../');
+const sinon      = require('sinon');
+const should     = require('should');
+const nassert    = require('n-assert');
+const BaseParser = require('../../src/parsers/base');
 
 describe('parsers / base', () => {
-  describe('httpMsg', () => {
-    it('should throw error when httpMsg is undefined', () => {
-      should(httpZ.parse.bind(null)).throw(Error, {
-        message: 'Unknown message format'
+  function getParserInstance(params) {
+    return new BaseParser(params);
+  }
+
+  describe('_parseMessageForRows', () => {
+    it('should throw error when message does not have headers', () => {
+      let requestMsg = [
+        '',
+        'Body'
+      ].join('\n');
+      let parser = getParserInstance({ httpMessage: requestMsg });
+
+      should(parser._parseMessageForRows.bind(parser)).throw(Error, {
+        message: 'Incorrect message format, it must have headers and body, separated by empty line'
       });
+    });
+
+    it('should throw error when message does not have body', () => {
+      let requestMsg = [
+        'start-line',
+        'host-line',
+        'Header1'
+      ].join('\n');
+      let parser = getParserInstance({ httpMessage: requestMsg });
+
+      should(parser._parseMessageForRows.bind(parser)).throw(Error, {
+        message: 'Incorrect message format, it must have headers and body, separated by empty line'
+      });
+    });
+
+    it('should parse message for rows', () => {
+      let requestMsg = [
+        'start-line',
+        'host-line',
+        'Header1',
+        'Header2',
+        'Header3',
+        'Cookie',
+        '',
+        'Body'
+      ].join('\n');
+      let parser = getParserInstance({ httpMessage: requestMsg });
+
+      let actual = parser._parseMessageForRows();
+      should(actual.startRow).eql('start-line');
+      should(actual.headerRows).eql(['host-line', 'Header1', 'Header2', 'Header3', 'Cookie']);
+      should(actual.bodyRows).eql('Body');
     });
   });
 
-  describe('start row', () => {
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
-      'Accept: */*',
-      'Accept-Encoding: gzip,deflate',
-      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-      '',
-      ''
-    ];
+  describe('_parseHeaderRows', () => {
+    it('should throw error when headerRow has invalid format', () => {
+      let parser = getParserInstance();
+      parser.headerRows = [
+        'Header1: values',
+        'Header2 - values',
+        'Header3: values',
+      ];
 
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      params: { p1: 'v1' },
-      basicAuth: {},
-      headers: [
+      should(parser._parseHeaderRows.bind(parser)).throw(Error, {
+        message: 'Incorrect header row format, expected: Name: Values.\nDetails: "Header2 - values"'
+      });
+    });
+
+    it('should throw error when header values have invalid format (case 1)', () => {
+      let parser = getParserInstance();
+      parser.headerRows = [
+        'Header1: value1, value2',
+        'Header2: ',
+        'Header3: value',
+      ];
+
+      should(parser._parseHeaderRows.bind(parser)).throw(Error, {
+        message: 'Incorrect header row format, expected: Name: Values.\nDetails: "Header2: "'
+      });
+    });
+
+    it('should throw error when header values have invalid format (case 2)', () => {
+      let parser = getParserInstance();
+      parser.headerRows = [
+        'Header1: value1, value2',
+        'Header2: value1, ',
+        'Header3: value',
+      ];
+
+      should(parser._parseHeaderRows.bind(parser)).throw(Error, {
+        message: 'Incorrect header values format, expected: Value1, Value2, ....\nDetails: "Header2: value1, "'
+      });
+    });
+
+    it('should set instance.headers when headerRows are valid', () => {
+      let parser = getParserInstance();
+      parser.headerRows = [
+        'connection: keep-alive',
+        'accept-Encoding: gzip, deflate   ',
+        'Accept-language: ru-RU, ru; q=0.8,en-US;q=0.6,en;  q=0.4'
+      ];
+      parser._parseHeaderRows();
+
+      let expected = [
         {
           name: 'Connection',
           values: [
             { value: 'keep-alive', params: null }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache', params: null }
-          ]
-        },
-        {
-          name: 'User-Agent',
-          values: [
-            { value: 'Mozilla/5.0 (Windows NT 6.1 WOW64)', params: null }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*', params: null }
           ]
         },
         {
@@ -76,116 +128,213 @@ describe('parsers / base', () => {
             { value: 'en', params: 'q=0.4' }
           ]
         }
-      ],
-      cookies: null,
-      body: null
-    };
-
-    it('should throw error when start row has invalid format', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpMsgClone[0] = 'absolutely wrong string';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Unknown message format'
-      });
-    });
-
-    it('should parse GET method', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.1';
-      let httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.method = 'GET';
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse DELETE method', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      httpMsgClone[0] = 'DELETE http://example.com/features?p1=v1 HTTP/1.1';
-      let httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.method = 'DELETE';
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse HTTP protocol and url without parameters', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      httpMsgClone[0] = 'GET http://example.com/features HTTP/1.1';
-      let httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.params = {};
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse HTTP protocol and url with parameters', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.1';
-      let httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.params = { p1: 'v1' };
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse HTTPS protocol', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      httpMsgClone[0] = 'GET https://example.com/features HTTP/1.1';
-      let httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.protocol = 'HTTPS';
-      httpModelClone.params = {};
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse HTTP protocol v1.0', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/1.0';
-      let httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.protocolVersion = 'HTTP/1.0';
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse HTTP protocol v2.0', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      httpMsgClone[0] = 'GET http://example.com/features?p1=v1 HTTP/2.0';
-      let httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.protocolVersion = 'HTTP/2.0';
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
+      ];
+      should(parser.headers).eql(expected);
     });
   });
 
-  describe('headers', () => {
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
-      'Accept: */*',
-      'Accept-Encoding: gzip,deflate',
-      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-      'Referer: http://app2.net/user/fjvbuq/',
-      '',
-      ''
-    ];
+  describe('_parseBodyRows', () => {
+    function test({ headers, bodyRows, expected, expectedFnArgs = {}}) {
+      let parser = getParserInstance();
+      sinon.stub(parser, '_parseFormDataBody').callsFake(() =>   parser.body.formDataParams = 'body');
+      sinon.stub(parser, '_parseXwwwFormUrlencodedBody').callsFake(() => parser.body.formDataParams = 'body');
+      sinon.stub(parser, '_parseJsonBody').callsFake(() => parser.body.json = 'body');
+      sinon.stub(parser, '_parsePlainBody').callsFake(() => parser.body.plain = 'body');
+      parser.headers = headers;
+      parser.bodyRows = bodyRows;
 
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      params: { p1: 'v1' },
-      basicAuth: {},
-      headers: [
+      parser._parseBodyRows();
+      should(parser.body).eql(expected);
+
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseFormDataBody', expectedArgs: expectedFnArgs.parseFormDataBody });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.parseXwwwFormUrlencodedBody });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseJsonBody', expectedArgs: expectedFnArgs.parseJsonBody });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parsePlainBody', expectedArgs: expectedFnArgs.parsePlainBody });
+    }
+
+    it('should set instance.body to null when bodyRows is empty', () => {
+      let bodyRows = null;
+      let expected = null;
+
+      test({ bodyRows, expected });
+    });
+
+    it('should set instance.body when bodyRows are valid and contentType header is multipart/form-data', () => {
+      let headers = [{ name: 'Content-Type', values: [{ value: 'multipart/form-data' }] }];
+      let bodyRows = 'body';
+      let expected = {
+        contentType: 'multipart/form-data',
+        formDataParams: 'body'
+      };
+      let expectedFnArgs = { parseFormDataBody: '_without-args_' };
+
+      test({ headers, bodyRows, expected, expectedFnArgs });
+    });
+
+    it('should set instance.body when bodyRows are valid and contentType header is application/x-www-form-urlencoded', () => {
+      let headers = [{ name: 'Content-Type', values: [{ value: 'application/x-www-form-urlencoded' }] }];
+      let bodyRows = 'body';
+      let expected = {
+        contentType: 'application/x-www-form-urlencoded',
+        formDataParams: 'body'
+      };
+      let expectedFnArgs = { parseXwwwFormUrlencodedBody: '_without-args_' };
+
+      test({ headers, bodyRows, expected, expectedFnArgs });
+    });
+
+    it('should set instance.body when bodyRows are valid and contentType header is application/json', () => {
+      let headers = [{ name: 'Content-Type', values: [{ value: 'application/json' }] }];
+      let bodyRows = 'body';
+      let expected = {
+        contentType: 'application/json',
+        json: 'body'
+      };
+      let expectedFnArgs = { parseJsonBody: '_without-args_' };
+
+      test({ headers, bodyRows, expected, expectedFnArgs });
+    });
+
+    it('should set instance.body when bodyRows are valid and contentType header is missing', () => {
+      let bodyRows = 'body';
+      let expected = {
+        plain: 'body'
+      };
+      let expectedFnArgs = { parsePlainBody: '_without-args_' };
+
+      test({ bodyRows, expected, expectedFnArgs });
+    });
+  });
+
+  describe('_parseFormDataBody', () => {
+    it('should throw error when some param has incorrect format', () => {
+      let parser = getParserInstance();
+      parser.body = {};
+      parser.headers = [{
+        name: 'Content-Type',
+        values: [
+          { value: 'multipart/form-data', params: 'boundary=11136253119209' }
+        ]
+      }];
+      parser.bodyRows = [
+        '--11136253119209',
+        'Content-Disposition: form-data; name="firstName"',
+        '',
+        'John',
+        '--11136253119209',
+        'Content-Disposition: form-data; name="age"',
+        '25',
+        '--11136253119209--'
+      ].join('\n');
+
+      should(parser._parseFormDataBody.bind(parser)).throw(Error, {
+        message: 'Incorrect form-data parameter.\nDetails: "\nContent-Disposition: form-data; name="age"\n25\n"'
+      });
+    });
+
+    it('should set instance.body when all params in body are valid', () => {
+      let parser = getParserInstance();
+      parser.body = {};
+      parser.headers = [{
+        name: 'Content-Type',
+        values: [
+          { value: 'multipart/form-data', params: 'boundary=11136253119209' }
+        ]
+      }];
+      parser.bodyRows = [
+        '--11136253119209',
+        'Content-Disposition: form-data; name="firstName"',
+        '',
+        'John',
+        '--11136253119209',
+        'Content-Disposition: form-data; name="age"',
+        '',
+        '25',
+        '--11136253119209--'
+      ].join('\n');
+
+      parser._parseFormDataBody();
+
+      let expected = {
+        boundary: '11136253119209',
+        formDataParams: [
+          { name: 'firstName', value: 'John' },
+          { name: 'age', value: '25' }
+        ]
+      };
+      should(parser.body).eql(expected);
+    });
+  });
+
+  describe('_parseXwwwFormUrlencodedBody', () => {
+    it('should throw error when some param has incorrect format', () => {
+      let parser = getParserInstance();
+      parser.bodyRows = 'firstName=John&=Smith&age=25';
+
+      should(parser._parseXwwwFormUrlencodedBody.bind(parser)).throw(Error, {
+        message: 'Incorrect x-www-form-urlencoded parameter, expected: Name="Value.\nDetails: "=Smith"'
+      });
+    });
+
+    it('should set instance.body when all params in body are valid', () => {
+      let parser = getParserInstance();
+      parser.body = {};
+      parser.bodyRows = 'firstName=John&lastName=Smith=25';
+
+      parser._parseXwwwFormUrlencodedBody();
+
+      let expected = {
+        formDataParams: [
+          { name: 'firstName', value: 'John' },
+          { name: 'lastName', value: 'Smith=25' }
+        ]
+      };
+      should(parser.body).eql(expected);
+    });
+  });
+
+  describe('_parseJsonBody', () => {
+    it('should parse body and throw error when json is invalid', () => {
+      let parser = getParserInstance();
+      parser.bodyRows = 'Incorrect json';
+
+      should(parser._parseJsonBody.bind(parser)).throw(Error, {
+        message: 'Invalid json in body'
+      });
+    });
+
+    it('should parse body and set instance.body to parsed object when json is valid', () => {
+      let parser = getParserInstance();
+      parser.body = {};
+      parser.bodyRows = '{"name":"John"}';
+
+      parser._parseJsonBody();
+
+      let expected = {
+        json: { name : 'John' }
+      };
+      should(parser.body).eql(expected);
+    });
+  });
+
+  describe('_parsePlainBody', () => {
+    it('should set instance.body using bodyRows', () => {
+      let parser = getParserInstance();
+      parser.body = {};
+      parser.bodyRows = 'body';
+
+      parser._parsePlainBody();
+
+      let expected = {
+        plain: 'body'
+      };
+      should(parser.body).eql(expected);
+    });
+  });
+
+  describe('_getContentType', () => {
+    function getDefaultHeaders() {
+      return [
         {
           name: 'Connection',
           values: [
@@ -193,473 +342,40 @@ describe('parsers / base', () => {
           ]
         },
         {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache', params: null }
-          ]
-        },
-        {
-          name: 'User-Agent',
-          values: [
-            { value: 'Mozilla/5.0 (Windows NT 6.1 WOW64)', params: null }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*', params: null }
-          ]
-        },
-        {
           name: 'Accept-Encoding',
           values: [
             { value: 'gzip', params: null },
             { value: 'deflate', params: null }
-          ]
-        },
-        {
-          name: 'Accept-Language',
-          values: [
-            { value: 'ru-RU', params: null },
-            { value: 'ru', params: 'q=0.8' },
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
-          ]
-        },
-        {
-          name: 'Referer',
-          values: [
-            { value: 'http://app2.net/user/fjvbuq/', params: null }
-          ]
-        }
-      ],
-      cookies: null,
-      body: null
-    };
-
-    it('should throw error when header has invalid format', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpMsgClone[2] = 'Connection keep-alive';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Header row must be in format: ' +
-                 'Name: Values. Data: Connection keep-alive'
-      });
-
-      httpMsgClone[2] = 'Connection: ';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Header row must be in format: ' +
-                 'Name: Values. Data: Connection: '
-      });
-
-      httpMsgClone[2] = ' : keep-alive';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Header row must be in format: ' +
-                 'Name: Values. Data:  : keep-alive'
-      });
-    });
-
-    it('should parse valid headers', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelCloneo = _.cloneDeep(httpModel);
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelCloneo);
-    });
-
-    it('should parse Accept-Language header with one value', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone[7] = 'Accept-Language: ru-RU;q=0.8';
-      httpModelClone.headers[5].values = [
-        { value: 'ru-RU', params: 'q=0.8' }
-      ];
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse Accept-Language header with two values', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone[7] = 'Accept-Language: ru-RU;q=0.8, en-US';
-      httpModelClone.headers[5].values = [
-        { value: 'ru-RU', params: 'q=0.8' },
-        { value: 'en-US', params: null }
-      ];
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-  });
-
-  describe('cookies', () => {
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
-      'Accept: */*',
-      'Accept-Encoding: gzip,deflate',
-      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-      'Cookie: csrftoken=123abc;sessionid=456def',
-      '',
-      ''
-    ];
-
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      params: { p1: 'v1' },
-      basicAuth: {},
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive', params: null }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache', params: null }
-          ]
-        },
-        {
-          name: 'User-Agent',
-          values: [
-            { value: 'Mozilla/5.0 (Windows NT 6.1 WOW64)', params: null }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*', params: null }
-          ]
-        },
-        {
-          name: 'Accept-Encoding',
-          values: [
-            { value: 'gzip', params: null },
-            { value: 'deflate', params: null }
-          ]
-        },
-        {
-          name: 'Accept-Language',
-          values: [
-            { value: 'ru-RU', params: null },
-            { value: 'ru', params: 'q=0.8' },
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
-          ]
-        }
-      ],
-      cookies: [
-        { name: 'csrftoken', value: '123abc' },
-        { name: 'sessionid', value: '456def' }
-      ],
-      body: null
-    };
-
-    it('should throw error when cookie row is invalid', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpMsgClone[8] = 'Cookie: ';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Cookie row must be in format: ' +
-                 'Cookie: Name1=Value1;.... Data: Cookie:'
-      });
-    });
-
-    it('should not throw Error when cookie row is empty', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone.splice(8, 1);
-      httpModelClone.cookies = null;
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse cookie with one name-value pair', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone[8] = 'Cookie: csrftoken=123abc';
-      httpModelClone.cookies = [
-        { name: 'csrftoken', value: '123abc' }
-      ];
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse cookie with one name-value pair and parameters', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone[8] = 'Cookie: csrftoken=123abc;sessionid=456def';
-      httpModelClone.cookies = [
-        { name: 'csrftoken', value: '123abc' },
-        { name: 'sessionid', value: '456def' }
-      ];
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-  });
-
-  describe('body', () => {
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
-      'Accept: */*',
-      'Accept-Encoding: gzip,deflate',
-      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-      'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-      'Content-Length: 301',
-      '',
-      ''
-    ];
-
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      params: { p1: 'v1' },
-      basicAuth: {},
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive', params: null }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache', params: null }
-          ]
-        },
-        {
-          name: 'User-Agent',
-          values: [
-            { value: 'Mozilla/5.0 (Windows NT 6.1 WOW64)', params: null }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*', params: null }
-          ]
-        },
-        {
-          name: 'Accept-Encoding',
-          values: [
-            { value: 'gzip', params: null },
-            { value: 'deflate', params: null }
-          ]
-        },
-        {
-          name: 'Accept-Language',
-          values: [
-            { value: 'ru-RU', params: null },
-            { value: 'ru', params: 'q=0.8' },
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
           ]
         },
         {
           name: 'Content-Type',
           values: [
-            { value: 'application/x-www-form-urlencoded', params: 'charset=UTF-8' }
-          ]
-        },
-        {
-          name: 'Content-Length',
-          values: [
-            { value: '301', params: null }
+            { value: 'application/json', params: null }
           ]
         }
-      ],
-      cookies: null,
-      body: null
-    };
+      ];
+    }
 
-    it('should throw error when body has invalid format and ContentType=application/x-www-form-urlencoded', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
+    it('should return null when instance.headers does not include contentType header', () => {
+      let parser = getParserInstance();
+      parser.headers = getDefaultHeaders();
+      parser.headers.splice(2, 1);
 
-      httpMsgClone[8] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
+      let expected = null;
+      let actual = parser._getContentType();
 
-      httpMsgClone[11] = 'id=11&messageHello';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Invalid x-www-form-url-encode parameter. ' +
-                 'Data: messageHello'
-      });
-
-      httpMsgClone[11] = 'id=11&message=Hello&';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Invalid x-www-form-url-encode parameter'
-      });
+      should(actual).eql(expected);
     });
 
-    it('should throw error when body has invalid format and ContentType=multipart/form-data', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
+    it('should return contentType value', () => {
+      let parser = getParserInstance();
+      parser.headers = getDefaultHeaders();
 
-      httpMsgClone[8] = 'Content-Type: multipart/form-data; boundary=------11136253119209';
-      httpMsgClone[11] = '-----------------------------11136253119209';
-      httpMsgClone[12] = 'Content-Disposit: form-data; name="Name"';
-      httpMsgClone[13] = '';
-      httpMsgClone[14] = 'Smith';
-      httpMsgClone[15] = '-----------------------------11136253119209';
-      httpMsgClone[16] = 'Content-Disposition: form-data;';
-      httpMsgClone[17] = '';
-      httpMsgClone[18] = '25';
-      httpMsgClone[19] = '-----------------------------11136253119209--';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Invalid formData parameter. ' +
-                 'Data: \nContent-Disposit: form-data; name="Name"\n\nSmith\n'
-      });
-    });
+      let expected = { value: 'application/json', params: null };
+      let actual = parser._getContentType();
 
-    it('should throw error when boundary parameter has invalid format and ContentType=multipart/form-data ', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpMsgClone[11] = 'body';
-
-      httpMsgClone[8] = 'Content-Type: multipart/form-data';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Request with ContentType=FormData must have a header with boundary'
-      });
-
-      httpMsgClone[8] = 'Content-Type: multipart/form-data; boundary';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Boundary param must be in format: boundary=value. ' +
-                 'Data: boundary'
-      });
-
-      httpMsgClone[8] = 'Content-Type: multipart/form-data; boundary=';
-      should(httpZ.parse.bind(null, { httpMessage: httpMsgClone.join('\n') })).throw(Error, {
-        message: 'Boundary param must be in format: boundary=value. ' +
-                 'Data: boundary='
-      });
-    });
-
-    it('should not throw Error when body is empty', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpModelClone.body = null;
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse valid body with ContentType=application/x-www-form-urlencoded', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone[8] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
-      httpMsgClone[11] = 'id=11&message=Hello';
-
-      httpModelClone.headers[6].values = [{
-        value: 'application/x-www-form-urlencoded',
-        params: 'charset=UTF-8'
-      }];
-      httpModelClone.body = {
-        contentType: 'application/x-www-form-urlencoded',
-        formDataParams: [
-          { name: 'id', value: '11' },
-          { name: 'message', value: 'Hello' }
-        ]
-      };
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse valid body with ContentType=multipart/form-data', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone[8] = 'Content-Type: multipart/form-data; boundary=------11136253119209';
-      httpMsgClone[11] = '-----------------------------11136253119209';
-      httpMsgClone[12] = 'Content-Disposition: form-data; name="Name"';
-      httpMsgClone[13] = '';
-      httpMsgClone[14] = 'Smith';
-      httpMsgClone[15] = '-----------------------------11136253119209';
-      httpMsgClone[16] = 'Content-Disposition: form-data; name="Age"';
-      httpMsgClone[17] = '';
-      httpMsgClone[18] = '25';
-      httpMsgClone[19] = '-----------------------------11136253119209--';
-
-      httpModelClone.headers[6].values = [{
-        value: 'multipart/form-data',
-        params: 'boundary=------11136253119209'
-      }];
-      httpModelClone.body = {
-        contentType: 'multipart/form-data',
-        boundary: '------11136253119209',
-        formDataParams: [
-          { name: 'Name', value: 'Smith' },
-          { name: 'Age', value: '25' }
-        ]
-      };
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse valid body with ContentType=application/json', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone[8] = 'Content-Type: application/json';
-      httpMsgClone[11] = '{"p1":"v1","p2":"v2"}';
-
-      httpModelClone.headers[6].values = [{
-        value: 'application/json',
-        params: null
-      }];
-      httpModelClone.body = {
-        contentType: 'application/json',
-        json: { p1: 'v1', p2: 'v2' }
-      };
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
-    });
-
-    it('should parse valid body with ContentType=text/plain', () => {
-      let httpMsgClone = _.cloneDeep(httpMsg);
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpMsgClone[8] = 'Content-Type: text/plain';
-      httpMsgClone[11] = 'Plain text';
-
-      httpModelClone.headers[6].values = [{
-        value: 'text/plain',
-        params: null
-      }];
-      httpModelClone.body = {
-        contentType: 'text/plain',
-        plain: 'Plain text'
-      };
-
-      let actual = httpZ.parse({ httpMessage: httpMsgClone.join('\n') });
-      should(actual).eql(httpModelClone);
+      should(actual).eql(expected);
     });
   });
 });

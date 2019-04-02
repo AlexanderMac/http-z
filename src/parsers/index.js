@@ -2,11 +2,15 @@
 
 const _              = require('lodash');
 const consts         = require('../consts');
+const utils          = require('../utils');
 const RequestParser  = require('./request');
 const ResponseParser = require('./response');
 
-// TODO: test it
 module.exports = ({ httpMessage, eol = '\n' } = {}) => {
+  if (!httpMessage) {
+    throw utils.getErrorMessage('httpMessage is required');
+  }
+
   let firstRow = _.chain(httpMessage).split(eol).head().value();
 
   if (consts.regexps.requestStartRow.test(firstRow)) {
@@ -15,5 +19,5 @@ module.exports = ({ httpMessage, eol = '\n' } = {}) => {
   if (consts.regexps.responseStartRow.test(firstRow)) {
     return ResponseParser.parse({ httpMessage, eol });
   }
-  throw new Error('Unknown message format');
+  throw new Error('Unknown httpMessage format');
 };

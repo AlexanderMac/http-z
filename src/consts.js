@@ -14,8 +14,8 @@ const regexps = {
   url: new RegExp(RegExpStrings.url, 'i'),
   requestStartRow: new RegExp('^' + RegExpStrings.method + ' ' + RegExpStrings.url + ' ' + RegExpStrings.protocolVer + '$', 'i'),
   responseStartRow: new RegExp('^' + RegExpStrings.protocolVer + ' ' + '\\d{3}' + ' ' + '\\w+( \\w+)*$'  + '$', 'i'),
-  boundary: /boundary=-+\w+/im,
-  param: /Content-Disposition:\s*form-data;\s*name="\w+"/im,
+  boundary: /boundary=\w+/im,
+  param: /Content-Disposition:\s*form-data;\s*name="\w+"\n\n/im,
   paramName: /name="\w+"/im,
   quote: /"/g
 };

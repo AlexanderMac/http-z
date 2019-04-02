@@ -1,5 +1,6 @@
 'use strict';
 
+const _       = require('lodash');
 const { URL } = require('url');
 const consts  = require('../consts');
 const utils   = require('../utils');
@@ -12,8 +13,6 @@ class HttpZRequestParser extends Base {
   }
 
   parse() {
-    super.parse();
-
     this._parseMessageForRows();
     this._parseStartRow();
     this._parseHeaderRows();
@@ -24,18 +23,28 @@ class HttpZRequestParser extends Base {
   }
 
   _parseMessageForRows() {
-    let { headerRows, cookiesRow, bodyRows } = super._parseMessageForRows();
+    let { startRow, headerRows, bodyRows } = super._parseMessageForRows();
 
-    this.startRow = headerRows[0];
-    this.hostRow = headerRows[1];
-    this.headerRows = headerRows.splice(2);
+    let cookiesRow;
+    let cookiesIndex = _.findIndex(headerRows, row => _.startsWith(row, 'Cookie')); // TODO: can be in lower case
+    if (cookiesIndex !== -1) {
+      cookiesRow = headerRows[cookiesIndex];
+      headerRows.splice(cookiesIndex, 1);
+    }
+
+    this.startRow = startRow;
+    this.hostRow = headerRows[0];
+    this.headerRows = headerRows.splice(1);
     this.cookiesRow = cookiesRow;
     this.bodyRows = bodyRows;
   }
 
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
-      throw utils.getErrorMessage('Method SP Request-URI SP HTTP-Version CRLF', this.startRow);
+      throw utils.getErrorMessage(
+        'Incorrect startRow format, expected: Method SP Request-URI SP HTTP-Version CRLF',
+        this.startRow
+      );
     }
 
     let rowElems = this.startRow.split(' ');
@@ -49,6 +58,32 @@ class HttpZRequestParser extends Base {
     this.path = url.pathname;
     this.params = this._getParams(url);
     this.basicAuth = this._getBasicAuth(url);
+  }
+
+  _parseCookiesRow() {
+    if (!this.cookiesRow) {
+      this.cookies = null;
+      return;
+    }
+
+    let [unused, values] = utils.splitIntoTwoParts(this.cookiesRow, ':');
+    if (!unused || !values) {
+      throw utils.getErrorMessage('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow);
+    }
+    this.cookies = _.chain(values)
+      .split(';')
+      .map(pair => {
+        let [name, value] = _.split(pair, '=');
+        let cookie = {
+          name: _.trim(name),
+          value: _.trim(value) || null
+        };
+        if (!cookie.name) {
+          throw utils.getErrorMessage('Incorrect cookie pair format, expected: Name1=Value1;...', values);
+        }
+        return cookie;
+      })
+      .value();
   }
 
   _generateModel() {
@@ -68,7 +103,7 @@ class HttpZRequestParser extends Base {
 
   // TODO: test it
   _getProtocol(url) {
-    return (url.protocol || '').replace(':', '').toUpperCase();
+    return url.protocol.replace(':', '').toUpperCase();
   }
 
   // TODO: test it

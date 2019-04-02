@@ -10,6 +10,28 @@ describe('parsers / response', () => {
     return new ResponseParser(params);
   }
 
+  describe('static parse', () => {
+    beforeEach(() => {
+      sinon.stub(ResponseParser.prototype, 'parse');
+    });
+
+    afterEach(() => {
+      ResponseParser.prototype.parse.restore();
+    });
+
+    it('should create an instance of ResponseParser and call instance.parse', () => {
+      let params = {};
+      let expected = 'ok';
+
+      ResponseParser.prototype.parse.returns('ok');
+
+      let actual = ResponseParser.parse(params);
+      nassert.assert(actual, expected);
+
+      nassert.validateCalledFn({ srvc: ResponseParser.prototype, fnName: 'parse', expectedArgs: '_without-args_' });
+    });
+  });
+
   describe('parse', () => {
     it('should call related methods and return response model', () => {
       let parser = getParserInstance({ httpMessage: 'responseMsg' });
@@ -35,17 +57,18 @@ describe('parsers / response', () => {
     it('should parse message for rows', () => {
       let responseMsg = [
         'start-line',
-        'Header1:',
-        'Header2:',
-        'Header3:',
+        'Header1',
+        'Header2',
+        'Header3',
         '',
         'Body'
       ].join('\n');
-      let parser = getParserInstance({ httpMessage: responseMsg });
 
+      let parser = getParserInstance({ httpMessage: responseMsg });
       parser._parseMessageForRows();
+
       should(parser.startRow).eql('start-line');
-      should(parser.headerRows).eql(['Header1:', 'Header2:', 'Header3:']);
+      should(parser.headerRows).eql(['Header1', 'Header2', 'Header3']);
       should(parser.bodyRows).eql('Body');
     });
   });
@@ -78,7 +101,7 @@ describe('parsers / response', () => {
       parser.startRow = 'Invalid response startRow';
 
       should(parser._parseStartRow.bind(parser)).throw(Error, {
-        message: 'HTTP-Version SP Status-Code SP Status-Message CRLF. Data: Invalid response startRow'
+        message: 'Incorrect startRow format, expected: HTTP-Version SP Status-Code SP Status-Message CRLF.\nDetails: "Invalid response startRow"'
       });
     });
 

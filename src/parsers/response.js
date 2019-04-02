@@ -11,8 +11,6 @@ class HttpZResponseParser extends Base {
   }
 
   parse() {
-    super.parse();
-
     this._parseMessageForRows();
     this._parseStartRow();
     this._parseHeaderRows();
@@ -22,16 +20,19 @@ class HttpZResponseParser extends Base {
   }
 
   _parseMessageForRows() {
-    let { headerRows, bodyRows } = super._parseMessageForRows();
+    let { startRow, headerRows, bodyRows } = super._parseMessageForRows();
 
-    this.startRow = headerRows[0];
-    this.headerRows = headerRows.splice(1);
+    this.startRow = startRow;
+    this.headerRows = headerRows;
     this.bodyRows = bodyRows;
   }
 
   _parseStartRow() {
     if (!consts.regexps.responseStartRow.test(this.startRow)) {
-      throw utils.getErrorMessage('HTTP-Version SP Status-Code SP Status-Message CRLF', this.startRow);
+      throw utils.getErrorMessage(
+        'Incorrect startRow format, expected: HTTP-Version SP Status-Code SP Status-Message CRLF',
+        this.startRow
+      );
     }
 
     let rowElems = this.startRow.split(' ');
