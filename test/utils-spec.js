@@ -46,6 +46,136 @@ describe('utils', () => {
     });
   });
 
+  describe('validateNotEmptyString', () => {
+    let name = 'username';
+
+    it('should throw error when val is nil (undefined, null, empty)', () => {
+      should(utils.validateNotEmptyString.bind(null, undefined, name)).throw(Error, {
+        message: 'username must be not empty string'
+      });
+
+      should(utils.validateNotEmptyString.bind(null, null, name)).throw(Error, {
+        message: 'username must be not empty string'
+      });
+
+      should(utils.validateNotEmptyString.bind(null, '', name)).throw(Error, {
+        message: 'username must be not empty string'
+      });
+    });
+
+    it('should throw error when val is not a string (number, date, object)', () => {
+      should(utils.validateNotEmptyString.bind(null, 10, name)).throw(Error, {
+        message: 'username must be not empty string'
+      });
+
+      should(utils.validateNotEmptyString.bind(null, new Date(), name)).throw(Error, {
+        message: 'username must be not empty string'
+      });
+
+      should(utils.validateNotEmptyString.bind(null, { val: 10 }, name)).throw(Error, {
+        message: 'username must be not empty string'
+      });
+    });
+
+    it('should not throw error when val is not empty string', () => {
+      should(utils.validateNotEmptyString.bind(null, 'smith', name)).not.throw(Error);
+    });
+  });
+
+  describe('validateNotZeroOrNegativeNumber', () => {
+    let name = 'age';
+
+    it('should throw error when val is nil (undefined, null, empty)', () => {
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, undefined, name)).throw(Error, {
+        message: 'age must be not zero, positive number'
+      });
+
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, null, name)).throw(Error, {
+        message: 'age must be not zero, positive number'
+      });
+
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, '', name)).throw(Error, {
+        message: 'age must be not zero, positive number'
+      });
+    });
+
+    it('should throw error when val is not a number (string, date, object)', () => {
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, '10', name)).throw(Error, {
+        message: 'age must be not zero, positive number'
+      });
+
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, new Date(), name)).throw(Error, {
+        message: 'age must be not zero, positive number'
+      });
+
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, { val: 10 }, name)).throw(Error, {
+        message: 'age must be not zero, positive number'
+      });
+    });
+
+    it('should throw error when val is less or equal to zero', () => {
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, -5, name)).throw(Error, {
+        message: 'age must be not zero, positive number'
+      });
+
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, 0, name)).throw(Error, {
+        message: 'age must be not zero, positive number'
+      });
+    });
+
+    it('should not throw error when val is a positive number', () => {
+      should(utils.validateNotZeroOrNegativeNumber.bind(null, 25, name)).not.throw(Error);
+    });
+  });
+
+  describe('generateUrl', () => {
+    function test({ params, expected }) {
+      let actual = utils.generateUrl(params);
+      should(actual).eql(expected);
+    }
+
+    it('should generate url', () => {
+      let params = {
+        protocol: 'http',
+        host: 'example.com',
+        path: '/features'
+      };
+      let expected = 'http://example.com/features';
+
+      test({ params, expected });
+    });
+
+    it('should generate url with basic auth', () => {
+      let params = {
+        protocol: 'http',
+        host: 'example.com',
+        path: '/features',
+        basicAuth: {
+          username: 'smith',
+          password: 12345
+        }
+      };
+      let expected = 'http://smith:12345@example.com/features';
+
+      test({ params, expected });
+    });
+
+    it('should generate url with params', () => {
+      let params = {
+        protocol: 'http',
+        host: 'example.com',
+        path: '/features',
+        params: {
+          p1: 'v1',
+          p2: null
+        }
+      };
+      let expected = 'http://example.com/features?p1=v1&p2=null';
+
+      test({ params, expected });
+    });
+  });
+
   describe('getHeaderName', () => {
     function test(name, expected) {
       let actual = utils.getHeaderName(name);

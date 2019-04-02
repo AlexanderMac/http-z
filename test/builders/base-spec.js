@@ -183,27 +183,27 @@ describe('builders / base', () => {
 
       httpModelClone.headers[0].name = null;
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header name must be defined. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.headers[0])
+        message: 'Header name must be defined.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
       });
 
       httpModelClone = _.cloneDeep(httpModel);
       httpModelClone.headers[0].values = null;
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header values must be defined. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.headers[0])
+        message: 'Header values must be defined.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
       });
 
       httpModelClone.headers[0].values = {};
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header values must be defined. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.headers[0])
+        message: 'Header values must be defined.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
       });
 
       httpModelClone.headers[0].values = [];
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header values must be defined. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.headers[0])
+        message: 'Header values must be defined.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
       });
 
       httpModelClone.headers[0].values = [
@@ -211,8 +211,8 @@ describe('builders / base', () => {
         { value: null }
       ];
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header value must be defined. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.headers[0])
+        message: 'Header value must be defined.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
       });
     });
 
@@ -316,8 +316,8 @@ describe('builders / base', () => {
         { name: 'sessionid', value: '456def' }
       ];
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Cookie name and value must be defined. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.cookies[0])
+        message: 'Cookie name and value must be defined.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.cookies[0]) + '"'
       });
 
       httpModelClone.cookies = [
@@ -325,8 +325,8 @@ describe('builders / base', () => {
         { name: 'sessionid', value: '' }
       ];
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Cookie name and value must be defined. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.cookies[1])
+        message: 'Cookie name and value must be defined.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.cookies[1]) + '"'
       });
     });
 
@@ -468,8 +468,8 @@ describe('builders / base', () => {
         { name: 'message', value: 'Hello' }
       ];
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'FormData parameter must have name and value. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.body.formDataParams[0])
+        message: 'FormData parameter must have name and value.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.body.formDataParams[0]) + '"'
       });
 
       httpModelClone.body.formDataParams = [
@@ -477,8 +477,8 @@ describe('builders / base', () => {
         { name: 'message', value: '' }
       ];
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'FormData parameter must have name and value. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.body.formDataParams[0])
+        message: 'FormData parameter must have name and value.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.body.formDataParams[0]) + '"'
       });
     });
 
@@ -545,8 +545,8 @@ describe('builders / base', () => {
         { name: 'message', value: 'Hello' }
       ];
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'FormData parameter must have name and value. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.body.formDataParams[0])
+        message: 'FormData parameter must have name and value.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.body.formDataParams[0]) + '"'
       });
 
       httpModelClone.body.formDataParams = [
@@ -554,8 +554,8 @@ describe('builders / base', () => {
         { name: 'message', value: '' }
       ];
       should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'FormData parameter must have name and value. ' +
-                 'Data: ' + JSON.stringify(httpModelClone.body.formDataParams[0])
+        message: 'FormData parameter must have name and value.\n' +
+                 'Details: "' + JSON.stringify(httpModelClone.body.formDataParams[0]) + '"'
       });
     });
 

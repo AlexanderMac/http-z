@@ -133,8 +133,7 @@ describe('builders / request', () => {
       });
 
       should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookie name and value must be defined. ' +
-                 'Data: {"value":"v2"}'
+        message: 'Cookie name and value must be defined.\nDetails: "{"value":"v2"}"'
       });
     });
 
@@ -147,8 +146,7 @@ describe('builders / request', () => {
       });
 
       should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookie name and value must be defined. ' +
-                 'Data: {"name":"c2"}'
+        message: 'Cookie name and value must be defined.\nDetails: "{"name":"c2"}"'
       });
     });
 

@@ -25,7 +25,7 @@ class HttpZResponseBuilder extends Base {
 
   _generateStartRow() {
     utils.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
-    utils.validateNotZeroNumber(this.statusCode, 'statusCode');
+    utils.validateNotZeroOrNegativeNumber(this.statusCode, 'statusCode');
     utils.validateNotEmptyString(this.statusMessage, 'statusMessage');
 
     let protocolVersion = this.protocolVersion.toUpperCase();

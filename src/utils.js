@@ -2,6 +2,7 @@
 
 const _                   = require('lodash');
 const { URLSearchParams } = require('url');
+const consts              = require('./consts');
 
 exports.splitIntoTwoParts = (str, delimiter) => {
   if (_.isEmpty(str)) {
@@ -20,33 +21,19 @@ exports.splitIntoTwoParts = (str, delimiter) => {
   return res;
 };
 
-// TODO: test it
-exports.validateNotEmptyString = (str, name) => {
-  if (!str || !_.isString(str)) {
+exports.validateNotEmptyString = (val, name) => {
+  if (_.isNil(val) || _.isEmpty(val) || !_.isString(val)) {
     throw exports.getErrorMessage(`${name} must be not empty string`);
   }
 };
 
-// TODO: test it
-exports.validateNotZeroNumber = (num, name) => {
-  if (!num || !_.isNumber(num) || num < 0) {
+exports.validateNotZeroOrNegativeNumber = (val, name) => {
+  if (_.isNil(val) || !_.isNumber(val) || val <= 0) {
     throw exports.getErrorMessage(`${name} must be not zero, positive number`);
   }
 };
 
-// TODO: test it
-exports.getErrorMessage = (msg, data) => {
-  if (data) {
-    msg += `. Data: ${data}`;
-  }
-
-  let err = new Error(msg);
-  err.type = 'HttpZ Error';
-  return err;
-};
-
-// TODO: test it
-exports.genUrl = ({ protocol, host, path, basicAuth, params }) => {
+exports.generateUrl = ({ protocol, host, path, basicAuth, params }) => {
   let basicAuthStr = '';
   if (!_.isEmpty(basicAuth)) {
     basicAuthStr = (basicAuth.username || '') + ':' + (basicAuth.password || '') + '@';
@@ -72,4 +59,38 @@ exports.getHeaderName = (name) => {
     .map(_.capitalize)
     .join('-')
     .value();
+};
+
+// TODO: test it
+exports.getBoundary = (contentType) => {
+  if (!contentType || !contentType.params) {
+    throw exports.getErrorMessage('Request with ContentType=FormData must have a header with boundary');
+  }
+
+  let boundaryMatch = contentType.params.match(consts.regexps.boundary);
+  if (!boundaryMatch) {
+    throw exports.getErrorMessage('Incorrect boundary, expected: boundary=value', contentType.params);
+  }
+
+  let boundaryAndValue = _.split(boundaryMatch, '=');
+  if (boundaryAndValue.length !== 2) {
+    throw exports.getErrorMessage('Incorrect boundary, expected: boundary=value', contentType.params);
+  }
+
+  let boundaryValue =  _.trim(boundaryAndValue[1]);
+  if (!boundaryValue) {
+    throw exports.getErrorMessage('Incorrect boundary, expected: boundary=value', contentType.params);
+  }
+
+  return boundaryValue;
+};
+
+exports.getErrorMessage = (msg, data) => {
+  if (data) {
+    msg += `.\nDetails: "${data}"`;
+  }
+
+  let err = new Error(msg);
+  err.type = 'HttpZError';
+  return err;
 };
