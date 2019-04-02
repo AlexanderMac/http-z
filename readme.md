@@ -7,18 +7,26 @@
 ## Features
 
 * Parse HTTP request/response message:
+  - path params, basicAuth
   - headers
   - cookies
-  - body (supported contentTypes: `multipart/form-data`, `application/x-www-form-urlencoded`, `application/json`, `text/plain`)
+  - body, supported contentTypes:
+    - `multipart/form-data`
+    - `application/x-www-form-urlencoded`
+    - `application/json`, `text/plain`
 * Build HTTP request/response message from model:
+  - path params, basicAuth
   - headers
   - cookies
-  - body (supported contentTypes: `multipart/form-data`, `application/x-www-form-urlencoded`, `application/json`, `text/plain`)
+  - body, supported contentTypes:
+    - `multipart/form-data`
+    - `application/x-www-form-urlencoded`
+    - `application/json`, `text/plain`
 
 ## Commands
 
 ```sh
-// Install
+# Install
 $ npm i http-z
 ```
 
@@ -37,7 +45,7 @@ let httpMessage = [
   ''
 ].join('\n');
 
-let httpModel = httpZ.parse(httpMessage);
+let httpModel = httpZ.parse({ httpMessage });
 console.log(JSON.stringify(httpModel, null, 2));
 
 /* output:
@@ -64,7 +72,7 @@ console.log(JSON.stringify(httpModel, null, 2));
 }
 */
 
-let newHttpMessage = httpZ.buildRequest(httpModel);
+let newHttpMessage = httpZ.build(httpModel);
 console.log(newHttpMessage);
 
 /* output:
