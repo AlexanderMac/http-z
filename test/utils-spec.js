@@ -47,24 +47,21 @@ describe('utils', () => {
   });
 
   describe('generateUrl', () => {
-    function test({ params, expected }) {
+    function test(params, expected) {
       let actual = utils.generateUrl(params);
       should(actual).eql(expected);
     }
 
     it('should generate url', () => {
-      let params = {
+      test({
         protocol: 'http',
         host: 'example.com',
         path: '/features'
-      };
-      let expected = 'http://example.com/features';
-
-      test({ params, expected });
+      }, 'http://example.com/features');
     });
 
     it('should generate url with basic auth', () => {
-      let params = {
+      test({
         protocol: 'http',
         host: 'example.com',
         path: '/features',
@@ -72,14 +69,11 @@ describe('utils', () => {
           username: 'smith',
           password: 12345
         }
-      };
-      let expected = 'http://smith:12345@example.com/features';
-
-      test({ params, expected });
+      }, 'http://smith:12345@example.com/features');
     });
 
     it('should generate url with params', () => {
-      let params = {
+      test({
         protocol: 'http',
         host: 'example.com',
         path: '/features',
@@ -87,10 +81,7 @@ describe('utils', () => {
           p1: 'v1',
           p2: null
         }
-      };
-      let expected = 'http://example.com/features?p1=v1&p2=null';
-
-      test({ params, expected });
+      }, 'http://example.com/features?p1=v1&p2=null');
     });
   });
 
