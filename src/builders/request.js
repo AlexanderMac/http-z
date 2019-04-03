@@ -55,12 +55,12 @@ class HttpZRequestBuilder extends Base {
     }
 
     if (!_.isArray(this.cookies) || this.cookies.length === 0) {
-      throw utils.getErrorMessage('Cookies must be not empty array');
+      throw utils.getError('Cookies must be not empty array');
     }
 
     let cookiesStr = _.map(this.cookies, ({ name, value }) => {
       if (!name || !value) {
-        throw utils.getErrorMessage('Cookie name and value must be defined', JSON.stringify({ name, value }));
+        throw utils.getError('Cookie name and value must be defined', JSON.stringify({ name, value }));
       }
       return name + '=' + value;
     });

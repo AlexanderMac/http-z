@@ -41,7 +41,7 @@ class HttpZRequestParser extends Base {
 
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
-      throw utils.getErrorMessage(
+      throw utils.getError(
         'Incorrect startRow format, expected: Method SP Request-URI SP HTTP-Version CRLF',
         this.startRow
       );
@@ -68,7 +68,7 @@ class HttpZRequestParser extends Base {
 
     let [unused, values] = utils.splitIntoTwoParts(this.cookiesRow, ':');
     if (!unused || !values) {
-      throw utils.getErrorMessage('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow);
+      throw utils.getError('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow);
     }
     this.cookies = _.chain(values)
       .split(';')
@@ -79,7 +79,7 @@ class HttpZRequestParser extends Base {
           value: _.trim(value) || null
         };
         if (!cookie.name) {
-          throw utils.getErrorMessage('Incorrect cookie pair format, expected: Name1=Value1;...', values);
+          throw utils.getError('Incorrect cookie pair format, expected: Name1=Value1;...', values);
         }
         return cookie;
       })

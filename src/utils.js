@@ -23,13 +23,13 @@ exports.splitIntoTwoParts = (str, delimiter) => {
 
 exports.validateNotEmptyString = (val, name) => {
   if (_.isNil(val) || _.isEmpty(val) || !_.isString(val)) {
-    throw exports.getErrorMessage(`${name} must be not empty string`);
+    throw exports.getError(`${name} must be not empty string`);
   }
 };
 
 exports.validateNotZeroOrNegativeNumber = (val, name) => {
   if (_.isNil(val) || !_.isNumber(val) || val <= 0) {
-    throw exports.getErrorMessage(`${name} must be not zero, positive number`);
+    throw exports.getError(`${name} must be not zero, positive number`);
   }
 };
 
@@ -64,28 +64,28 @@ exports.getHeaderName = (name) => {
 // TODO: test it
 exports.getBoundary = (contentType) => {
   if (!contentType || !contentType.params) {
-    throw exports.getErrorMessage('Request with ContentType=FormData must have a header with boundary');
+    throw exports.getError('Request with ContentType=FormData must have a header with boundary');
   }
 
   let boundaryMatch = contentType.params.match(consts.regexps.boundary);
   if (!boundaryMatch) {
-    throw exports.getErrorMessage('Incorrect boundary, expected: boundary=value', contentType.params);
+    throw exports.getError('Incorrect boundary, expected: boundary=value', contentType.params);
   }
 
   let boundaryAndValue = _.split(boundaryMatch, '=');
   if (boundaryAndValue.length !== 2) {
-    throw exports.getErrorMessage('Incorrect boundary, expected: boundary=value', contentType.params);
+    throw exports.getError('Incorrect boundary, expected: boundary=value', contentType.params);
   }
 
   let boundaryValue =  _.trim(boundaryAndValue[1]);
   if (!boundaryValue) {
-    throw exports.getErrorMessage('Incorrect boundary, expected: boundary=value', contentType.params);
+    throw exports.getError('Incorrect boundary, expected: boundary=value', contentType.params);
   }
 
   return boundaryValue;
 };
 
-exports.getErrorMessage = (msg, data) => {
+exports.getError = (msg, data) => {
   if (data) {
     msg += `.\nDetails: "${data}"`;
   }

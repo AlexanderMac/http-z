@@ -8,7 +8,7 @@ const ResponseParser = require('./response');
 
 module.exports = ({ httpMessage, eol = '\n' } = {}) => {
   if (!httpMessage) {
-    throw utils.getErrorMessage('httpMessage is required');
+    throw utils.getError('httpMessage is required');
   }
 
   let firstRow = _.chain(httpMessage).split(eol).head().value();

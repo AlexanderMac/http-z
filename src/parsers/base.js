@@ -14,7 +14,7 @@ class HttpZBaseParser {
     let eol2x = this.eol + this.eol;
     let [headers, body] = utils.splitIntoTwoParts(this.httpMessage, eol2x);
     if (_.isNil(headers) || _.isNil(body)) {
-      throw utils.getErrorMessage(
+      throw utils.getError(
         'Incorrect message format, it must have headers and body, separated by empty line'
       );
     }
@@ -31,11 +31,11 @@ class HttpZBaseParser {
     this.headers = _.map(this.headerRows, hRow => {
       let [name, values] = utils.splitIntoTwoParts(hRow, ':');
       if (!name || !values) {
-        throw utils.getErrorMessage('Incorrect header row format, expected: Name: Values', hRow);
+        throw utils.getError('Incorrect header row format, expected: Name: Values', hRow);
       }
       values = _.split(values, ',');
       if (values.length === 0 || _.some(values, val => _.isEmpty(val))) {
-        throw utils.getErrorMessage('Incorrect header values format, expected: Value1, Value2, ...', hRow);
+        throw utils.getError('Incorrect header values format, expected: Value1, Value2, ...', hRow);
       }
       let valuesAndParams = _.map(values, (value) => {
         let valueAndParams = _.split(value, ';');
@@ -89,7 +89,7 @@ class HttpZBaseParser {
       .map(param => {
         let paramMatch = param.match(consts.regexps.param);
         if (!paramMatch) {
-          throw utils.getErrorMessage('Incorrect form-data parameter', param);
+          throw utils.getError('Incorrect form-data parameter', param);
         }
 
         let paramNameMatch = paramMatch.toString().match(consts.regexps.paramName);
@@ -110,7 +110,7 @@ class HttpZBaseParser {
       .map(pair => {
         let [name, value] = utils.splitIntoTwoParts(pair, '=');
         if (!name) {
-          throw utils.getErrorMessage('Incorrect x-www-form-urlencoded parameter, expected: Name="Value', pair);
+          throw utils.getError('Incorrect x-www-form-urlencoded parameter, expected: Name="Value', pair);
         }
         return { name, value };
       })
@@ -120,7 +120,7 @@ class HttpZBaseParser {
   _parseJsonBody() {
     let json = _.attempt(JSON.parse.bind(null, this.bodyRows));
     if (_.isError(json)) {
-      throw utils.getErrorMessage('Invalid json in body');
+      throw utils.getError('Invalid json in body');
     }
     this.body.json = json;
   }

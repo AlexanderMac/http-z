@@ -6,7 +6,7 @@ const ResponseBuilder = require('./response');
 
 module.exports = (httpModel) => {
   if (!httpModel) {
-    throw utils.getErrorMessage('httpModel is required');
+    throw utils.getError('httpModel is required');
   }
 
   if (httpModel.method) {

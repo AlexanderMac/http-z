@@ -20,6 +20,7 @@ class HttpZResponseBuilder extends Base {
     return '' +
       this._generateStartRow() +
       this._generateHeaderRows() +
+      this._generateCookieRows() +
       this._generateBodyRows();
   }
 
@@ -30,6 +31,12 @@ class HttpZResponseBuilder extends Base {
 
     let protocolVersion = this.protocolVersion.toUpperCase();
     return `${protocolVersion} ${this.statusCode} ${this.statusMessage}\n`;
+  }
+
+  // TODO: implement it
+  // TODO: test it
+  _generateCookieRows() {
+    return '';
   }
 }
 
