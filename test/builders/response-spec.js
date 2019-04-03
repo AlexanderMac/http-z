@@ -38,7 +38,7 @@ describe('builders / response', () => {
       let builder = getBuilderInstance({ protocolVersion: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'protocolVersion must be not empty string'
+        message: 'protocolVersion is required'
       });
     });
 
@@ -46,7 +46,7 @@ describe('builders / response', () => {
       let builder = getBuilderInstance({ statusCode: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'statusCode must be not zero, positive number'
+        message: 'statusCode is required'
       });
     });
 
@@ -54,7 +54,7 @@ describe('builders / response', () => {
       let builder = getBuilderInstance({ statusMessage: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'statusMessage must be not empty string'
+        message: 'statusMessage is required'
       });
     });
 

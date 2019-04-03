@@ -44,7 +44,7 @@ describe('builders / request', () => {
       let builder = getBuilderInstance({ method: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'method must be not empty string'
+        message: 'method is required'
       });
     });
 
@@ -52,7 +52,7 @@ describe('builders / request', () => {
       let builder = getBuilderInstance({ protocol: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'protocol must be not empty string'
+        message: 'protocol is required'
       });
     });
 
@@ -60,7 +60,7 @@ describe('builders / request', () => {
       let builder = getBuilderInstance({ protocolVersion: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'protocolVersion must be not empty string'
+        message: 'protocolVersion is required'
       });
     });
 
@@ -68,7 +68,7 @@ describe('builders / request', () => {
       let builder = getBuilderInstance({ host: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'host must be not empty string'
+        message: 'host is required'
       });
     });
 
@@ -76,7 +76,7 @@ describe('builders / request', () => {
       let builder = getBuilderInstance({ path: null });
 
       should(builder._generateStartRow.bind(builder)).throw(Error, {
-        message: 'path must be not empty string'
+        message: 'path is required'
       });
     });
 
@@ -112,7 +112,7 @@ describe('builders / request', () => {
       let builder = getBuilderInstance({ cookies: 'wrong cookies' });
 
       should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookies must be not empty array'
+        message: 'cookies must be an array'
       });
     });
 
@@ -120,7 +120,7 @@ describe('builders / request', () => {
       let builder = getBuilderInstance({ cookies: [] });
 
       should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookies must be not empty array'
+        message: 'cookies must be not empty array'
       });
     });
 
@@ -133,7 +133,7 @@ describe('builders / request', () => {
       });
 
       should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookie name and value must be defined.\nDetails: "{"value":"v2"}"'
+        message: 'cookie name is required.\nDetails: "cookie index: 1"'
       });
     });
 
@@ -146,7 +146,7 @@ describe('builders / request', () => {
       });
 
       should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'Cookie name and value must be defined.\nDetails: "{"name":"c2"}"'
+        message: 'cookie value is required.\nDetails: "cookie index: 1"'
       });
     });
 

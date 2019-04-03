@@ -21,18 +21,6 @@ exports.splitIntoTwoParts = (str, delimiter) => {
   return res;
 };
 
-exports.validateNotEmptyString = (val, name) => {
-  if (_.isNil(val) || _.isEmpty(val) || !_.isString(val)) {
-    throw exports.getError(`${name} must be not empty string`);
-  }
-};
-
-exports.validateNotZeroOrNegativeNumber = (val, name) => {
-  if (_.isNil(val) || !_.isNumber(val) || val <= 0) {
-    throw exports.getError(`${name} must be not zero, positive number`);
-  }
-};
-
 exports.generateUrl = ({ protocol, host, path, basicAuth, params }) => {
   let basicAuthStr = '';
   if (!_.isEmpty(basicAuth)) {
@@ -54,6 +42,7 @@ exports.generateUrl = ({ protocol, host, path, basicAuth, params }) => {
 };
 
 exports.getHeaderName = (name) => {
+  // capitalize: accept => Accept, accept-encoding => Accept-Encoding, etc
   return _.chain(name)
     .split('-')
     .map(_.capitalize)

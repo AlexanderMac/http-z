@@ -1,7 +1,7 @@
 'use strict';
 
-const utils = require('../utils');
-const Base  = require('./base');
+const validators = require('../validators');
+const Base       = require('./base');
 
 class HttpZResponseBuilder extends Base {
   static build(params) {
@@ -25,9 +25,9 @@ class HttpZResponseBuilder extends Base {
   }
 
   _generateStartRow() {
-    utils.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
-    utils.validateNotZeroOrNegativeNumber(this.statusCode, 'statusCode');
-    utils.validateNotEmptyString(this.statusMessage, 'statusMessage');
+    validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
+    validators.validatePositiveNumber(this.statusCode, 'statusCode');
+    validators.validateNotEmptyString(this.statusMessage, 'statusMessage');
 
     let protocolVersion = this.protocolVersion.toUpperCase();
     return `${protocolVersion} ${this.statusCode} ${this.statusMessage}\n`;

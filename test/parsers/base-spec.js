@@ -136,7 +136,7 @@ describe('parsers / base', () => {
   describe('_parseBodyRows', () => {
     function test({ headers, bodyRows, expected, expectedFnArgs = {}}) {
       let parser = getParserInstance();
-      sinon.stub(parser, '_parseFormDataBody').callsFake(() =>   parser.body.formDataParams = 'body');
+      sinon.stub(parser, '_parseFormDataBody').callsFake(() => parser.body.formDataParams = 'body');
       sinon.stub(parser, '_parseXwwwFormUrlencodedBody').callsFake(() => parser.body.formDataParams = 'body');
       sinon.stub(parser, '_parseJsonBody').callsFake(() => parser.body.json = 'body');
       sinon.stub(parser, '_parsePlainBody').callsFake(() => parser.body.plain = 'body');

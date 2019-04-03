@@ -1,8 +1,9 @@
 'use strict';
 
-const _     = require('lodash');
-const utils = require('../utils');
-const Base  = require('./base');
+const _          = require('lodash');
+const utils      = require('../utils');
+const validators = require('../validators');
+const Base       = require('./base');
 
 class HttpZRequestBuilder extends Base {
   static build(params) {
@@ -32,11 +33,11 @@ class HttpZRequestBuilder extends Base {
   }
 
   _generateStartRow() {
-    utils.validateNotEmptyString(this.method, 'method');
-    utils.validateNotEmptyString(this.protocol, 'protocol');
-    utils.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
-    utils.validateNotEmptyString(this.host, 'host');
-    utils.validateNotEmptyString(this.path, 'path');
+    validators.validateNotEmptyString(this.method, 'method');
+    validators.validateNotEmptyString(this.protocol, 'protocol');
+    validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
+    validators.validateNotEmptyString(this.host, 'host');
+    validators.validateNotEmptyString(this.path, 'path');
 
     return '' +
       this.method.toUpperCase() + ' ' +
@@ -54,14 +55,11 @@ class HttpZRequestBuilder extends Base {
       return '';
     }
 
-    if (!_.isArray(this.cookies) || this.cookies.length === 0) {
-      throw utils.getError('Cookies must be not empty array');
-    }
+    validators.validateNotEmptyArray(this.cookies, 'cookies');
 
-    let cookiesStr = _.map(this.cookies, ({ name, value }) => {
-      if (!name || !value) {
-        throw utils.getError('Cookie name and value must be defined', JSON.stringify({ name, value }));
-      }
+    let cookiesStr = _.map(this.cookies, ({ name, value }, index) => {
+      validators.validateNotEmptyString(name, 'cookie name', `cookie index: ${index}`);
+      validators.validateNotEmptyString(value, 'cookie value', `cookie index: ${index}`);
       return name + '=' + value;
     });
 
