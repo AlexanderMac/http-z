@@ -1,8 +1,9 @@
 'use strict';
 
-const _      = require('lodash');
-const consts = require('../consts');
-const utils  = require('../utils');
+const _          = require('lodash');
+const consts     = require('../consts');
+const utils      = require('../utils');
+const validators = require('../validators');
 
 class HttpZBaseBuilder {
   constructor({ headers, body }) {
@@ -11,33 +12,30 @@ class HttpZBaseBuilder {
   }
 
   _generateHeaderRows() {
-    if (!this.headers || !_.isArray(this.headers)) {
-      throw utils.getErrorMessage('Headers must be array');
-    }
+    validators.validateArray(this.headers, 'headers');
 
-    let headerRows = _.map(this.headers, (header) => {
-      if (!header.name) {
-        throw utils.getErrorMessage('Header name must be defined', JSON.stringify(header));
-      }
-      if (!header.values || !_.isArray(header.values) || header.values.length === 0) {
-        throw utils.getErrorMessage('Header values must be defined', JSON.stringify(header));
-      }
+    let headerRowsStr = _.chain(this.headers)
+      .map((header, index) => {
+        validators.validateRequired(header.name, 'header name', `header index: ${index}`);
+        validators.validateNotEmptyArray(header.values, 'header.values', `header index: ${index}`);
 
-      let hvsStr = _.map(header.values, (headerValue) => {
-        let hvStr = headerValue.value;
-        if (!hvStr) {
-          throw utils.getErrorMessage('Header value must be defined', JSON.stringify(header));
-        }
-        if (headerValue.params) {
-          hvStr += ';' + headerValue.params;
-        }
-        return hvStr;
-      });
+        let headerValues = _.chain(header.values)
+          .map(headerVal => {
+            validators.validateRequired(headerVal.value, 'header.values.value', `header index: ${index}`);
+            if (headerVal.params) {
+              return headerVal.value + ';' + headerVal.params;
+            }
+            return headerVal.value;
+          })
+          .join(', ')
+          .value();
 
-      return utils.getHeaderName(header.name) + ': ' + hvsStr.join(', ');
-    });
+        return utils.getHeaderName(header.name) + ': ' + headerValues;
+      })
+      .join('\n')
+      .value();
 
-    return headerRows.join('\n') + '\n';
+    return headerRowsStr + '\n';
   }
 
   _generateBodyRows() {
@@ -47,30 +45,27 @@ class HttpZBaseBuilder {
 
     switch (this.body.contentType) {
       case consts.http.contentTypes.formData:
-        return '\n' + this._buildFormDataBody();
+        return '\n' + this._generateFormDataBody();
       case consts.http.contentTypes.xWwwFormUrlencoded:
-        return '\n' + this._buildXwwwFormUrlencodedBody();
+        return '\n' + this._generateXwwwFormUrlencodedBody();
       case consts.http.contentTypes.json:
-        return '\n' + JSON.stringify(this.body.json);
+        return '\n' + this._generateJsonBody();
+      case consts.http.contentTypes.plain:
+        return '\n' + this._generatePlainBody();
       default:
-        return '\n' + this.body.plain;
+        throw utils.getError('Missing on unsupported body contentType');
     }
   }
 
-  _buildFormDataBody() {
-    if (!this.body.boundary) {
-      throw utils.getErrorMessage('Body with ContentType=multipart/form-data must have boundary');
-    }
-    if (!this.body.formDataParams || !_.isArray(this.body.formDataParams) || this.body.formDataParams.length === 0) {
-      throw utils.getErrorMessage('Body with ContentType=multipart/form-data must have parameters');
-    }
+  _generateFormDataBody() {
+    validators.validateNotEmptyArray(this.body.formDataParams, 'body.formDataParams');
+    validators.validateNotEmptyString(this.body.boundary, 'body.boundary');
 
-    let formDataParamsStr = _.map(this.body.formDataParams, (dataParam) => {
-      if (!dataParam.name || !dataParam.value) {
-        throw utils.getErrorMessage('FormData parameter must have name and value', JSON.stringify(dataParam));
-      }
+    let formDataParamsStr = _.map(this.body.formDataParams, (dataParam, index) => {
+      validators.validateNotEmptyString(dataParam.name, 'body.formDataParams[index].name', `dataParam index: ${index}`);
+      validators.validateNotEmptyString(dataParam.value, 'body.formDataParams[index].value', `dataParam index: ${index}`);
       return [
-        '-----------------------' + this.body.boundary,
+        '--' + this.body.boundary,
         '\n',
         `Content-Disposition: form-data; name="${dataParam.name}"`,
         '\n',
@@ -80,22 +75,29 @@ class HttpZBaseBuilder {
       ].join('');
     }).join('');
 
-    return `${formDataParamsStr}-----------------------${this.body.boundary}--`;
+    return `${formDataParamsStr}--${this.body.boundary}--`;
   }
 
-  _buildXwwwFormUrlencodedBody() {
-    if (!this.body.formDataParams || !_.isArray(this.body.formDataParams) || this.body.formDataParams.length === 0) {
-      throw utils.getErrorMessage('Body with ContentType=application/x-www-form-urlencoded must have parameters');
-    }
+  _generateXwwwFormUrlencodedBody() {
+    validators.validateNotEmptyArray(this.body.formDataParams, 'body.formDataParams');
 
-    let formDataParamsStr = _.map(this.body.formDataParams, (dataParam) => {
-      if (!dataParam.name || !dataParam.value) {
-        throw utils.getErrorMessage('FormData parameter must have name and value', JSON.stringify(dataParam));
-      }
+    let formDataParamsStr = _.map(this.body.formDataParams, (dataParam, index) => {
+      validators.validateNotEmptyString(dataParam.name, 'body.formDataParams[index].name', `dataParam index: ${index}`);
+      validators.validateNotEmptyString(dataParam.value, 'body.formDataParams[index].value', `dataParam index: ${index}`);
       return dataParam.name + '=' + dataParam.value;
     }).join('&');
 
     return formDataParamsStr;
+  }
+
+  _generateJsonBody() {
+    validators.validateRequired(this.body.json, 'body.json');
+    return JSON.stringify(this.body.json);
+  }
+
+  _generatePlainBody() {
+    validators.validateRequired(this.body.plain, 'body.plain');
+    return this.body.plain;
   }
 }
 

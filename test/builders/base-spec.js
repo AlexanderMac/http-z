@@ -1,129 +1,24 @@
 'use strict';
 
-const _      = require('lodash');
-const should = require('should');
-const httpZ  = require('../../');
+const _           = require('lodash');
+const sinon       = require('sinon');
+const should      = require('should');
+const nassert     = require('n-assert');
+const utils       = require('../../src/utils');
+const BaseBuilder = require('../../src/builders/base');
 
 describe('builders / base', () => {
-  describe('start-row', () => {
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      params: { p1: 'v1' },
-      headers: [
+  function getBuilderInstance(params) {
+    return new BaseBuilder(params);
+  }
+
+  describe('_generateHeaderRows', () => {
+    function getDefaultHeaders() {
+      return [
         {
           name: 'Connection',
           values: [
             { value: 'keep-alive' }
-          ]
-        }
-      ]
-    };
-
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      ''
-    ];
-
-    it('should throw error when method or path or protocol or protocolVersion are empty', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.method = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Unknown httpModel format'
-      });
-
-      httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.path = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'path must be not empty string'
-      });
-
-      httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.protocol = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'protocol must be not empty string'
-      });
-
-      httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.protocolVersion = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'protocolVersion must be not empty string'
-      });
-    });
-
-    it('should build start-row when method and path and protocol and protocolVersion aren\'t empty', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      let actual = httpZ.build(httpModelClone);
-      should(actual).eql(httpMsgClone.join('\n'));
-    });
-  });
-
-  describe('host-row', () => {
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      params: { p1: 'v1' },
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
-        }
-      ]
-    };
-
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      ''
-    ];
-
-    it('should build host-row', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      let actual = httpZ.build(httpModelClone);
-      should(actual).eql(httpMsgClone.join('\n'));
-    });
-  });
-
-  describe('headers', () => {
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      params: { p1: 'v1' },
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache' }
-          ]
-        },
-        {
-          name: 'User-Agent',
-          values: [
-            { value: 'Mozilla/5.0 (Windows NT 6.1 WOW64)' }
           ]
         },
         {
@@ -143,536 +38,408 @@ describe('builders / base', () => {
         {
           name: 'Accept-Language',
           values: [
-            { value: 'ru-RU' },
-            { value: 'ru', params: 'q=0.8' },
             { value: 'en-US', params: 'q=0.6' },
             { value: 'en', params: 'q=0.4' }
           ]
         }
-      ]
-    };
-
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
-      'Accept: */*, text/plain',
-      'Accept-Encoding: gzip, deflate',
-      'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-      ''
-    ];
-
-    it('should throw error when headers list is invalid', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpModelClone.headers = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Headers must be array'
-      });
-
-      httpModelClone.headers = {};
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Headers must be array'
-      });
-    });
-
-    it('should throw error when header is invalid', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpModelClone.headers[0].name = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header name must be defined.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
-      });
-
-      httpModelClone = _.cloneDeep(httpModel);
-      httpModelClone.headers[0].values = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header values must be defined.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
-      });
-
-      httpModelClone.headers[0].values = {};
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header values must be defined.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
-      });
-
-      httpModelClone.headers[0].values = [];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header values must be defined.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
-      });
-
-      httpModelClone.headers[0].values = [
-        { value: 'keep-alive' },
-        { value: null }
       ];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Header value must be defined.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.headers[0]) + '"'
-      });
+    }
+
+    it('should throw error when instance.headers is nil', () => {
+      let headers = null;
+      let expected = utils.getError('headers is required');
+
+      let builder = getBuilderInstance({ headers });
+      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
     });
 
-    it('should build header-rows when headers list is valid', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
+    it('should throw error when instance.headers is not an array', () => {
+      let headers = 'headers';
+      let expected = utils.getError('headers must be an array');
 
-      let actual = httpZ.build(httpModelClone);
-      should(actual).eql(httpMsgClone.join('\n'));
+      let builder = getBuilderInstance({ headers });
+      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.headers contains header without name', () => {
+      let headers = getDefaultHeaders();
+      headers[1].name = undefined;
+      let expected = utils.getError('header name is required.\nDetails: "header index: 1"');
+
+      let builder = getBuilderInstance({ headers });
+      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.headers contains header without values', () => {
+      let headers = getDefaultHeaders();
+      headers[2].values = undefined;
+      let expected = utils.getError('header.values is required.\nDetails: "header index: 2"');
+
+      let builder = getBuilderInstance({ headers });
+      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.headers contains header with values that is not array', () => {
+      let headers = getDefaultHeaders();
+      headers[2].values = 'values';
+      let expected = utils.getError('header.values must be an array.\nDetails: "header index: 2"');
+
+      let builder = getBuilderInstance({ headers });
+      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.headers contains header with empty values array', () => {
+      let headers = getDefaultHeaders();
+      headers[2].values = [];
+      let expected = utils.getError('header.values must be not empty array.\nDetails: "header index: 2"');
+
+      let builder = getBuilderInstance({ headers });
+      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.headers.values contains empty value', () => {
+      let headers = getDefaultHeaders();
+      headers[3].values[0] = {};
+      let expected = utils.getError('header.values.value is required.\nDetails: "header index: 3"');
+
+      let builder = getBuilderInstance({ headers });
+      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+    });
+
+    it('should return \n when instance.headers is empty array', () => {
+      let headers = [];
+      let expected = '\n';
+
+      let builder = getBuilderInstance({ headers });
+      let actual = builder._generateHeaderRows();
+      should(actual).eql(expected);
+    });
+
+    it('should return headerRows when instance.headers is non empty array', () => {
+      let headers = getDefaultHeaders();
+      let expected = [
+        'Connection: keep-alive',
+        'Accept: */*, text/plain',
+        'Accept-Encoding: gzip, deflate',
+        'Accept-Language: en-US;q=0.6, en;q=0.4',
+        ''
+      ].join('\n');
+
+      let builder = getBuilderInstance({ headers });
+      let actual = builder._generateHeaderRows();
+      should(actual).eql(expected);
     });
   });
 
-  describe('cookies', () => {
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      params: { p1: 'v1' },
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache' }
-          ]
-        },
-        {
-          name: 'User-Agent',
-          values: [
-            { value: 'Mozilla/5.0 (Windows NT 6.1 WOW64)' }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*' }
-          ]
-        },
-        {
-          name: 'Accept-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
-        },
-        {
-          name: 'Accept-Language',
-          values: [
-            { value: 'ru-RU' },
-            { value: 'ru', params: 'q=0.8' },
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
-          ]
-        }
-      ],
-      cookies: [
-        { name: 'csrftoken', value: '123abc' },
-        { name: 'sessionid', value: '456def' }
-      ]
-    };
+  describe('_generateBodyRows', () => {
+    function test({ body, expected, expectedFnArgs = {}}) {
+      let builder = getBuilderInstance({ body });
+      sinon.stub(builder, '_generateFormDataBody').returns('FormDataBody');
+      sinon.stub(builder, '_generateXwwwFormUrlencodedBody').returns('XwwwFormUrlencodedBody');
+      sinon.stub(builder, '_generateJsonBody').returns('JsonBody');
+      sinon.stub(builder, '_generatePlainBody').returns('PlainBody');
 
-    let httpMsg = [
-      'GET http://example.com/features?p1=v1 HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
-      'Accept: */*',
-      'Accept-Encoding: gzip, deflate',
-      'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-      'Cookie: csrftoken=123abc; sessionid=456def',
-      ''
-    ];
+      if (!_.isError(expected)) {
+        let actual = builder._generateBodyRows();
+        should(actual).eql(expected);
+      } else {
+        should(builder._generateBodyRows.bind(builder)).throw(Error, expected);
+      }
 
-    it('should throw error when cookies has invalid type', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
+      nassert.validateCalledFn({ srvc: builder, fnName: '_generateFormDataBody', expectedArgs: expectedFnArgs.genFormDataBody });
+      nassert.validateCalledFn({ srvc: builder, fnName: '_generateXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.genXwwwFormUrlencodedBody });
+      nassert.validateCalledFn({ srvc: builder, fnName: '_generateJsonBody', expectedArgs: expectedFnArgs.genJsonBody });
+      nassert.validateCalledFn({ srvc: builder, fnName: '_generatePlainBody', expectedArgs: expectedFnArgs.genPlainBody });
+    }
 
-      httpModelClone.cookies = [];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Cookies must be not empty array'
-      });
+    it('should return empty string when instance.body is nil', () => {
+      let body = null;
+      let expected = '';
 
-      httpModelClone.cookies = {};
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Cookies must be not empty array'
-      });
+      test({ body, expected });
     });
 
-    it('should throw error when cookies is invalid', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
+    it('should return FormDataBody when instance.body is not empty and contentType is multipart/form-data', () => {
+      let body = {
+        contentType: 'multipart/form-data'
+      };
+      let expected = '\nFormDataBody';
+      let expectedFnArgs = { genFormDataBody: '_without-args_' };
 
-      httpModelClone.cookies = [
-        { name: '', value: '123abc' },
-        { name: 'sessionid', value: '456def' }
-      ];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Cookie name and value must be defined.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.cookies[0]) + '"'
-      });
-
-      httpModelClone.cookies = [
-        { name: 'csrftoken', value: '123abc' },
-        { name: 'sessionid', value: '' }
-      ];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Cookie name and value must be defined.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.cookies[1]) + '"'
-      });
+      test({ body, expected, expectedFnArgs });
     });
 
-    it('should not throw Error when cookies is empty', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
+    it('should return XwwwFormUrlencodedBody when instance.body is not empty and contentType is application/x-www-form-urlencoded', () => {
+      let body = {
+        contentType: 'application/x-www-form-urlencoded'
+      };
+      let expected = '\nXwwwFormUrlencodedBody';
+      let expectedFnArgs = { genXwwwFormUrlencodedBody: '_without-args_' };
 
-      httpModelClone.cookies = null;
-      httpMsgClone.splice(8, 1);
-
-      let actual = httpZ.build(httpModelClone);
-      actual.should.be.eql(httpMsgClone.join('\n'));
+      test({ body, expected, expectedFnArgs });
     });
 
-    it('should build cookie-row when cookies is valid', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
+    it('should return JsonBody when instance.body is not empty and contentType is application/json', () => {
+      let body = {
+        contentType: 'application/json'
+      };
+      let expected = '\nJsonBody';
+      let expectedFnArgs = { genJsonBody: '_without-args_' };
 
-      let actual = httpZ.build(httpModelClone);
-      actual.should.be.eql(httpMsgClone.join('\n'));
+      test({ body, expected, expectedFnArgs });
+    });
+
+    it('should return PlainBody when instance.body is not empty and contentType is text/plain', () => {
+      let body = {
+        contentType: 'text/plain'
+      };
+      let expected = '\nPlainBody';
+      let expectedFnArgs = { genPlainBody: '_without-args_' };
+
+      test({ body, expected, expectedFnArgs });
+    });
+
+    it('should throw error when instance.body is not empty and contentType is unsupported', () => {
+      let body = {
+        contentType: 'unsupported'
+      };
+      let expected = utils.getError('Missing on unsupported body contentType');
+
+      test({ body, expected });
     });
   });
 
-  describe('body', () => {
-    let httpModel = {
-      method: 'GET',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache' }
-          ]
-        },
-        {
-          name: 'User-Agent',
-          values: [
-            { value: 'Mozilla/5.0 (Windows NT 6.1 WOW64)' }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*' }
-          ]
-        },
-        {
-          name: 'Accept-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
-        },
-        {
-          name: 'Accept-Language',
-          values: [
-            { value: 'ru-RU' },
-            { value: 'ru', params: 'q=0.8' },
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
-          ]
-        },
-        {
-          name: 'Content-Type',
-          values: [
-            { value: 'application/x-www-form-urlencoded', params: 'charset=UTF-8' }
-          ]
-        },
-        {
-          name: 'Content-Length',
-          values: [
-            { value: '301' }
-          ]
+  describe('_generateFormDataBody', () => {
+    function getDefaultBody() {
+      return {
+        formDataParams: [
+          { name: 'name', value: 'Smith' },
+          { name: 'age', value: '25' }
+        ],
+        boundary: '11136253119209'
+      };
+    }
+
+    it('should throw error when instance.body.formDataParams is nil', () => {
+      let body = getDefaultBody();
+      body.formDataParams = null;
+      let expected = utils.getError('body.formDataParams is required');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.formDataParams is not array', () => {
+      let body = getDefaultBody();
+      body.formDataParams = 'params';
+      let expected = utils.getError('body.formDataParams must be an array');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.formDataParams is empty array', () => {
+      let body = getDefaultBody();
+      body.formDataParams = [];
+      let expected = utils.getError('body.formDataParams must be not empty array');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.boundary is nil', () => {
+      let body = getDefaultBody();
+      body.boundary = null;
+      let expected = utils.getError('body.boundary is required');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.boundary is not a string', () => {
+      let body = getDefaultBody();
+      body.boundary = 12345;
+      let expected = utils.getError('body.boundary must be a string');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.boundary is empty string', () => {
+      let body = getDefaultBody();
+      body.boundary = '';
+      let expected = utils.getError('body.boundary must be not empty string');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.formDataParams contains param with empty name', () => {
+      let body = getDefaultBody();
+      body.formDataParams[0].name = '';
+      let expected = utils.getError('body.formDataParams[index].name must be not empty string.\nDetails: "dataParam index: 0"');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.formDataParams contains param with empty value', () => {
+      let body = getDefaultBody();
+      body.formDataParams[1].value = '';
+      let expected = utils.getError('body.formDataParams[index].value must be not empty string.\nDetails: "dataParam index: 1"');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should return BodyRows when instance.body is not empty and valid', () => {
+      let body = getDefaultBody();
+      let expected = [
+        '--11136253119209',
+        'Content-Disposition: form-data; name="name"',
+        '',
+        'Smith',
+        '--11136253119209',
+        'Content-Disposition: form-data; name="age"',
+        '',
+        '25',
+        '--11136253119209--'
+      ].join('\n');
+
+      let builder = getBuilderInstance({ body });
+      let actual = builder._generateFormDataBody();
+      should(actual).eql(expected);
+    });
+  });
+
+  describe('_generateXwwwFormUrlencodedBody', () => {
+    function getDefaultBody() {
+      return {
+        formDataParams: [
+          { name: 'name', value: 'Smith' },
+          { name: 'age', value: '25' }
+        ]
+      };
+    }
+
+    it('should throw error when instance.body.formDataParams is nil', () => {
+      let body = getDefaultBody();
+      body.formDataParams = null;
+      let expected = utils.getError('body.formDataParams is required');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.formDataParams is not array', () => {
+      let body = getDefaultBody();
+      body.formDataParams = 'params';
+      let expected = utils.getError('body.formDataParams must be an array');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.formDataParams is empty array', () => {
+      let body = getDefaultBody();
+      body.formDataParams = [];
+      let expected = utils.getError('body.formDataParams must be not empty array');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.formDataParams contains param with empty name', () => {
+      let body = getDefaultBody();
+      body.formDataParams[0].name = '';
+      let expected = utils.getError('body.formDataParams[index].name must be not empty string.\nDetails: "dataParam index: 0"');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should throw error when instance.body.formDataParams contains param with empty value', () => {
+      let body = getDefaultBody();
+      body.formDataParams[1].value = '';
+      let expected = utils.getError('body.formDataParams[index].value must be not empty string.\nDetails: "dataParam index: 1"');
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+    });
+
+    it('should return BodyRows when instance.body is not empty and valid', () => {
+      let body = getDefaultBody();
+      let expected = 'name=Smith&age=25';
+
+      let builder = getBuilderInstance({ body });
+      let actual = builder._generateXwwwFormUrlencodedBody();
+      should(actual).eql(expected);
+    });
+  });
+
+  describe('_generateJsonBody', () => {
+    function getDefaultBody() {
+      return {
+        json: {
+          name: 'Smith',
+          age: 25
         }
-      ]
-    };
-
-    let httpMsg = [
-      'GET http://example.com/features HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'User-Agent: Mozilla/5.0 (Windows NT 6.1 WOW64)',
-      'Accept: */*',
-      'Accept-Encoding: gzip, deflate',
-      'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-      'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
-      'Content-Length: 301',
-      ''
-    ];
-
-    it('should throw error when ContentType=application/x-www-form-urlencoded and formDataParams list is empty or invalid type ', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpModelClone.headers[6].values = [{
-        value: 'application/x-www-form-urlencoded'
-      }];
-      httpModelClone.body = {
-        contentType: 'application/x-www-form-urlencoded',
       };
+    }
 
-      httpModelClone.body.formDataParams = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
-      });
+    it('should throw error when instance.body.json is nil', () => {
+      let body = getDefaultBody();
+      body.json = null;
+      let expected = utils.getError('body.json is required');
 
-      httpModelClone.body.formDataParams = {};
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
-      });
-
-      httpModelClone.body.formDataParams = [];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Body with ContentType=application/x-www-form-urlencoded must have parameters'
-      });
+      let builder = getBuilderInstance({ body });
+      should(builder._generateJsonBody.bind(builder)).throw(Error, expected);
     });
 
-    it('should throw error when ContentType=application/x-www-form-urlencoded and formDataParams list is invalid', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
+    it('should return BodyRows when instance.body is not empty and valid (body.json is a string)', () => {
+      let body = getDefaultBody();
+      body.json = 'some data';
+      let expected = '"some data"';
 
-      httpModelClone.headers[6].values = [{
-        value: 'application/x-www-form-urlencoded'
-      }];
-      httpModelClone.body = {
-        contentType: 'application/x-www-form-urlencoded',
-      };
-
-      httpModelClone.body.formDataParams = [
-        { name: '', value: '11' },
-        { name: 'message', value: 'Hello' }
-      ];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'FormData parameter must have name and value.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.body.formDataParams[0]) + '"'
-      });
-
-      httpModelClone.body.formDataParams = [
-        { name: '', value: '11' },
-        { name: 'message', value: '' }
-      ];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'FormData parameter must have name and value.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.body.formDataParams[0]) + '"'
-      });
+      let builder = getBuilderInstance({ body });
+      let actual = builder._generateJsonBody();
+      should(actual).eql(expected);
     });
 
-    it('should throw error when ContentType=multipart/form-data and boundary is empty', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
+    it('should return BodyRows when instance.body is not empty and valid', () => {
+      let body = getDefaultBody();
+      let expected = '{"name":"Smith","age":25}';
 
-      httpModelClone.headers[6].values = [{
-        value: 'multipart/form-data'
-      }];
-      httpModelClone.body = {
-        contentType: 'multipart/form-data',
-        formDataParams: [
-          { name: '', value: '11' },
-          { name: 'message', value: 'Hello' }
-        ]
+      let builder = getBuilderInstance({ body });
+      let actual = builder._generateJsonBody();
+      should(actual).eql(expected);
+    });
+  });
+
+  describe('_generatePlainBody', () => {
+    function getDefaultBody() {
+      return {
+        plain: 'plain data'
       };
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Body with ContentType=multipart/form-data must have boundary'
-      });
+    }
+
+    it('should throw error when instance.body.plain is nil', () => {
+      let body = getDefaultBody();
+      body.plain = null;
+      let expected = utils.getError('body.plain is required');
+
+
+      let builder = getBuilderInstance({ body });
+      should(builder._generatePlainBody.bind(builder)).throw(Error, expected);
     });
 
-    it('should throw error when ContentType=multipart/form-data and formDataParams list is empty or invalid type', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
+    it('should return BodyRows when instance.body is not empty and valid', () => {
+      let body = getDefaultBody();
+      let expected = 'plain data';
 
-      httpModelClone.headers[6].values = [{
-        value: 'multipart/form-data',
-        params: 'boundary=------11136253119209'
-      }];
-      httpModelClone.body = {
-        contentType: 'multipart/form-data',
-        boundary: '------11136253119209'
-      };
-
-      httpModelClone.body.formDataParams = null;
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Body with ContentType=multipart/form-data must have parameters'
-      });
-
-      httpModelClone.body.formDataParams = {};
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Body with ContentType=multipart/form-data must have parameters'
-      });
-
-      httpModelClone.body.formDataParams = [];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'Body with ContentType=multipart/form-data must have parameters'
-      });
-    });
-
-    it('should throw error when ContentType=multipart/form-data and formDataParams list is invalid', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-
-      httpModelClone.headers[6].values = [{
-        value: 'multipart/form-data',
-        params: 'boundary=------11136253119209'
-      }];
-      httpModelClone.body = {
-        contentType: 'multipart/form-data',
-        boundary: '------11136253119209'
-      };
-
-      httpModelClone.body.formDataParams = [
-        { name: '', value: '11' },
-        { name: 'message', value: 'Hello' }
-      ];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'FormData parameter must have name and value.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.body.formDataParams[0]) + '"'
-      });
-
-      httpModelClone.body.formDataParams = [
-        { name: '', value: '11' },
-        { name: 'message', value: '' }
-      ];
-      should(httpZ.build.bind(null, httpModelClone)).throw(Error, {
-        message: 'FormData parameter must have name and value.\n' +
-                 'Details: "' + JSON.stringify(httpModelClone.body.formDataParams[0]) + '"'
-      });
-    });
-
-    it('should build body when ContentType=application/x-www-form-urlencoded', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpModelClone.headers[6].values = [{
-        value: 'application/x-www-form-urlencoded',
-        params: 'charset=UTF-8'
-      }];
-      httpModelClone.body = {
-        contentType: 'application/x-www-form-urlencoded',
-        formDataParams: [
-          { name: 'id', value: '11' },
-          { name: 'message', value: 'Hello' }
-        ]
-      };
-
-      httpMsgClone[11] = 'id=11&message=Hello';
-
-      let actual = httpZ.build(httpModelClone);
-      actual.should.be.eql(httpMsgClone.join('\n'));
-    });
-
-    it('should build body when ContentType=multipart/form-data', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpModelClone.headers[6].values = [{
-        value: 'multipart/form-data',
-        params: 'boundary=------11136253119209'
-      }];
-      httpModelClone.body = {
-        contentType: 'multipart/form-data',
-        boundary: '------11136253119209',
-        formDataParams: [
-          { name: 'Name', value: 'Ivanov' },
-          { name: 'Age', value: '25' }
-        ]
-      };
-
-      httpMsgClone[8] = 'Content-Type: multipart/form-data;boundary=------11136253119209';
-      httpMsgClone[11] = '-----------------------------11136253119209';
-      httpMsgClone[12] = 'Content-Disposition: form-data; name="Name"';
-      httpMsgClone[13] = '';
-      httpMsgClone[14] = 'Ivanov';
-      httpMsgClone[15] = '-----------------------------11136253119209';
-      httpMsgClone[16] = 'Content-Disposition: form-data; name="Age"';
-      httpMsgClone[17] = '';
-      httpMsgClone[18] = '25';
-      httpMsgClone[19] = '-----------------------------11136253119209--';
-
-      let actual = httpZ.build(httpModelClone);
-      actual.should.be.eql(httpMsgClone.join('\n'));
-    });
-
-    it('should build body when ContentType=application/json', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpModelClone.headers[6].values = [{
-        value: 'application/json'
-      }];
-      httpModelClone.body = {
-        contentType: 'application/json',
-        json: { p1: 'v1', p2: 'v2' }
-      };
-
-      httpMsgClone[8] = 'Content-Type: application/json';
-      httpMsgClone[11] = '{"p1":"v1","p2":"v2"}';
-
-      let actual = httpZ.build(httpModelClone);
-      actual.should.be.eql(httpMsgClone.join('\n'));
-    });
-
-    it('should build body when ContentType=text/plain', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpModelClone.headers[6].values = [{
-        value: 'text/plain'
-      }];
-      httpModelClone.body = {
-        contentType: 'text/plain',
-        plain: 'Plain text'
-      };
-
-      httpMsgClone[8] = 'Content-Type: text/plain';
-      httpMsgClone[11] = 'Plain text';
-
-      let actual = httpZ.build(httpModelClone);
-      actual.should.be.eql(httpMsgClone.join('\n'));
-    });
-
-    it('should build body when ContentType=text/plain and cookie is not empty', () => {
-      let httpModelClone = _.cloneDeep(httpModel);
-      let httpMsgClone = _.cloneDeep(httpMsg);
-
-      httpModelClone.headers[6].values = [{
-        value: 'text/plain'
-      }];
-      httpModelClone.cookies = [
-        { name: 'csrftoken', value: '123abc' },
-        { name: 'sessionid', value: '456def' }
-      ];
-      httpModelClone.body = {
-        contentType: 'text/plain',
-        plain: 'Plain text'
-      };
-
-      httpMsgClone[8] = 'Content-Type: text/plain';
-      httpMsgClone[10] = 'Cookie: csrftoken=123abc; sessionid=456def';
-      httpMsgClone[12] = 'Plain text';
-
-      let actual = httpZ.build(httpModelClone);
-      actual.should.be.eql(httpMsgClone.join('\n'));
+      let builder = getBuilderInstance({ body });
+      let actual = builder._generatePlainBody();
+      should(actual).eql(expected);
     });
   });
 });

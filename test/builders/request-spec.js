@@ -18,6 +18,28 @@ describe('builders / request', () => {
     return new RequestBuilder(requestModel);
   }
 
+  describe('static build', () => {
+    beforeEach(() => {
+      sinon.stub(RequestBuilder.prototype, 'build');
+    });
+
+    afterEach(() => {
+      RequestBuilder.prototype.build.restore();
+    });
+
+    it('should create an instance of RequestBuilder and call instance.build', () => {
+      let params = {};
+      let expected = 'ok';
+
+      RequestBuilder.prototype.build.returns('ok');
+
+      let actual = RequestBuilder.build(params);
+      nassert.assert(actual, expected);
+
+      nassert.validateCalledFn({ srvc: RequestBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });
+    });
+  });
+
   describe('build', () => {
     it('should call related methods and return request message', () => {
       let builder = getBuilderInstance();
@@ -593,7 +615,7 @@ describe('builders / request', () => {
           {
             name: 'Content-Type',
             values: [
-              { value: 'multipart/form-data', params: 'boundary=------11136253119209' }
+              { value: 'multipart/form-data', params: 'boundary=11136253119209' }
             ]
           },
           {
@@ -613,7 +635,7 @@ describe('builders / request', () => {
         cookies: null,
         body: {
           contentType: 'multipart/form-data',
-          boundary: '------11136253119209',
+          boundary: '11136253119209',
           formDataParams: [
             { name: 'Name', value: 'Smith' },
             { name: 'Age', value: '25' }
@@ -628,19 +650,19 @@ describe('builders / request', () => {
         'Accept: */*',
         'Accept-Encoding: gzip, deflate',
         'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Content-Type: multipart/form-data;boundary=------11136253119209',
+        'Content-Type: multipart/form-data;boundary=11136253119209',
         'Content-Encoding: gzip, deflate',
         'Content-Length: 301',
         '',
-        '-----------------------------11136253119209',
+        '--11136253119209',
         'Content-Disposition: form-data; name="Name"',
         '',
         'Smith',
-        '-----------------------------11136253119209',
+        '--11136253119209',
         'Content-Disposition: form-data; name="Age"',
         '',
         '25',
-        '-----------------------------11136253119209--'
+        '--11136253119209--'
       ].join('\n');
 
       let builder = getBuilderInstance(requestModel);

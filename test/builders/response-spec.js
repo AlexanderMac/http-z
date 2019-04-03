@@ -16,6 +16,28 @@ describe('builders / response', () => {
     return new ResponseBuilder(responseModel);
   }
 
+  describe('static build', () => {
+    beforeEach(() => {
+      sinon.stub(ResponseBuilder.prototype, 'build');
+    });
+
+    afterEach(() => {
+      ResponseBuilder.prototype.build.restore();
+    });
+
+    it('should create an instance of ResponseBuilder and call instance.build', () => {
+      let params = {};
+      let expected = 'ok';
+
+      ResponseBuilder.prototype.build.returns('ok');
+
+      let actual = ResponseBuilder.build(params);
+      nassert.assert(actual, expected);
+
+      nassert.validateCalledFn({ srvc: ResponseBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });
+    });
+  });
+
   describe('build', () => {
     it('should call related methods and return response message', () => {
       let builder = getBuilderInstance();
