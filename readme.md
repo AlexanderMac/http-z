@@ -91,7 +91,7 @@ Accept-Language: en-US;q=0.6, en;q=0.4
 Parse HTTP request/response message and return model.
 
 - `httpMessage` is a plain HTTP message in string format.
-- `eol` _end of line_, `\n` by default.
+- `eol` end of line, `\n` by default.
 
 ### build(httpModel)
 Build HTTP message from request/response model.
