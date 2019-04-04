@@ -1,3 +1,10 @@
+# <sub>v0.4.0</sub>
+#### _Apr. 4, 2019_
+
+ * Added logic for parsing/building multiple set-cookie headers in response parser/builder.
+ * Fixed logic for parsing/building path and host.
+ * Removed HTTP Basic auth.
+
 # <sub>v0.3.0</sub>
 #### _Apr. 3, 2019_
 
