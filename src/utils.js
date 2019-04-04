@@ -21,12 +21,16 @@ exports.splitIntoTwoParts = (str, delimiter) => {
   return res;
 };
 
-exports.generateUrl = ({ protocol, host, path, basicAuth, params }) => {
-  let basicAuthStr = '';
-  if (!_.isEmpty(basicAuth)) {
-    basicAuthStr = (basicAuth.username || '') + ':' + (basicAuth.password || '') + '@';
+// TODO: test it
+exports.parseUrl = (url) => {
+  if (!_.startsWith('http://') && !_.startsWith('https://')) {
+    url = 'http://' + url;
   }
+  return new URL(url);
+};
 
+// TODO: test it
+exports.generateRelativeUrl = ({ path, params }) => {
   let paramsStr = '';
   if (!_.isEmpty(params)) {
     let urlSPs = new URLSearchParams(params);
@@ -34,9 +38,6 @@ exports.generateUrl = ({ protocol, host, path, basicAuth, params }) => {
   }
 
   return '' +
-    protocol.toLowerCase() + '://' +
-    basicAuthStr +
-    host +
     path +
     paramsStr;
 };

@@ -44,7 +44,7 @@ describe('parsers / index', () => {
 
   it('should call RequestParser.parse when httpMessage is request', () => {
     let params = {
-      httpMessage: 'get http://example.com/features http/1.1'
+      httpMessage: 'get /features http/1.1'
     };
     let expected = 'parsed-request';
     let expectedArgs = {

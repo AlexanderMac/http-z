@@ -36,7 +36,7 @@ $ npm i http-z
 const HttpZ = require('http-z');
 
 let httpMessage = [
-  'GET http://example.com/features?p1=v1 HTTP/1.1',
+  'GET /features?p1=v1 HTTP/1.1',
   'Host: example.com',
   'Accept: */*',
   'Accept-Encoding: gzip,deflate',
@@ -76,7 +76,7 @@ let newHttpMessage = httpZ.build(httpModel);
 console.log(newHttpMessage);
 
 /* output:
-GET http://example.com/features?p1=v1 HTTP/1.1
+GET /features?p1=v1 HTTP/1.1
 Host: example.com
 Accept: *//*
 Accept-Encoding: gzip,deflate

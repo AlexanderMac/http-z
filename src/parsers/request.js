@@ -1,10 +1,10 @@
 'use strict';
 
-const _       = require('lodash');
-const { URL } = require('url');
-const consts  = require('../consts');
-const utils   = require('../utils');
-const Base    = require('./base');
+const _          = require('lodash');
+const consts     = require('../consts');
+const utils      = require('../utils');
+const validators = require('../validators');
+const Base       = require('./base');
 
 class HttpZRequestParser extends Base {
   static parse(params) {
@@ -14,6 +14,7 @@ class HttpZRequestParser extends Base {
 
   parse() {
     this._parseMessageForRows();
+    this._parseHostRow();
     this._parseStartRow();
     this._parseHeaderRows();
     this._parseCookiesRow();
@@ -25,18 +26,24 @@ class HttpZRequestParser extends Base {
   _parseMessageForRows() {
     let { startRow, headerRows, bodyRows } = super._parseMessageForRows();
 
-    let cookiesRow;
-    let cookiesIndex = _.findIndex(headerRows, row => _.chain(row).toLower().startsWith('cookie').value());
-    if (cookiesIndex !== -1) {
-      cookiesRow = headerRows[cookiesIndex];
-      headerRows.splice(cookiesIndex, 1);
-    }
-
     this.startRow = startRow;
-    this.hostRow = headerRows[0];
-    this.headerRows = headerRows.splice(1);
-    this.cookiesRow = cookiesRow;
+    this.hostRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('host:').value());
+    this.cookiesRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('cookie:').value());
+    this.headerRows = _.without(headerRows, this.hostRow, this.cookiesRow);
     this.bodyRows = bodyRows;
+  }
+
+  _parseHostRow() {
+    validators.validateNotEmptyString(this.hostRow, 'host header');
+    // eslint-disable-next-line no-unused-vars
+    let [unused, value] = utils.splitIntoTwoParts(this.hostRow, ':');
+    validators.validateNotEmptyString(value, 'host header value');
+
+    let res = _.attempt(utils.parseUrl.bind(null, value));
+    if (_.isError(res)) {
+      throw utils.getError('Invalid host', value);
+    }
+    this.host = res.host;
   }
 
   _parseStartRow() {
@@ -50,11 +57,10 @@ class HttpZRequestParser extends Base {
     let rowElems = this.startRow.split(' ');
     this.method = rowElems[0].toUpperCase();
     this.protocolVersion = rowElems[2].toUpperCase();
-    let rawUrl = rowElems[1];
+    let path = rowElems[1];
 
-    let url = new URL(rawUrl);
+    let url = utils.parseUrl(this.host + path);
     this.protocol = this._getProtocol(url);
-    this.host = url.host;
     this.path = url.pathname;
     this.params = this._getParams(url);
     this.basicAuth = this._getBasicAuth(url);

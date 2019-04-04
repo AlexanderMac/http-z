@@ -37,6 +37,7 @@ describe('parsers / request', () => {
     it('should call related methods and return request model', () => {
       let parser = getParserInstance({ httpMessage: 'requestMsg' });
       sinon.stub(parser, '_parseMessageForRows');
+      sinon.stub(parser, '_parseHostRow');
       sinon.stub(parser, '_parseStartRow');
       sinon.stub(parser, '_parseHeaderRows');
       sinon.stub(parser, '_parseCookiesRow');
@@ -48,6 +49,7 @@ describe('parsers / request', () => {
       should(actual).eql(expected);
 
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseMessageForRows', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: parser, fnName: '_parseHostRow', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseStartRow', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseHeaderRows', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: parser, fnName: '_parseCookiesRow', expectedArgs: '_without-args_' });
@@ -60,43 +62,82 @@ describe('parsers / request', () => {
     it('should parse message for rows, when headers does not contain Cookies row', () => {
       let requestMsg = [
         'start-line',
-        'host-line',
-        'Header1',
-        'Header2',
-        'Header3',
+        'host: somehost',
+        'header1',
+        'header2',
+        'header3',
         '',
-        'Body'
+        'body'
       ].join('\n');
 
       let parser = getParserInstance({ httpMessage: requestMsg });
       parser._parseMessageForRows();
 
       should(parser.startRow).eql('start-line');
-      should(parser.hostRow).eql('host-line');
-      should(parser.headerRows).eql(['Header1', 'Header2', 'Header3']);
-      should(parser.bodyRows).eql('Body');
+      should(parser.hostRow).eql('host: somehost');
+      should(parser.headerRows).eql(['header1', 'header2', 'header3']);
+      should(parser.cookiesRow).is.undefined;
+      should(parser.bodyRows).eql('body');
     });
 
     it('should parse message for rows when headers contain Cookies row', () => {
       let requestMsg = [
         'start-line',
-        'host-line',
-        'Header1',
-        'Header2',
-        'Header3',
-        'Cookie',
+        'host: somehost',
+        'header1',
+        'header2',
+        'header3',
+        'cookie: somecookies',
         '',
-        'Body'
+        'body'
       ].join('\n');
 
       let parser = getParserInstance({ httpMessage: requestMsg });
       parser._parseMessageForRows();
 
       should(parser.startRow).eql('start-line');
-      should(parser.hostRow).eql('host-line');
-      should(parser.headerRows).eql(['Header1', 'Header2', 'Header3']);
-      should(parser.cookiesRow).is.undefined;
-      should(parser.bodyRows).eql('Body');
+      should(parser.hostRow).eql('host: somehost');
+      should(parser.headerRows).eql(['header1', 'header2', 'header3']);
+      should(parser.cookiesRow).eql('cookie: somecookies');
+      should(parser.bodyRows).eql('body');
+    });
+  });
+
+  describe('_parseHostRow', () => {
+    it('should throw error when hostRow is nil', () => {
+      let parser = getParserInstance();
+      parser.hostRow = null;
+
+      should(parser._parseHostRow.bind(parser)).throw(Error, {
+        message: 'host header is required'
+      });
+    });
+
+    it('should throw error when host header value is empy', () => {
+      let parser = getParserInstance();
+      parser.hostRow = 'Host:';
+
+      should(parser._parseHostRow.bind(parser)).throw(Error, {
+        message: 'host header value must be not empty string'
+      });
+    });
+
+    it('should throw error when host header value is not valid URL', () => {
+      let parser = getParserInstance();
+      parser.hostRow = 'Host: ?!invalid-host';
+
+      should(parser._parseHostRow.bind(parser)).throw(Error, {
+        message: 'Invalid host.\nDetails: "?!invalid-host"'
+      });
+    });
+
+    it('should set instance.host when host header value is valid URL', () => {
+      let parser = getParserInstance();
+      parser.hostRow = 'Host: www.example.com:2345';
+
+      let expected = 'www.example.com:2345';
+      parser._parseHostRow();
+      should(parser.host).eql(expected);
     });
   });
 
@@ -104,13 +145,13 @@ describe('parsers / request', () => {
     function test({ startRow, expected }) {
       let parser = getParserInstance();
       parser.startRow = startRow;
+      parser.host = 'example.com';
 
       parser._parseStartRow();
       should(parser.method).eql(expected.method);
       should(parser.protocol).eql(expected.protocol);
       should(parser.protocolVersion).eql(expected.protocolVersion);
       should(parser.path).eql(expected.path);
-      should(parser.host).eql(expected.host);
       should(parser.params).eql(expected.params);
       should(parser.basicAuth).eql(expected.basicAuth);
     }
@@ -138,14 +179,14 @@ describe('parsers / request', () => {
     });
 
     it('should parse valid startRow (GET method)', () => {
-      let startRow = 'get http://example.com/features http/1.1';
+      let startRow = 'get /features http/1.1';
       let expected = getDefaultExpected();
 
       test({ startRow, expected });
     });
 
     it('should parse valid startRow (DELETE method)', () => {
-      let startRow = 'DELETE http://example.com/features HTTP/1.1';
+      let startRow = 'DELETE /features HTTP/1.1';
       let expected = getDefaultExpected({
         method: 'DELETE'
       });
@@ -154,7 +195,7 @@ describe('parsers / request', () => {
     });
 
     it('should parse valid startRow (path with two parameters)', () => {
-      let startRow = 'GET http://example.com/features?p1=v1&p2=v2 HTTP/1.1';
+      let startRow = 'GET /features?p1=v1&p2=v2 HTTP/1.1';
       let expected = getDefaultExpected({
         params: { p1: 'v1', p2: 'v2' }
       });
@@ -162,8 +203,8 @@ describe('parsers / request', () => {
       test({ startRow, expected });
     });
 
-    it('should parse valid startRow (url with auth)', () => {
-      let startRow = 'GET http://smith:12345@example.com/features HTTP/1.1';
+    it.skip('should parse valid startRow (url with auth)', () => {
+      let startRow = 'GET /features HTTP/1.1';
       let expected = getDefaultExpected({
         basicAuth: { username: 'smith', password: '12345' }
       });
@@ -172,7 +213,7 @@ describe('parsers / request', () => {
     });
 
     it('should parse valid startRow (HTTP protocol v2.0)', () => {
-      let startRow = 'GET http://example.com/features HTTP/2.0';
+      let startRow = 'GET /features HTTP/2.0';
       let expected = getDefaultExpected({
         protocolVersion: 'HTTP/2.0'
       });
@@ -257,8 +298,8 @@ describe('parsers / request', () => {
   describe('functional tests', () => {
     it('should parse request without body and headers', () => {
       let requestMsg = [
-        'get http://admin:pass@example.com/features?p1=v1 http/1.1',
-        'host: example.com',
+        'get /features?p1=v1 http/1.1',
+        'host: www.example.com',
         '',
         ''
       ].join('\n');
@@ -267,13 +308,10 @@ describe('parsers / request', () => {
         method: 'GET',
         protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
+        host: 'www.example.com',
         path: '/features',
         params: { p1: 'v1' },
-        basicAuth: {
-          username: 'admin',
-          password: 'pass'
-        },
+        basicAuth: {},
         headers: [],
         cookies: null,
         body: null
@@ -286,7 +324,7 @@ describe('parsers / request', () => {
 
     it('should parse request without body (header names in lower case)', () => {
       let requestMsg = [
-        'get http://example.com/features http/1.1',
+        'get /features http/1.1',
         'host: example.com',
         'connection: keep-alive',
         'accept: */*',
@@ -345,7 +383,7 @@ describe('parsers / request', () => {
 
     it('should parse request with cookies and without body', () => {
       let requestMsg = [
-        'GET http://example.com/features HTTP/1.1',
+        'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -408,7 +446,7 @@ describe('parsers / request', () => {
 
     it('should parse request with body and contentType=text/plain', () => {
       let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
+        'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -492,7 +530,7 @@ describe('parsers / request', () => {
 
     it('should parse request with body and contentType=application/json', () => {
       let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
+        'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -576,7 +614,7 @@ describe('parsers / request', () => {
 
     it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
       let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
+        'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -663,7 +701,7 @@ describe('parsers / request', () => {
 
     it('should parse request with body and contentType=multipart/form-data', () => {
       let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
+        'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',

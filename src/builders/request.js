@@ -41,7 +41,7 @@ class HttpZRequestBuilder extends Base {
 
     return '' +
       this.method.toUpperCase() + ' ' +
-      utils.generateUrl(_.pick(this, 'protocol', 'host', 'path', 'basicAuth', 'params')) + ' ' +
+      utils.generateRelativeUrl(_.pick(this, 'path', 'params')) + ' ' +
       this.protocolVersion.toUpperCase() +
       '\n';
   }

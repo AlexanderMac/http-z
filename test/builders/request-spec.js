@@ -105,7 +105,7 @@ describe('builders / request', () => {
     it('should build startRow when all params are valid', () => {
       let builder = getBuilderInstance();
 
-      let expected = 'GET http://example.com/ HTTP/1.1\n';
+      let expected = 'GET / HTTP/1.1\n';
       let actual = builder._generateStartRow();
       should(actual).eql(expected);
     });
@@ -192,7 +192,7 @@ describe('builders / request', () => {
       };
 
       let requestMsg = [
-        'GET https://admin:pass@example.com/features?p1=v1 HTTP/1.1',
+        'GET /features?p1=v1 HTTP/1.1',
         'Host: example.com',
         '',
         ''
@@ -241,7 +241,7 @@ describe('builders / request', () => {
       };
 
       let requestMsg = [
-        'GET http://example.com/features HTTP/1.1',
+        'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -300,7 +300,7 @@ describe('builders / request', () => {
       };
 
       let requestMsg = [
-        'GET http://example.com/features HTTP/1.1',
+        'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -379,7 +379,7 @@ describe('builders / request', () => {
       };
 
       let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
+        'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -461,7 +461,7 @@ describe('builders / request', () => {
       };
 
       let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
+        'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -546,7 +546,7 @@ describe('builders / request', () => {
       };
 
       let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
+        'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',
@@ -632,7 +632,7 @@ describe('builders / request', () => {
       };
 
       let requestMsg = [
-        'POST http://example.com/features HTTP/1.1',
+        'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
         'Accept: */*',

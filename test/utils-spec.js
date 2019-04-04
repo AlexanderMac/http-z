@@ -46,42 +46,26 @@ describe('utils', () => {
     });
   });
 
-  describe('generateUrl', () => {
+  describe('generateRelativeUrl', () => {
     function test(params, expected) {
-      let actual = utils.generateUrl(params);
+      let actual = utils.generateRelativeUrl(params);
       should(actual).eql(expected);
     }
 
-    it('should generate url', () => {
+    it('should generate relative url', () => {
       test({
-        protocol: 'http',
-        host: 'example.com',
         path: '/features'
-      }, 'http://example.com/features');
+      }, '/features');
     });
 
-    it('should generate url with basic auth', () => {
+    it('should generate relative url with params', () => {
       test({
-        protocol: 'http',
-        host: 'example.com',
-        path: '/features',
-        basicAuth: {
-          username: 'smith',
-          password: 12345
-        }
-      }, 'http://smith:12345@example.com/features');
-    });
-
-    it('should generate url with params', () => {
-      test({
-        protocol: 'http',
-        host: 'example.com',
         path: '/features',
         params: {
           p1: 'v1',
           p2: null
         }
-      }, 'http://example.com/features?p1=v1&p2=null');
+      }, '/features?p1=v1&p2=null');
     });
   });
 

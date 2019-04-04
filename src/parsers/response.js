@@ -24,11 +24,9 @@ class HttpZResponseParser extends Base {
   _parseMessageForRows() {
     let { startRow, headerRows, bodyRows } = super._parseMessageForRows();
 
-    let cookieRows = _.filter(headerRows, row => _.chain(row).toLower().startsWith('set-cookie').value());
-
     this.startRow = startRow;
-    this.headerRows = _.without(headerRows, ...cookieRows);
-    this.cookieRows = cookieRows;
+    this.cookieRows = _.filter(headerRows, row => _.chain(row).toLower().startsWith('set-cookie').value());
+    this.headerRows = _.without(headerRows, ...this.cookieRows);
     this.bodyRows = bodyRows;
   }
 

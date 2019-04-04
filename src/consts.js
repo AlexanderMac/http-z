@@ -4,7 +4,8 @@ const RegExpStrings = {
   method: '(get|post|put|patch|delete)',
   protocol: '(https?|ftp)',
   protocolVer: '(http)\\/(1\\.0|1\\.1|2\\.0)',
-  url: '((https?|ftp)://)*(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?'
+  url: '((https?|ftp)://)*(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?',
+  path: '\\/\\S+'
 };
 
 const regexps = {
@@ -12,7 +13,7 @@ const regexps = {
   httpProtocol: new RegExp(RegExpStrings.protocol, 'i'),
   httpProtocolVer: new RegExp(RegExpStrings.protocolVer, 'i'),
   url: new RegExp(RegExpStrings.url, 'i'),
-  requestStartRow: new RegExp('^' + RegExpStrings.method + ' ' + RegExpStrings.url + ' ' + RegExpStrings.protocolVer + '$', 'i'),
+  requestStartRow: new RegExp('^' + RegExpStrings.method + ' ' + RegExpStrings.path + ' ' + RegExpStrings.protocolVer + '$', 'i'),
   responseStartRow: new RegExp('^' + RegExpStrings.protocolVer + ' ' + '\\d{3}' + ' ' + '\\w+( \\w+)*$'  + '$', 'i'),
   boundary: /boundary=\w+/im,
   param: /Content-Disposition:\s*form-data;\s*name="\w+"\n\n/im,
