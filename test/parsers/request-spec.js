@@ -57,7 +57,27 @@ describe('parsers / request', () => {
   });
 
   describe('_parseMessageForRows', () => {
-    it('should parse message for rows', () => {
+    it('should parse message for rows, when headers does not contain Cookies row', () => {
+      let requestMsg = [
+        'start-line',
+        'host-line',
+        'Header1',
+        'Header2',
+        'Header3',
+        '',
+        'Body'
+      ].join('\n');
+
+      let parser = getParserInstance({ httpMessage: requestMsg });
+      parser._parseMessageForRows();
+
+      should(parser.startRow).eql('start-line');
+      should(parser.hostRow).eql('host-line');
+      should(parser.headerRows).eql(['Header1', 'Header2', 'Header3']);
+      should(parser.bodyRows).eql('Body');
+    });
+
+    it('should parse message for rows when headers contain Cookies row', () => {
       let requestMsg = [
         'start-line',
         'host-line',
@@ -75,7 +95,7 @@ describe('parsers / request', () => {
       should(parser.startRow).eql('start-line');
       should(parser.hostRow).eql('host-line');
       should(parser.headerRows).eql(['Header1', 'Header2', 'Header3']);
-      should(parser.cookiesRow).eql('Cookie');
+      should(parser.cookiesRow).is.undefined;
       should(parser.bodyRows).eql('Body');
     });
   });
@@ -183,22 +203,22 @@ describe('parsers / request', () => {
     it('should set instance.cookies to null when cookiesRow is empty', () => {
       let parser = getParserInstance();
       parser.cookiesRow = null;
-      parser._parseCookiesRow();
 
       let expected = null;
+      parser._parseCookiesRow();
       should(parser.cookies).eql(expected);
     });
 
     it('should set instance.cookies when cookiesRow is valid and not empty', () => {
       let parser = getParserInstance();
       parser.cookiesRow = 'Cookie: csrftoken=123abc;sessionid=456def;username=';
-      parser._parseCookiesRow();
 
       let expected = [
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', value: '456def' },
         { name: 'username', value: null }
       ];
+      parser._parseCookiesRow();
       should(parser.cookies).eql(expected);
     });
   });
@@ -229,7 +249,6 @@ describe('parsers / request', () => {
         cookies: 'cookies',
         body: 'body'
       };
-
       let actual = parser._generateModel();
       should(actual).eql(expected);
     });

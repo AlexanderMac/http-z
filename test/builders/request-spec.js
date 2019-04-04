@@ -46,7 +46,7 @@ describe('builders / request', () => {
       sinon.stub(builder, '_generateStartRow').returns('startRow\n');
       sinon.stub(builder, '_generateHostRow').returns('hostRow\n');
       sinon.stub(builder, '_generateHeaderRows').returns('headerRows\n');
-      sinon.stub(builder, '_generateCookieRows').returns('cookieRow\n');
+      sinon.stub(builder, '_generateCookiesRow').returns('cookieRow\n');
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows');
 
       let expected = 'startRow\nhostRow\nheaderRows\ncookieRow\nbodyRows';
@@ -56,7 +56,7 @@ describe('builders / request', () => {
       nassert.validateCalledFn({ srvc: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: builder, fnName: '_generateHostRow', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateCookieRows', expectedArgs: '_without-args_' });
+      nassert.validateCalledFn({ srvc: builder, fnName: '_generateCookiesRow', expectedArgs: '_without-args_' });
       nassert.validateCalledFn({ srvc: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' });
     });
   });
@@ -121,27 +121,27 @@ describe('builders / request', () => {
     });
   });
 
-  describe('_generateCookieRows', () => {
-    it('should return empty string when instance.cookies is undefined', () => {
+  describe('_generateCookiesRow', () => {
+    it('should return empty string when instance.cookies is nil', () => {
       let builder = getBuilderInstance({ cookies: null });
 
       let expected = '';
-      let actual = builder._generateCookieRows();
+      let actual = builder._generateCookiesRow();
       should(actual).eql(expected);
     });
 
     it('should throw error when instance.cookies is not array', () => {
       let builder = getBuilderInstance({ cookies: 'wrong cookies' });
 
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+      should(builder._generateCookiesRow.bind(builder)).throw(Error, {
         message: 'cookies must be an array'
       });
     });
 
-    it('should throw error when instance.cookies is empty array', () => {
+    it('should throw error when instance.cookies is an empty array', () => {
       let builder = getBuilderInstance({ cookies: [] });
 
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+      should(builder._generateCookiesRow.bind(builder)).throw(Error, {
         message: 'cookies must be not empty array'
       });
     });
@@ -154,21 +154,8 @@ describe('builders / request', () => {
         ]
       });
 
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+      should(builder._generateCookiesRow.bind(builder)).throw(Error, {
         message: 'cookie name is required.\nDetails: "cookie index: 1"'
-      });
-    });
-
-    it('should throw error when instance.cookies contains element with undefined value', () => {
-      let builder = getBuilderInstance({
-        cookies: [
-          { name: 'c1', value: 'v1' },
-          { name: 'c2' }
-        ]
-      });
-
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'cookie value is required.\nDetails: "cookie index: 1"'
       });
     });
 
@@ -176,12 +163,13 @@ describe('builders / request', () => {
       let builder = getBuilderInstance({
         cookies: [
           { name: 'c1', value: 'v1' },
-          { name: 'c2', value: 'v2' }
+          { name: 'c2', value: 'v2' },
+          { name: 'c3', value: null }
         ]
       });
 
-      let expected = 'Cookie: c1=v1; c2=v2\n';
-      let actual = builder._generateCookieRows();
+      let expected = 'Cookie: c1=v1; c2=v2; c3=\n';
+      let actual = builder._generateCookiesRow();
       should(actual).eql(expected);
     });
   });

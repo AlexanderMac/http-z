@@ -106,7 +106,7 @@ describe('builders / base', () => {
       should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
     });
 
-    it('should return \n when instance.headers is empty array', () => {
+    it('should return \n when instance.headers is an empty array', () => {
       let headers = [];
       let expected = '\n';
 
@@ -238,7 +238,7 @@ describe('builders / base', () => {
       should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
     });
 
-    it('should throw error when instance.body.formDataParams is empty array', () => {
+    it('should throw error when instance.body.formDataParams is an empty array', () => {
       let body = getDefaultBody();
       body.formDataParams = [];
       let expected = utils.getError('body.formDataParams must be not empty array');
@@ -340,7 +340,7 @@ describe('builders / base', () => {
       should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
     });
 
-    it('should throw error when instance.body.formDataParams is empty array', () => {
+    it('should throw error when instance.body.formDataParams is an empty array', () => {
       let body = getDefaultBody();
       body.formDataParams = [];
       let expected = utils.getError('body.formDataParams must be not empty array');

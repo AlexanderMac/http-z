@@ -89,6 +89,76 @@ describe('builders / response', () => {
     });
   });
 
+  describe('_generateCookieRows', () => {
+    function getDefaultCookes() {
+      return [
+        { name: 'csrftoken', value: '123abc', params: null },
+        { name: 'sessionid', value: null, params: ['Domain=example.com', 'Path=/'] },
+        { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
+      ];
+    }
+
+    it('should return empty string when instance.cookies is nil', () => {
+      let builder = getBuilderInstance({ cookies: null });
+
+      let expected = '';
+      let actual = builder._generateCookieRows();
+      should(actual).eql(expected);
+    });
+
+    it('should throw error when instance.cookies is not array', () => {
+      let builder = getBuilderInstance({ cookies: 'wrong cookies' });
+
+      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+        message: 'cookies must be an array'
+      });
+    });
+
+    it('should throw error when instance.cookies is an empty array', () => {
+      let builder = getBuilderInstance({ cookies: [] });
+
+      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+        message: 'cookies must be not empty array'
+      });
+    });
+
+    it('should throw error when instance.cookies contains element with undefined name', () => {
+      let builder = getBuilderInstance({
+        cookies: getDefaultCookes()
+      });
+      builder.cookies[1].name = undefined;
+
+      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+        message: 'cookie name is required.\nDetails: "cookie index: 1"'
+      });
+    });
+
+    it('should throw error when instance.cookies contains element with non array params', () => {
+      let builder = getBuilderInstance({
+        cookies: getDefaultCookes()
+      });
+      builder.cookies[1].params = 'wrong params';
+
+      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+        message: 'cookie params must be an array.\nDetails: "cookie index: 1"'
+      });
+    });
+
+    it('should build cookie rows when instance.cookies are valid', () => {
+      let builder = getBuilderInstance({
+        cookies: getDefaultCookes()
+      });
+
+      let expected = [
+        'Set-Cookie: csrftoken=123abc',
+        'Set-Cookie: sessionid=; Domain=example.com; Path=/',
+        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
+      ].join('\n') + '\n';
+      let actual = builder._generateCookieRows();
+      should(actual).eql(expected);
+    });
+  });
+
   describe('functional tests', () => {
     it('should build response message without body (header names in lower case)', () => {
       let responseModel = {
@@ -131,6 +201,63 @@ describe('builders / response', () => {
         'Cache-Control: no-cache',
         'Content-Type: text/plain;charset=UTF-8',
         'Content-Encoding: gzip, deflate',
+        ''
+      ].join('\n');
+
+      let builder = getBuilderInstance(responseModel);
+      let actual = builder.build();
+      should(actual).eql(responseMsg);
+    });
+
+    it('should build response message with cookies and without body', () => {
+      let responseModel = {
+        protocolVersion: 'HTTP/1.1',
+        statusCode: 201,
+        statusMessage: 'Created',
+        headers: [
+          {
+            name: 'Connection',
+            values: [
+              { value: 'keep-alive', params: null }
+            ]
+          },
+          {
+            name: 'Cache-Control',
+            values: [
+              { value: 'no-cache', params: null }
+            ]
+          },
+          {
+            name: 'Content-Type',
+            values: [
+              { value: 'text/plain', params: 'charset=UTF-8' }
+            ]
+          },
+          {
+            name: 'Content-Encoding',
+            values: [
+              { value: 'gzip', params: null },
+              { value: 'deflate', params: null }
+            ]
+          }
+        ],
+        cookies: [
+          { name: 'csrftoken', value: '123abc', params: null },
+          { name: 'sessionid', value: '456def', params: ['Domain=example.com', 'Path=/'] },
+          { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
+        ],
+        body: null
+      };
+
+      let responseMsg = [
+        'HTTP/1.1 201 Created',
+        'Connection: keep-alive',
+        'Cache-Control: no-cache',
+        'Content-Type: text/plain;charset=UTF-8',
+        'Content-Encoding: gzip, deflate',
+        'Set-Cookie: csrftoken=123abc',
+        'Set-Cookie: sessionid=456def; Domain=example.com; Path=/',
+        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
         ''
       ].join('\n');
 

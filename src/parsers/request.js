@@ -26,7 +26,7 @@ class HttpZRequestParser extends Base {
     let { startRow, headerRows, bodyRows } = super._parseMessageForRows();
 
     let cookiesRow;
-    let cookiesIndex = _.findIndex(headerRows, row => _.startsWith(row, 'Cookie')); // TODO: can be in lower case
+    let cookiesIndex = _.findIndex(headerRows, row => _.chain(row).toLower().startsWith('cookie').value());
     if (cookiesIndex !== -1) {
       cookiesRow = headerRows[cookiesIndex];
       headerRows.splice(cookiesIndex, 1);

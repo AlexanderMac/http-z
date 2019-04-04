@@ -28,7 +28,7 @@ class HttpZRequestBuilder extends Base {
       this._generateStartRow() +
       this._generateHostRow() +
       this._generateHeaderRows() +
-      this._generateCookieRows() +
+      this._generateCookiesRow() +
       this._generateBodyRows();
   }
 
@@ -50,7 +50,7 @@ class HttpZRequestBuilder extends Base {
     return `Host: ${this.host}\n`;
   }
 
-  _generateCookieRows() {
+  _generateCookiesRow() {
     if (!this.cookies) {
       return '';
     }
@@ -59,8 +59,7 @@ class HttpZRequestBuilder extends Base {
 
     let cookiesStr = _.map(this.cookies, ({ name, value }, index) => {
       validators.validateNotEmptyString(name, 'cookie name', `cookie index: ${index}`);
-      validators.validateNotEmptyString(value, 'cookie value', `cookie index: ${index}`);
-      return name + '=' + value;
+      return name + '=' + (value || '');
     });
 
     return 'Cookie: ' + cookiesStr.join('; ') + '\n';
