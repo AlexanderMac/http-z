@@ -1,8 +1,10 @@
 'use strict';
 
-const _                   = require('lodash');
-const { URLSearchParams } = require('url');
-const consts              = require('./consts');
+const _             = require('lodash');
+const {
+  URL,
+  URLSearchParams } = require('url');
+const consts        = require('./consts');
 
 exports.splitIntoTwoParts = (str, delimiter) => {
   if (_.isEmpty(str)) {
