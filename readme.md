@@ -7,7 +7,7 @@
 ## Features
 
 * Parse HTTP request/response message:
-  - path params, basicAuth
+  - path params
   - headers
   - cookies
   - body, supported contentTypes:
@@ -15,7 +15,7 @@
     - `application/x-www-form-urlencoded`
     - `application/json`, `text/plain`
 * Build HTTP request/response message from model:
-  - path params, basicAuth
+  - path params
   - headers
   - cookies
   - body, supported contentTypes:

@@ -183,10 +183,6 @@ describe('builders / request', () => {
         host: 'example.com',
         path: '/features',
         params: { p1: 'v1' },
-        basicAuth: {
-          username: 'admin',
-          password: 'pass'
-        },
         headers: [],
         body: null
       };

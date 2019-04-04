@@ -153,7 +153,6 @@ describe('parsers / request', () => {
       should(parser.protocolVersion).eql(expected.protocolVersion);
       should(parser.path).eql(expected.path);
       should(parser.params).eql(expected.params);
-      should(parser.basicAuth).eql(expected.basicAuth);
     }
 
     function getDefaultExpected(ex) {
@@ -163,8 +162,7 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         path: '/features',
         host: 'example.com',
-        params: {},
-        basicAuth: {}
+        params: {}
       };
       return _.extend(def, ex);
     }
@@ -198,15 +196,6 @@ describe('parsers / request', () => {
       let startRow = 'GET /features?p1=v1&p2=v2 HTTP/1.1';
       let expected = getDefaultExpected({
         params: { p1: 'v1', p2: 'v2' }
-      });
-
-      test({ startRow, expected });
-    });
-
-    it.skip('should parse valid startRow (url with auth)', () => {
-      let startRow = 'GET /features HTTP/1.1';
-      let expected = getDefaultExpected({
-        basicAuth: { username: 'smith', password: '12345' }
       });
 
       test({ startRow, expected });
@@ -273,7 +262,6 @@ describe('parsers / request', () => {
       parser.path = 'path';
       parser.host = 'host';
       parser.params = 'params';
-      parser.basicAuth = 'basicAuth';
       parser.headers = 'headers';
       parser.cookies = 'cookies';
       parser.body = 'body';
@@ -285,7 +273,6 @@ describe('parsers / request', () => {
         path: 'path',
         host: 'host',
         params: 'params',
-        basicAuth: 'basicAuth',
         headers: 'headers',
         cookies: 'cookies',
         body: 'body'
@@ -311,7 +298,6 @@ describe('parsers / request', () => {
         host: 'www.example.com',
         path: '/features',
         params: { p1: 'v1' },
-        basicAuth: {},
         headers: [],
         cookies: null,
         body: null
@@ -341,7 +327,6 @@ describe('parsers / request', () => {
         host: 'example.com',
         path: '/features',
         params: {},
-        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -401,7 +386,6 @@ describe('parsers / request', () => {
         host: 'example.com',
         path: '/features',
         params: {},
-        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -466,7 +450,6 @@ describe('parsers / request', () => {
         host: 'example.com',
         path: '/features',
         params: {},
-        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -550,7 +533,6 @@ describe('parsers / request', () => {
         host: 'example.com',
         path: '/features',
         params: {},
-        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -634,7 +616,6 @@ describe('parsers / request', () => {
         host: 'example.com',
         path: '/features',
         params: {},
-        basicAuth: {},
         headers: [
           {
             name: 'Connection',
@@ -729,7 +710,6 @@ describe('parsers / request', () => {
         host: 'example.com',
         path: '/features',
         params: {},
-        basicAuth: {},
         headers: [
           {
             name: 'Connection',

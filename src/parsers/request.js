@@ -63,7 +63,6 @@ class HttpZRequestParser extends Base {
     this.protocol = this._getProtocol(url);
     this.path = url.pathname;
     this.params = this._getParams(url);
-    this.basicAuth = this._getBasicAuth(url);
   }
 
   _parseCookiesRow() {
@@ -100,7 +99,6 @@ class HttpZRequestParser extends Base {
       host: this.host,
       path: this.path,
       params: this.params,
-      basicAuth: this.basicAuth,
       headers: this.headers,
       cookies: this.cookies,
       body: this.body
@@ -117,18 +115,6 @@ class HttpZRequestParser extends Base {
     let params = {};
     url.searchParams.forEach((value, name) => params[name] = value);
     return params;
-  }
-
-  // TODO: test it
-  _getBasicAuth(url) {
-    let basicAuth = {};
-    if (url.username) {
-      basicAuth.username = url.username;
-    }
-    if (url.password) {
-      basicAuth.password = url.password;
-    }
-    return basicAuth;
   }
 }
 
