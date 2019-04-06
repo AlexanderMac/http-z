@@ -146,10 +146,10 @@ describe('parsers / base', () => {
       parser._parseBodyRows();
       should(parser.body).eql(expected);
 
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseFormDataBody', expectedArgs: expectedFnArgs.parseFormDataBody });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.parseXwwwFormUrlencodedBody });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseJsonBody', expectedArgs: expectedFnArgs.parseJsonBody });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parsePlainBody', expectedArgs: expectedFnArgs.parsePlainBody });
+      nassert.assertFn({ inst: parser, fnName: '_parseFormDataBody', expectedArgs: expectedFnArgs.parseFormDataBody });
+      nassert.assertFn({ inst: parser, fnName: '_parseXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.parseXwwwFormUrlencodedBody });
+      nassert.assertFn({ inst: parser, fnName: '_parseJsonBody', expectedArgs: expectedFnArgs.parseJsonBody });
+      nassert.assertFn({ inst: parser, fnName: '_parsePlainBody', expectedArgs: expectedFnArgs.parsePlainBody });
     }
 
     it('should set instance.body to null when bodyRows is empty', () => {

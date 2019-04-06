@@ -36,7 +36,7 @@ describe('builders / request', () => {
       let actual = RequestBuilder.build(params);
       nassert.assert(actual, expected);
 
-      nassert.validateCalledFn({ srvc: RequestBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: RequestBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });
     });
   });
 
@@ -53,11 +53,11 @@ describe('builders / request', () => {
       let actual = builder.build();
       should(actual).eql(expected);
 
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateHostRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateCookiesRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: builder, fnName: '_generateHostRow', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: builder, fnName: '_generateCookiesRow', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' });
     });
   });
 

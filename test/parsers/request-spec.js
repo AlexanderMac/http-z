@@ -29,7 +29,7 @@ describe('parsers / request', () => {
       let actual = RequestParser.parse(params);
       nassert.assert(actual, expected);
 
-      nassert.validateCalledFn({ srvc: RequestParser.prototype, fnName: 'parse', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: RequestParser.prototype, fnName: 'parse', expectedArgs: '_without-args_' });
     });
   });
 
@@ -48,13 +48,13 @@ describe('parsers / request', () => {
       let actual = parser.parse();
       should(actual).eql(expected);
 
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseMessageForRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseHostRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseStartRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseHeaderRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseCookiesRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_parseBodyRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: parser, fnName: '_generateModel', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: parser, fnName: '_parseMessageForRows', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: parser, fnName: '_parseHostRow', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: parser, fnName: '_parseStartRow', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: parser, fnName: '_parseHeaderRows', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: parser, fnName: '_parseCookiesRow', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: parser, fnName: '_parseBodyRows', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: parser, fnName: '_generateModel', expectedArgs: '_without-args_' });
     });
   });
 

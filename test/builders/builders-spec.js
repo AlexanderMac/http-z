@@ -46,7 +46,7 @@ describe('builders / index', () => {
     let actual = builder(httpModel);
     should(actual).eql(expected);
 
-    nassert.validateCalledFn({ srvc: RequestBuilder, fnName: 'build', expectedArgs });
+    nassert.assertFn({ inst: RequestBuilder, fnName: 'build', expectedArgs });
   });
 
   it('should call ResponseBuilder.build when httpModel is response', () => {
@@ -61,6 +61,6 @@ describe('builders / index', () => {
     let actual = builder(httpModel);
     should(actual).eql(expected);
 
-    nassert.validateCalledFn({ srvc: ResponseBuilder, fnName: 'build', expectedArgs });
+    nassert.assertFn({ inst: ResponseBuilder, fnName: 'build', expectedArgs });
   });
 });

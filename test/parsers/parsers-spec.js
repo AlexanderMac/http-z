@@ -57,7 +57,7 @@ describe('parsers / index', () => {
     let actual = parser(params);
     should(actual).eql(expected);
 
-    nassert.validateCalledFn({ srvc: RequestParser, fnName: 'parse', expectedArgs });
+    nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedArgs });
   });
 
   it('should call ResponseParser.parse when httpMessage is response', () => {
@@ -76,6 +76,6 @@ describe('parsers / index', () => {
     let actual = parser(params);
     should(actual).eql(expected);
 
-    nassert.validateCalledFn({ srvc: ResponseParser, fnName: 'parse', expectedArgs });
+    nassert.assertFn({ inst: ResponseParser, fnName: 'parse', expectedArgs });
   });
 });

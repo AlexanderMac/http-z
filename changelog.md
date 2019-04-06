@@ -1,7 +1,7 @@
 # <sub>v0.4.1</sub>
 #### _Apr. 4, 2019_
 
-  * Bug fix.
+  * Bug fixes.
 
 # <sub>v0.4.0</sub>
 #### _Apr. 4, 2019_

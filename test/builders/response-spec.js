@@ -34,7 +34,7 @@ describe('builders / response', () => {
       let actual = ResponseBuilder.build(params);
       nassert.assert(actual, expected);
 
-      nassert.validateCalledFn({ srvc: ResponseBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: ResponseBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });
     });
   });
 
@@ -49,9 +49,9 @@ describe('builders / response', () => {
       let actual = builder.build();
       should(actual).eql(expected);
 
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' });
+      nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' });
     });
   });
 

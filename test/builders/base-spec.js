@@ -146,10 +146,10 @@ describe('builders / base', () => {
         should(builder._generateBodyRows.bind(builder)).throw(Error, expected);
       }
 
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateFormDataBody', expectedArgs: expectedFnArgs.genFormDataBody });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.genXwwwFormUrlencodedBody });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generateJsonBody', expectedArgs: expectedFnArgs.genJsonBody });
-      nassert.validateCalledFn({ srvc: builder, fnName: '_generatePlainBody', expectedArgs: expectedFnArgs.genPlainBody });
+      nassert.assertFn({ inst: builder, fnName: '_generateFormDataBody', expectedArgs: expectedFnArgs.genFormDataBody });
+      nassert.assertFn({ inst: builder, fnName: '_generateXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.genXwwwFormUrlencodedBody });
+      nassert.assertFn({ inst: builder, fnName: '_generateJsonBody', expectedArgs: expectedFnArgs.genJsonBody });
+      nassert.assertFn({ inst: builder, fnName: '_generatePlainBody', expectedArgs: expectedFnArgs.genPlainBody });
     }
 
     it('should return empty string when instance.body is nil', () => {
