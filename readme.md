@@ -86,14 +86,13 @@ Accept-Language: en-US;q=0.6, en;q=0.4
 ```
 
 ## API
-
-### parse({ httpMessage, eol })
+- **parse({ httpMessage, eol })**<br>
 Parse HTTP request/response message and return model.
 
 - `httpMessage` is a plain HTTP message in string format.
 - `eol` end of line, `\n` by default.
 
-### build(httpModel)
+- **build(httpModel)**<br>
 Build HTTP message from request/response model.
 
 - `httpModel` is HTTP model.
