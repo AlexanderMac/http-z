@@ -1,3 +1,9 @@
+# <sub>v0.4.3</sub>
+#### _Apr_. 17, 2019_
+
+ * Fixed request startRow processing with empty path (in parser).
+ * Fixed body processing with unsupported content-type (in builder).
+
 # <sub>v0.4.2</sub>
 #### _Apr_. 6, 2019_
 
