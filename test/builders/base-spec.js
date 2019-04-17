@@ -199,13 +199,14 @@ describe('builders / base', () => {
       test({ body, expected, expectedFnArgs });
     });
 
-    it('should throw error when instance.body is not empty and contentType is unsupported', () => {
+    it('should return PlainBody when instance.body is not empty and contentType is unsupported', () => {
       let body = {
         contentType: 'unsupported'
       };
-      let expected = utils.getError('Missing on unsupported body contentType');
+      let expected = '\nPlainBody';
+      let expectedFnArgs = { genPlainBody: '_without-args_' };
 
-      test({ body, expected });
+      test({ body, expected, expectedFnArgs });
     });
   });
 

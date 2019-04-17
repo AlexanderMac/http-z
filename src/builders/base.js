@@ -50,10 +50,8 @@ class HttpZBaseBuilder {
         return '\n' + this._generateXwwwFormUrlencodedBody();
       case consts.http.contentTypes.json:
         return '\n' + this._generateJsonBody();
-      case consts.http.contentTypes.plain:
-        return '\n' + this._generatePlainBody();
       default:
-        throw utils.getError('Missing on unsupported body contentType');
+        return '\n' + this._generatePlainBody();
     }
   }
 
