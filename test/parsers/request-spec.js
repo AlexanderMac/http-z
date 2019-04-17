@@ -192,6 +192,15 @@ describe('parsers / request', () => {
       test({ startRow, expected });
     });
 
+    it('should parse valid startRow (path is empty)', () => {
+      let startRow = 'GET / HTTP/1.1';
+      let expected = getDefaultExpected({
+        path: '/'
+      });
+
+      test({ startRow, expected });
+    });
+
     it('should parse valid startRow (path with two parameters)', () => {
       let startRow = 'GET /features?p1=v1&p2=v2 HTTP/1.1';
       let expected = getDefaultExpected({

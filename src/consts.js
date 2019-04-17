@@ -5,7 +5,7 @@ const RegExpStrings = {
   protocol: '(https?|ftp)',
   protocolVer: '(http)\\/(1\\.0|1\\.1|2\\.0)',
   url: '((https?|ftp)://)*(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?',
-  path: '\\/\\S+'
+  path: '\\/\\S*'
 };
 
 const regexps = {
