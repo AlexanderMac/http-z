@@ -12,11 +12,11 @@ describe('parsers / base', () => {
 
   describe('_parseMessageForRows', () => {
     it('should throw error when message does not have headers', () => {
-      let requestMsg = [
+      let plainRequest = [
         '',
         'Body'
       ].join('\n');
-      let parser = getParserInstance({ httpMessage: requestMsg });
+      let parser = getParserInstance(plainRequest);
 
       should(parser._parseMessageForRows.bind(parser)).throw(Error, {
         message: 'Incorrect message format, it must have headers and body, separated by empty line'
@@ -24,12 +24,12 @@ describe('parsers / base', () => {
     });
 
     it('should throw error when message does not have body', () => {
-      let requestMsg = [
+      let plainRequest = [
         'start-line',
         'host-line',
         'Header1'
       ].join('\n');
-      let parser = getParserInstance({ httpMessage: requestMsg });
+      let parser = getParserInstance(plainRequest);
 
       should(parser._parseMessageForRows.bind(parser)).throw(Error, {
         message: 'Incorrect message format, it must have headers and body, separated by empty line'
@@ -37,7 +37,7 @@ describe('parsers / base', () => {
     });
 
     it('should parse message for rows', () => {
-      let requestMsg = [
+      let plainRequest = [
         'start-line',
         'host-line',
         'Header1',
@@ -47,7 +47,7 @@ describe('parsers / base', () => {
         '',
         'Body'
       ].join('\n');
-      let parser = getParserInstance({ httpMessage: requestMsg });
+      let parser = getParserInstance(plainRequest);
 
       let actual = parser._parseMessageForRows();
       should(actual.startRow).eql('start-line');

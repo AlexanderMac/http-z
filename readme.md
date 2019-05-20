@@ -6,7 +6,7 @@
 
 ## Features
 
-* Parse HTTP request/response message:
+* Parse HTTP request/response plain message:
   - path params
   - headers
   - cookies
@@ -14,14 +14,15 @@
     - `multipart/form-data`
     - `application/x-www-form-urlencoded`
     - `application/json`, `text/plain`
-* Build HTTP request/response message from model:
+* Build HTTP request/response plain message from model:
   - path params
   - headers
   - cookies
   - body, supported contentTypes:
     - `multipart/form-data`
     - `application/x-www-form-urlencoded`
-    - `application/json`, `text/plain`
+    - `application/json`
+    - `text/plain`
 
 ## Commands
 
@@ -33,9 +34,9 @@ $ npm i http-z
 ## Usage
 
 ```js
-const HttpZ = require('http-z');
+const httpZ = require('http-z');
 
-let httpMessage = [
+let plainMessage = [
   'GET /features?p1=v1 HTTP/1.1',
   'Host: example.com',
   'Accept: */*',
@@ -45,8 +46,8 @@ let httpMessage = [
   ''
 ].join('\n');
 
-let httpModel = httpZ.parse({ httpMessage });
-console.log(JSON.stringify(httpModel, null, 2));
+let messageModel = httpZ.parse(plainMessage);
+console.log(JSON.stringify(messageModel, null, 2));
 
 /* output:
 { 
@@ -72,8 +73,8 @@ console.log(JSON.stringify(httpModel, null, 2));
 }
 */
 
-let newHttpMessage = httpZ.build(httpModel);
-console.log(newHttpMessage);
+plainMessage = httpZ.build(messageModel);
+console.log(plainMessage);
 
 /* output:
 GET /features?p1=v1 HTTP/1.1
@@ -86,16 +87,17 @@ Accept-Language: en-US;q=0.6, en;q=0.4
 ```
 
 ## API
-### parse({ httpMessage, eol })
-Parse HTTP request/response message and return model.
 
-- `httpMessage` is a plain HTTP message in string format.
+### parse(plainMessage, eol)
+Parse HTTP request/response plain message and return model.
+
+- `plainMessage` is HTTP plain message.
 - `eol` end of line, `\n` by default.
 
-### build(httpModel)
-Build HTTP message from request/response model.
+### build(messageModel)
+Build HTTP request/response plain message from model.
 
-- `httpModel` is HTTP model.
+- `messageModel` is HTTP message model.
 
 ## Author
 Alexander Mac

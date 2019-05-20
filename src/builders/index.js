@@ -4,16 +4,16 @@ const utils           = require('../utils');
 const RequestBuilder  = require('./request');
 const ResponseBuilder = require('./response');
 
-module.exports = (httpModel) => {
-  if (!httpModel) {
-    throw utils.getError('httpModel is required');
+module.exports = (messageModel) => {
+  if (!messageModel) {
+    throw utils.getError('messageModel is required');
   }
 
-  if (httpModel.method) {
-    return RequestBuilder.build(httpModel);
+  if (messageModel.method) {
+    return RequestBuilder.build(messageModel);
   }
-  if (httpModel.statusCode) {
-    return ResponseBuilder.build(httpModel);
+  if (messageModel.statusCode) {
+    return ResponseBuilder.build(messageModel);
   }
-  throw new Error('Unknown httpModel format');
+  throw new Error('Unknown messageModel format');
 };

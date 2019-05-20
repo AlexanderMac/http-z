@@ -22,6 +22,7 @@
   "keywords": [
     "http",
     "http-utility",
+    "message",
     "builder",
     "parser",
     "request",

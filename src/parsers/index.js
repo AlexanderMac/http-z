@@ -6,18 +6,18 @@ const utils          = require('../utils');
 const RequestParser  = require('./request');
 const ResponseParser = require('./response');
 
-module.exports = ({ httpMessage, eol = '\n' } = {}) => {
-  if (!httpMessage) {
-    throw utils.getError('httpMessage is required');
+module.exports = (plainMessage, eol = '\n') => {
+  if (!plainMessage) {
+    throw utils.getError('plainMessage is required');
   }
 
-  let firstRow = _.chain(httpMessage).split(eol).head().value();
+  let firstRow = _.chain(plainMessage).split(eol).head().value();
 
   if (consts.regexps.requestStartRow.test(firstRow)) {
-    return RequestParser.parse({ httpMessage, eol });
+    return RequestParser.parse(plainMessage, eol);
   }
   if (consts.regexps.responseStartRow.test(firstRow)) {
-    return ResponseParser.parse({ httpMessage, eol });
+    return ResponseParser.parse(plainMessage, eol);
   }
-  throw new Error('Unknown httpMessage format');
+  throw new Error('Unknown plainMessage format');
 };

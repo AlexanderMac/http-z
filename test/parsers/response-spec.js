@@ -34,7 +34,7 @@ describe('parsers / response', () => {
 
   describe('parse', () => {
     it('should call related methods and return response model', () => {
-      let parser = getParserInstance({ httpMessage: 'responseMsg' });
+      let parser = getParserInstance('plainResponse');
       sinon.stub(parser, '_parseMessageForRows');
       sinon.stub(parser, '_parseStartRow');
       sinon.stub(parser, '_parseHeaderRows');
@@ -57,7 +57,7 @@ describe('parsers / response', () => {
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows, when headers does not contain Set-Cookie rows', () => {
-      let responseMsg = [
+      let plainResponse = [
         'start-line',
         'Header1',
         'Header2',
@@ -66,7 +66,7 @@ describe('parsers / response', () => {
         'Body'
       ].join('\n');
 
-      let parser = getParserInstance({ httpMessage: responseMsg });
+      let parser = getParserInstance(plainResponse);
       parser._parseMessageForRows();
 
       should(parser.startRow).eql('start-line');
@@ -76,7 +76,7 @@ describe('parsers / response', () => {
     });
 
     it('should parse message for rows, when headers contain Set-Cookie rows', () => {
-      let responseMsg = [
+      let plainResponse = [
         'start-line',
         'Header1',
         'Header2',
@@ -87,7 +87,7 @@ describe('parsers / response', () => {
         'Body'
       ].join('\n');
 
-      let parser = getParserInstance({ httpMessage: responseMsg });
+      let parser = getParserInstance(plainResponse);
       parser._parseMessageForRows();
 
       should(parser.startRow).eql('start-line');
@@ -195,7 +195,7 @@ describe('parsers / response', () => {
 
   describe('functional tests', () => {
     it('should parse response without body (header names in lower case)', () => {
-      let responseMsg = [
+      let plainResponse = [
         'http/1.1 201 Created',
         'connection: keep-alive',
         'cache-Control: no-cache',
@@ -240,13 +240,13 @@ describe('parsers / response', () => {
         body: null
       };
 
-      let parser = getParserInstance({ httpMessage: responseMsg });
+      let parser = getParserInstance(plainResponse);
       let actual = parser.parse();
       should(actual).eql(responseModel);
     });
 
     it('should parse response without cookies and without body', () => {
-      let responseMsg = [
+      let plainResponse = [
         'http/1.1 201 Created',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -298,13 +298,13 @@ describe('parsers / response', () => {
         body: null
       };
 
-      let parser = getParserInstance({ httpMessage: responseMsg });
+      let parser = getParserInstance(plainResponse);
       let actual = parser.parse();
       should(actual).eql(responseModel);
     });
 
     it('should parse response with body and contentType=text/plain', () => {
-      let responseMsg = [
+      let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -359,13 +359,13 @@ describe('parsers / response', () => {
         }
       };
 
-      let parser = getParserInstance({ httpMessage: responseMsg });
+      let parser = getParserInstance(plainResponse);
       let actual = parser.parse();
       should(actual).eql(responseModel);
     });
 
     it('should parse response with body and contentType=application/json', () => {
-      let responseMsg = [
+      let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -420,7 +420,7 @@ describe('parsers / response', () => {
         }
       };
 
-      let parser = getParserInstance({ httpMessage: responseMsg });
+      let parser = getParserInstance(plainResponse);
       let actual = parser.parse();
       should(actual).eql(responseModel);
     });

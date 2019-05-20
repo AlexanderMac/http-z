@@ -5,14 +5,14 @@ const consts = require('../consts');
 const utils  = require('../utils');
 
 class HttpZBaseParser {
-  constructor({ httpMessage, eol = '\n' } = {}) {
-    this.httpMessage = httpMessage;
+  constructor(plainMessage, eol = '\n') {
+    this.plainMessage = plainMessage;
     this.eol = eol;
   }
 
   _parseMessageForRows() {
     let eol2x = this.eol + this.eol;
-    let [headers, body] = utils.splitIntoTwoParts(this.httpMessage, eol2x);
+    let [headers, body] = utils.splitIntoTwoParts(this.plainMessage, eol2x);
     if (_.isNil(headers) || _.isNil(body)) {
       throw utils.getError(
         'Incorrect message format, it must have headers and body, separated by empty line'

@@ -18,47 +18,47 @@ describe('builders / index', () => {
     ResponseBuilder.build.restore();
   });
 
-  it('should throw error when httpModel is undefined', () => {
+  it('should throw error when messageModel is undefined', () => {
     should(builder.bind(null)).throw(Error, {
-      message: 'httpModel is required'
+      message: 'messageModel is required'
     });
   });
 
   it('should throw error when model has unknown format', () => {
-    let httpModel = {
+    let messageModel = {
       data: 'some data'
     };
 
-    should(builder.bind(null, httpModel)).throw(Error, {
-      message: 'Unknown httpModel format'
+    should(builder.bind(null, messageModel)).throw(Error, {
+      message: 'Unknown messageModel format'
     });
   });
 
-  it('should call RequestBuilder.build when httpModel is request', () => {
-    let httpModel = {
+  it('should call RequestBuilder.build when messageModel is request', () => {
+    let messageModel = {
       method: 'GET'
     };
     let expected = 'built-request';
-    let expectedArgs = httpModel;
+    let expectedArgs = messageModel;
 
     RequestBuilder.build.returns('built-request');
 
-    let actual = builder(httpModel);
+    let actual = builder(messageModel);
     should(actual).eql(expected);
 
     nassert.assertFn({ inst: RequestBuilder, fnName: 'build', expectedArgs });
   });
 
-  it('should call ResponseBuilder.build when httpModel is response', () => {
-    let httpModel = {
+  it('should call ResponseBuilder.build when messageModel is response', () => {
+    let messageModel = {
       statusCode: 200
     };
     let expected = 'built-response';
-    let expectedArgs = httpModel;
+    let expectedArgs = messageModel;
 
     ResponseBuilder.build.returns('built-response');
 
-    let actual = builder(httpModel);
+    let actual = builder(messageModel);
     should(actual).eql(expected);
 
     nassert.assertFn({ inst: ResponseBuilder, fnName: 'build', expectedArgs });

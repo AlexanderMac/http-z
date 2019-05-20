@@ -187,7 +187,7 @@ describe('builders / request', () => {
         body: null
       };
 
-      let requestMsg = [
+      let plainRequest = [
         'GET /features?p1=v1 HTTP/1.1',
         'Host: example.com',
         '',
@@ -196,7 +196,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
-      should(actual).eql(requestMsg);
+      should(actual).eql(plainRequest);
     });
 
     it('should build request message without body (header names in lower case)', () => {
@@ -236,7 +236,7 @@ describe('builders / request', () => {
         body: null
       };
 
-      let requestMsg = [
+      let plainRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -248,7 +248,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
-      should(actual).eql(requestMsg);
+      should(actual).eql(plainRequest);
     });
 
     it('should parse request with cookies and without body', () => {
@@ -295,7 +295,7 @@ describe('builders / request', () => {
         body: null
       };
 
-      let requestMsg = [
+      let plainRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -308,7 +308,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
-      should(actual).eql(requestMsg);
+      should(actual).eql(plainRequest);
     });
 
     it('should parse request with body and contentType=text/plain', () => {
@@ -374,7 +374,7 @@ describe('builders / request', () => {
         }
       };
 
-      let requestMsg = [
+      let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -390,7 +390,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
-      should(actual).eql(requestMsg);
+      should(actual).eql(plainRequest);
     });
 
     it('should parse request with body and contentType=application/json', () => {
@@ -456,7 +456,7 @@ describe('builders / request', () => {
         }
       };
 
-      let requestMsg = [
+      let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -472,7 +472,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
-      should(actual).eql(requestMsg);
+      should(actual).eql(plainRequest);
     });
 
     it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
@@ -541,7 +541,7 @@ describe('builders / request', () => {
         }
       };
 
-      let requestMsg = [
+      let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -557,7 +557,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
-      should(actual).eql(requestMsg);
+      should(actual).eql(plainRequest);
     });
 
     it('should parse request with body and contentType=multipart/form-data', () => {
@@ -627,7 +627,7 @@ describe('builders / request', () => {
         }
       };
 
-      let requestMsg = [
+      let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -651,7 +651,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
-      should(actual).eql(requestMsg);
+      should(actual).eql(plainRequest);
     });
   });
 });

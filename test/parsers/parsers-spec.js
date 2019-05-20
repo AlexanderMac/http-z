@@ -18,64 +18,51 @@ describe('parsers / index', () => {
     ResponseParser.parse.restore();
   });
 
-  it('should throw error when params is empty', () => {
+  it('should throw error when function called without params', () => {
     should(parser.bind(null)).throw(Error, {
-      message: 'httpMessage is required'
+      message: 'plainMessage is required'
     });
   });
 
-  it('should throw error when httpMessage is nil', () => {
-    let params = {};
+  it('should throw error when plainMessage is nil', () => {
+    let params = [null];
 
-    should(parser.bind(null, params)).throw(Error, {
-      message: 'httpMessage is required'
+    should(parser.bind(null, ...params)).throw(Error, {
+      message: 'plainMessage is required'
     });
   });
 
-  it('should throw error when httpMessage has unknown format', () => {
-    let params = {
-      httpMessage: 'invalid'
-    };
+  it('should throw error when plainMessage has unknown format', () => {
+    let params = ['invalid'];
 
-    should(parser.bind(null, params)).throw(Error, {
-      message: 'Unknown httpMessage format'
+    should(parser.bind(null, ...params)).throw(Error, {
+      message: 'Unknown plainMessage format'
     });
   });
 
-  it('should call RequestParser.parse when httpMessage is request', () => {
-    let params = {
-      httpMessage: 'get /features http/1.1'
-    };
+  it('should call RequestParser.parse when plainMessage is request', () => {
+    let params = ['get /features http/1.1'];
     let expected = 'parsed-request';
-    let expectedArgs = {
-      httpMessage: params.httpMessage,
-      eol: '\n'
-    };
+    let expectedMultipleArgs = [params[0], '\n'];
 
     RequestParser.parse.returns('parsed-request');
 
-    let actual = parser(params);
+    let actual = parser(...params);
     should(actual).eql(expected);
 
-    nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedArgs });
+    nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedMultipleArgs });
   });
 
-  it('should call ResponseParser.parse when httpMessage is response', () => {
-    let params = {
-      httpMessage: 'http/1.1 200 Ok',
-      eol: '\r\n'
-    };
+  it('should call ResponseParser.parse when plainMessage is response', () => {
+    let params = ['http/1.1 200 Ok', '\r\n'];
     let expected = 'parsed-response';
-    let expectedArgs = {
-      httpMessage: params.httpMessage,
-      eol: '\r\n'
-    };
+    let expectedMultipleArgs = params;
 
     ResponseParser.parse.returns('parsed-response');
 
-    let actual = parser(params);
+    let actual = parser(...params);
     should(actual).eql(expected);
 
-    nassert.assertFn({ inst: ResponseParser, fnName: 'parse', expectedArgs });
+    nassert.assertFn({ inst: ResponseParser, fnName: 'parse', expectedMultipleArgs });
   });
 });

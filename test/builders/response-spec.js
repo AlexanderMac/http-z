@@ -195,7 +195,7 @@ describe('builders / response', () => {
         body: null
       };
 
-      let responseMsg = [
+      let plainResponse = [
         'HTTP/1.1 201 Created',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -206,7 +206,7 @@ describe('builders / response', () => {
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
-      should(actual).eql(responseMsg);
+      should(actual).eql(plainResponse);
     });
 
     it('should build response message with cookies and without body', () => {
@@ -249,7 +249,7 @@ describe('builders / response', () => {
         body: null
       };
 
-      let responseMsg = [
+      let plainResponse = [
         'HTTP/1.1 201 Created',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -263,7 +263,7 @@ describe('builders / response', () => {
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
-      should(actual).eql(responseMsg);
+      should(actual).eql(plainResponse);
     });
 
     it('should build response message with body and contentType=text/plain', () => {
@@ -310,7 +310,7 @@ describe('builders / response', () => {
         }
       };
 
-      let responseMsg = [
+      let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -323,7 +323,7 @@ describe('builders / response', () => {
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
-      should(actual).eql(responseMsg);
+      should(actual).eql(plainResponse);
     });
 
     it('should build response message with body and contentType=application/json', () => {
@@ -370,7 +370,7 @@ describe('builders / response', () => {
         }
       };
 
-      let responseMsg = [
+      let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -383,7 +383,7 @@ describe('builders / response', () => {
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
-      should(actual).eql(responseMsg);
+      should(actual).eql(plainResponse);
     });
   });
 });
