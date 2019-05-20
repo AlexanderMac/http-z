@@ -1,3 +1,8 @@
+# <sub>v0.5.0</sub>
+#### _May_. 20, 2019_
+
+ * Changed `parse` method declaration, now it accepts the arguments list instead of params object: `parse('message', 'eol)`.
+
 # <sub>v0.4.3</sub>
 #### _Apr_. 17, 2019_
 
