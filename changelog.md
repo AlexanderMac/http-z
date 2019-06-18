@@ -1,3 +1,8 @@
+# <sub>v0.6.0</sub>
+#### _Jun_. 18, 2019_
+
+  * Renamed field `params` to `queryParams`.
+
 # <sub>v0.5.0</sub>
 #### _May_. 20, 2019_
 
