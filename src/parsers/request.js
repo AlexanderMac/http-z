@@ -62,7 +62,7 @@ class HttpZRequestParser extends Base {
     let url = utils.parseUrl(this.host + path);
     this.protocol = this._getProtocol(url);
     this.path = url.pathname;
-    this.params = this._getParams(url);
+    this.queryParams = this._getQueryParams(url);
   }
 
   _parseCookiesRow() {
@@ -98,7 +98,7 @@ class HttpZRequestParser extends Base {
       protocolVersion: this.protocolVersion,
       host: this.host,
       path: this.path,
-      params: this.params,
+      queryParams: this.queryParams,
       headers: this.headers,
       cookies: this.cookies,
       body: this.body
@@ -111,10 +111,10 @@ class HttpZRequestParser extends Base {
   }
 
   // TODO: test it
-  _getParams(url) {
-    let params = {};
-    url.searchParams.forEach((value, name) => params[name] = value);
-    return params;
+  _getQueryParams(url) {
+    let queryParams = {};
+    url.searchParams.forEach((value, name) => queryParams[name] = value);
+    return queryParams;
   }
 }
 

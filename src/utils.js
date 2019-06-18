@@ -32,16 +32,16 @@ exports.parseUrl = (url) => {
 };
 
 // TODO: test it
-exports.generateRelativeUrl = ({ path, params }) => {
-  let paramsStr = '';
-  if (!_.isEmpty(params)) {
-    let urlSPs = new URLSearchParams(params);
-    paramsStr = '?' + urlSPs.toString();
+exports.generateRelativeUrl = ({ path, queryParams }) => {
+  let queryParamsStr = '';
+  if (!_.isEmpty(queryParams)) {
+    let urlSPs = new URLSearchParams(queryParams);
+    queryParamsStr = '?' + urlSPs.toString();
   }
 
   return '' +
     path +
-    paramsStr;
+    queryParamsStr;
 };
 
 exports.getHeaderName = (name) => {

@@ -11,14 +11,14 @@ class HttpZRequestBuilder extends Base {
     return instance.build();
   }
 
-  constructor({ method, protocol, protocolVersion, host, path, params = {}, headers, cookies, body }) {
+  constructor({ method, protocol, protocolVersion, host, path, queryParams = {}, headers, cookies, body }) {
     super({ headers, body });
     this.method = method;
     this.protocol = protocol;
     this.protocolVersion = protocolVersion;
     this.host = host;
     this.path = path;
-    this.params = params;
+    this.queryParams = queryParams;
     this.cookies = cookies;
   }
 
@@ -40,7 +40,10 @@ class HttpZRequestBuilder extends Base {
 
     return '' +
       this.method.toUpperCase() + ' ' +
-      utils.generateRelativeUrl(_.pick(this, 'path', 'params')) + ' ' +
+      utils.generateRelativeUrl({
+        path: this.path,
+        queryParams: this.queryParams
+      }) + ' ' +
       this.protocolVersion.toUpperCase() +
       '\n';
   }

@@ -61,7 +61,7 @@ describe('utils', () => {
     it('should generate relative url with params', () => {
       test({
         path: '/features',
-        params: {
+        queryParams: {
           p1: 'v1',
           p2: null
         }
