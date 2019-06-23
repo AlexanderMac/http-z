@@ -400,7 +400,7 @@ describe('builders / base', () => {
     it('should return BodyRows when instance.body is not empty and valid (body.json is a string)', () => {
       let body = getDefaultBody();
       body.json = 'some data';
-      let expected = '"some data"';
+      let expected = 'some data';
 
       let builder = getBuilderInstance({ body });
       let actual = builder._generateJsonBody();

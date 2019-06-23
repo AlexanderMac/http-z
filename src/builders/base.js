@@ -90,7 +90,7 @@ class HttpZBaseBuilder {
 
   _generateJsonBody() {
     validators.validateRequired(this.body.json, 'body.json');
-    return JSON.stringify(this.body.json);
+    return _.isString(this.body.json) ? this.body.json : JSON.stringify(this.body.json);
   }
 
   _generatePlainBody() {
