@@ -1,7 +1,8 @@
-# <sub>v0.6.1</sub>
+# <sub>v0.6.2</sub>
 #### _Jun_. 23, 2019_
 
   * Added consts to export.
+  * Bug fixes.
 
 # <sub>v0.6.0</sub>
 #### _Jun_. 18, 2019_
