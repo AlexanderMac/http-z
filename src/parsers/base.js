@@ -14,9 +14,15 @@ class HttpZBaseParser {
     let eol2x = this.eol + this.eol;
     let [headers, body] = utils.splitIntoTwoParts(this.plainMessage, eol2x);
     if (_.isNil(headers) || _.isNil(body)) {
-      throw utils.getError(
-        'Incorrect message format, it must have headers and body, separated by empty line'
-      );
+      // special case when message doesn't contain body
+      if (/\n+$/g.test(this.plainMessage)) {
+        headers = this.plainMessage.replace(/\n+$/g, '');
+        body = null;
+      } else {
+        throw utils.getError(
+          'Incorrect message format, it must have headers and body, separated by empty line'
+        );
+      }
     }
 
     let headerRows = _.split(headers, this.eol);

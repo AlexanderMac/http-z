@@ -23,7 +23,7 @@ describe('parsers / base', () => {
       });
     });
 
-    it('should throw error when message does not have body', () => {
+    it('should throw error when message does not have empty line and body', () => {
       let plainRequest = [
         'start-line',
         'host-line',
@@ -36,7 +36,25 @@ describe('parsers / base', () => {
       });
     });
 
-    it('should parse message for rows', () => {
+    it('should parse message for rows (without body)', () => {
+      let plainRequest = [
+        'start-line',
+        'host-line',
+        'Header1',
+        'Header2',
+        'Header3',
+        'Cookie',
+        ''
+      ].join('\n');
+      let parser = getParserInstance(plainRequest);
+
+      let actual = parser._parseMessageForRows();
+      should(actual.startRow).eql('start-line');
+      should(actual.headerRows).eql(['host-line', 'Header1', 'Header2', 'Header3', 'Cookie']);
+      should(actual.bodyRows).eql(null);
+    });
+
+    it('should parse message for rows (with body)', () => {
       let plainRequest = [
         'start-line',
         'host-line',
