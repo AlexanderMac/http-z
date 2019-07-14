@@ -11,7 +11,7 @@ class HttpZRequestBuilder extends Base {
     return instance.build();
   }
 
-  constructor({ method, protocol, protocolVersion, host, path, queryParams = {}, headers, cookies, body }) {
+  constructor({ method, protocol, protocolVersion, host, path, queryParams = [], headers, cookies, body }) {
     super({ headers, body });
     this.method = method;
     this.protocol = protocol;

@@ -182,7 +182,9 @@ describe('builders / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        queryParams: { p1: 'v1' },
+        queryParams: [
+          { name: 'p1', value: 'v1' }
+        ],
         headers: [],
         body: null
       };

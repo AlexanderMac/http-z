@@ -35,7 +35,8 @@ exports.parseUrl = (url) => {
 exports.generateRelativeUrl = ({ path, queryParams }) => {
   let queryParamsStr = '';
   if (!_.isEmpty(queryParams)) {
-    let urlSPs = new URLSearchParams(queryParams);
+    let searchParams = _.map(queryParams, ({ name, value }) => [name, value]);
+    let urlSPs = new URLSearchParams(searchParams);
     queryParamsStr = '?' + urlSPs.toString();
   }
 

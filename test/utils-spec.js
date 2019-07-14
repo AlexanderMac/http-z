@@ -61,10 +61,10 @@ describe('utils', () => {
     it('should generate relative url with params', () => {
       test({
         path: '/features',
-        queryParams: {
-          p1: 'v1',
-          p2: null
-        }
+        queryParams: [
+          { name: 'p1', value: 'v1' },
+          { name: 'p2', value: null }
+        ]
       }, '/features?p1=v1&p2=null');
     });
   });

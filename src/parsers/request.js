@@ -112,8 +112,8 @@ class HttpZRequestParser extends Base {
 
   // TODO: test it
   _getQueryParams(url) {
-    let queryParams = {};
-    url.searchParams.forEach((value, name) => queryParams[name] = value);
+    let queryParams = [];
+    url.searchParams.forEach((value, name) => queryParams.push({ name, value }));
     return queryParams;
   }
 }

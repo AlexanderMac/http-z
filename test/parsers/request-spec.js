@@ -162,7 +162,7 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         path: '/features',
         host: 'example.com',
-        queryParams: {}
+        queryParams: []
       };
       return _.extend(def, ex);
     }
@@ -204,7 +204,10 @@ describe('parsers / request', () => {
     it('should parse valid startRow (path with two parameters)', () => {
       let startRow = 'GET /features?p1=v1&p2=v2 HTTP/1.1';
       let expected = getDefaultExpected({
-        queryParams: { p1: 'v1', p2: 'v2' }
+        queryParams: [
+          { name: 'p1', value: 'v1' },
+          { name: 'p2', value: 'v2' }
+        ]
       });
 
       test({ startRow, expected });
@@ -306,7 +309,9 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'www.example.com',
         path: '/features',
-        queryParams: { p1: 'v1' },
+        queryParams: [
+          { name: 'p1', value: 'v1' }
+        ],
         headers: [],
         cookies: null,
         body: null
@@ -336,7 +341,7 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        queryParams: {},
+        queryParams: [],
         headers: [
           {
             name: 'Connection',
@@ -401,7 +406,7 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        queryParams: {},
+        queryParams: [],
         headers: [
           {
             name: 'Connection',
@@ -465,7 +470,7 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        queryParams: {},
+        queryParams: [],
         headers: [
           {
             name: 'Connection',
@@ -548,7 +553,7 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        queryParams: {},
+        queryParams: [],
         headers: [
           {
             name: 'Connection',
@@ -631,7 +636,7 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        queryParams: {},
+        queryParams: [],
         headers: [
           {
             name: 'Connection',
@@ -725,7 +730,7 @@ describe('parsers / request', () => {
         protocolVersion: 'HTTP/1.1',
         host: 'example.com',
         path: '/features',
-        queryParams: {},
+        queryParams: [],
         headers: [
           {
             name: 'Connection',
