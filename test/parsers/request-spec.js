@@ -325,6 +325,7 @@ describe('parsers / request', () => {
         'accept: */*',
         'accept-Encoding: gzip,deflate',
         'accept-language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0',
         '',
         ''
       ].join('\n');
@@ -363,6 +364,12 @@ describe('parsers / request', () => {
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
+            ]
+          },
+          {
+            name: 'User-Agent',
+            values: [
+              { value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0', params: null }
             ]
           }
         ],

@@ -39,17 +39,25 @@ class HttpZBaseParser {
       if (!name || !values) {
         throw utils.getError('Incorrect header row format, expected: Name: Values', hRow);
       }
-      values = _.split(values, ',');
-      if (values.length === 0 || _.some(values, val => _.isEmpty(val))) {
-        throw utils.getError('Incorrect header values format, expected: Value1, Value2, ...', hRow);
+      let valuesAndParams;
+      if (_.toLower(name) === 'user-agent') { // use 'user-agent' as is
+        valuesAndParams = [{
+          value: values,
+          params: null
+        }];
+      } else {
+        values = _.split(values, ',');
+        if (values.length === 0 || _.some(values, val => _.isEmpty(val))) {
+          throw utils.getError('Incorrect header values format, expected: Value1, Value2, ...', hRow);
+        }
+        valuesAndParams = _.map(values, (value) => {
+          let valueAndParams = _.split(value, ';');
+          return {
+            value: _.trim(valueAndParams[0]),
+            params: valueAndParams.length > 1 ? _.trim(valueAndParams[1]) : null
+          };
+        });
       }
-      let valuesAndParams = _.map(values, (value) => {
-        let valueAndParams = _.split(value, ';');
-        return {
-          value: _.trim(valueAndParams[0]),
-          params: valueAndParams.length > 1 ? _.trim(valueAndParams[1]) : null
-        };
-      });
 
       return {
         name: utils.getHeaderName(name),
