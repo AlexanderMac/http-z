@@ -1,3 +1,9 @@
+# <sub>v0.8.0</sub>
+#### _Aug_. 9, 2019_
+
+  * Drop support for Node v6.
+  * Throw HttpZError in all the cases. Don't extend err.message by error details, provide it as err.details field instead. 
+
 # <sub>v0.7.0</sub>
 #### _Jul_. 14, 2019_
 
