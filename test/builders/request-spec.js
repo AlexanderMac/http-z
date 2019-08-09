@@ -203,11 +203,11 @@ describe('builders / request', () => {
       should(actual).eql(plainRequest);
     });
 
-    it('should build request message without body (header names in lower case)', () => {
+    it('should build request message without body (names in lower case)', () => {
       let requestModel = {
-        method: 'GET',
-        protocol: 'HTTP',
-        protocolVersion: 'HTTP/1.1',
+        method: 'get',
+        protocol: 'http',
+        protocolVersion: 'http/1.1',
         host: 'example.com',
         path: '/features',
         headers: [

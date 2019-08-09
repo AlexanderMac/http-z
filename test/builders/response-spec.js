@@ -163,9 +163,9 @@ describe('builders / response', () => {
   });
 
   describe('functional tests', () => {
-    it('should build response message without body (header names in lower case)', () => {
+    it('should build response message without body (names in lower case)', () => {
       let responseModel = {
-        protocolVersion: 'HTTP/1.1',
+        protocolVersion: 'http/1.1',
         statusCode: 201,
         statusMessage: 'Created',
         headers: [

@@ -53,6 +53,7 @@ describe('parsers / index', () => {
     should(actual).eql(expected);
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedMultipleArgs });
+    nassert.assertFn({ inst: ResponseParser, fnName: 'parse' });
   });
 
   it('should call ResponseParser.parse when plainMessage is response', () => {
@@ -65,6 +66,7 @@ describe('parsers / index', () => {
     let actual = parser(...params);
     should(actual).eql(expected);
 
+    nassert.assertFn({ inst: RequestParser, fnName: 'parse' });
     nassert.assertFn({ inst: ResponseParser, fnName: 'parse', expectedMultipleArgs });
   });
 });
