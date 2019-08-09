@@ -3,6 +3,7 @@
 const sinon          = require('sinon');
 const should         = require('should');
 const nassert        = require('n-assert');
+const HttpZError     = require('../../src/error');
 const ResponseParser = require('../../src/parsers/response');
 
 describe('parsers / response', () => {
@@ -102,8 +103,9 @@ describe('parsers / response', () => {
       let parser = getParserInstance();
       parser.startRow = 'Invalid response startRow';
 
-      should(parser._parseStartRow.bind(parser)).throw(Error, {
-        message: 'Incorrect startRow format, expected: HTTP-Version SP Status-Code SP Status-Message CRLF.\nDetails: "Invalid response startRow"'
+      should(parser._parseStartRow.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect startRow format, expected: HTTP-Version SP Status-Code SP Status-Message CRLF',
+        details: 'Invalid response startRow'
       });
     });
 
@@ -132,8 +134,9 @@ describe('parsers / response', () => {
       parser.cookieRows = getDefaultCookies();
       parser.cookieRows[1] = 'Set-cookie:    ';
 
-      should(parser._parseCookieRows.bind(parser)).throw(Error, {
-        message: 'Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;....\nDetails: "Set-cookie:    "'
+      should(parser._parseCookieRows.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;...',
+        details: 'Set-cookie:    '
       });
     });
 
@@ -142,8 +145,9 @@ describe('parsers / response', () => {
       parser.cookieRows = getDefaultCookies();
       parser.cookieRows[1] = 'Set-cookie:  =456def;  Domain=example.com;';
 
-      should(parser._parseCookieRows.bind(parser)).throw(Error, {
-        message: 'Incorrect cookie pair format, expected: Name1=Value1;....\nDetails: "=456def;  Domain=example.com;"'
+      should(parser._parseCookieRows.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect cookie pair format, expected: Name1=Value1;...',
+        details: '=456def;  Domain=example.com;'
       });
     });
 

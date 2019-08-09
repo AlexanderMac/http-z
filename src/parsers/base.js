@@ -1,8 +1,9 @@
 'use strict';
 
-const _      = require('lodash');
-const consts = require('../consts');
-const utils  = require('../utils');
+const _          = require('lodash');
+const consts     = require('../consts');
+const HttpZError = require('../error');
+const utils      = require('../utils');
 
 class HttpZBaseParser {
   constructor(plainMessage, eol = '\n') {
@@ -19,7 +20,7 @@ class HttpZBaseParser {
         headers = this.plainMessage.replace(/\n+$/g, '');
         body = null;
       } else {
-        throw utils.getError(
+        throw HttpZError.get(
           'Incorrect message format, it must have headers and body, separated by empty line'
         );
       }
@@ -37,7 +38,7 @@ class HttpZBaseParser {
     this.headers = _.map(this.headerRows, hRow => {
       let [name, values] = utils.splitIntoTwoParts(hRow, ':');
       if (!name || !values) {
-        throw utils.getError('Incorrect header row format, expected: Name: Values', hRow);
+        throw HttpZError.get('Incorrect header row format, expected: Name: Values', hRow);
       }
       let valuesAndParams;
       if (_.toLower(name) === 'user-agent') { // use 'user-agent' as is
@@ -48,7 +49,7 @@ class HttpZBaseParser {
       } else {
         values = _.split(values, ',');
         if (values.length === 0 || _.some(values, val => _.isEmpty(val))) {
-          throw utils.getError('Incorrect header values format, expected: Value1, Value2, ...', hRow);
+          throw HttpZError.get('Incorrect header values format, expected: Value1, Value2, ...', hRow);
         }
         valuesAndParams = _.map(values, (value) => {
           let valueAndParams = _.split(value, ';');
@@ -103,7 +104,7 @@ class HttpZBaseParser {
       .map(param => {
         let paramMatch = param.match(consts.regexps.param);
         if (!paramMatch) {
-          throw utils.getError('Incorrect form-data parameter', param);
+          throw HttpZError.get('Incorrect form-data parameter', param);
         }
 
         let paramNameMatch = paramMatch.toString().match(consts.regexps.paramName);
@@ -124,7 +125,7 @@ class HttpZBaseParser {
       .map(pair => {
         let [name, value] = utils.splitIntoTwoParts(pair, '=');
         if (!name) {
-          throw utils.getError('Incorrect x-www-form-urlencoded parameter, expected: Name="Value', pair);
+          throw HttpZError.get('Incorrect x-www-form-urlencoded parameter, expected: Name="Value', pair);
         }
         return { name, value };
       })
@@ -134,7 +135,7 @@ class HttpZBaseParser {
   _parseJsonBody() {
     let json = _.attempt(JSON.parse.bind(null, this.bodyRows));
     if (_.isError(json)) {
-      throw utils.getError('Invalid json in body');
+      throw HttpZError.get('Invalid json in body');
     }
     this.body.json = json;
   }

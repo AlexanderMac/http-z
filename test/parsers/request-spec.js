@@ -4,6 +4,7 @@ const _             = require('lodash');
 const sinon         = require('sinon');
 const should        = require('should');
 const nassert       = require('n-assert');
+const HttpZError    = require('../../src/error');
 const RequestParser = require('../../src/parsers/request');
 
 describe('parsers / request', () => {
@@ -108,7 +109,7 @@ describe('parsers / request', () => {
       let parser = getParserInstance();
       parser.hostRow = null;
 
-      should(parser._parseHostRow.bind(parser)).throw(Error, {
+      should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'host header is required'
       });
     });
@@ -117,7 +118,7 @@ describe('parsers / request', () => {
       let parser = getParserInstance();
       parser.hostRow = 'Host:';
 
-      should(parser._parseHostRow.bind(parser)).throw(Error, {
+      should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'host header value must be not empty string'
       });
     });
@@ -126,8 +127,9 @@ describe('parsers / request', () => {
       let parser = getParserInstance();
       parser.hostRow = 'Host: ?!invalid-host';
 
-      should(parser._parseHostRow.bind(parser)).throw(Error, {
-        message: 'Invalid host.\nDetails: "?!invalid-host"'
+      should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
+        message: 'Invalid host',
+        details: '?!invalid-host'
       });
     });
 
@@ -171,8 +173,9 @@ describe('parsers / request', () => {
       let parser = getParserInstance();
       parser.startRow = 'Invalid request startRow';
 
-      should(parser._parseStartRow.bind(parser)).throw(Error, {
-        message: 'Incorrect startRow format, expected: Method SP Request-URI SP HTTP-Version CRLF.\nDetails: "Invalid request startRow"'
+      should(parser._parseStartRow.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect startRow format, expected: Method SP Request-URI SP HTTP-Version CRLF',
+        details: 'Invalid request startRow'
       });
     });
 
@@ -228,8 +231,9 @@ describe('parsers / request', () => {
       let parser = getParserInstance();
       parser.cookiesRow = 'Cookie values';
 
-      should(parser._parseCookiesRow.bind(parser)).throw(Error, {
-        message: 'Incorrect cookie row format, expected: Cookie: Name1=Value1;....\nDetails: "Cookie values"'
+      should(parser._parseCookiesRow.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect cookie row format, expected: Cookie: Name1=Value1;...',
+        details: 'Cookie values'
       });
     });
 
@@ -237,8 +241,9 @@ describe('parsers / request', () => {
       let parser = getParserInstance();
       parser.cookiesRow = 'Cookie: csrftoken=123abc;=val';
 
-      should(parser._parseCookiesRow.bind(parser)).throw(Error, {
-        message: 'Incorrect cookie pair format, expected: Name1=Value1;....\nDetails: "csrftoken=123abc;=val"'
+      should(parser._parseCookiesRow.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect cookie pair format, expected: Name1=Value1;...',
+        details: 'csrftoken=123abc;=val'
       });
     });
 

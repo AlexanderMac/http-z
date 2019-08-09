@@ -4,7 +4,7 @@ const _           = require('lodash');
 const sinon       = require('sinon');
 const should      = require('should');
 const nassert     = require('n-assert');
-const utils       = require('../../src/utils');
+const HttpZError  = require('../../src/error');
 const BaseBuilder = require('../../src/builders/base');
 
 describe('builders / base', () => {
@@ -47,63 +47,63 @@ describe('builders / base', () => {
 
     it('should throw error when instance.headers is nil', () => {
       let headers = null;
-      let expected = utils.getError('headers is required');
+      let expected = HttpZError.get('headers is required');
 
       let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.headers is not an array', () => {
       let headers = 'headers';
-      let expected = utils.getError('headers must be an array');
+      let expected = HttpZError.get('headers must be an array');
 
       let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.headers contains header without name', () => {
       let headers = getDefaultHeaders();
       headers[1].name = undefined;
-      let expected = utils.getError('header name is required.\nDetails: "header index: 1"');
+      let expected = HttpZError.get('header name is required', 'header index: 1');
 
       let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.headers contains header without values', () => {
       let headers = getDefaultHeaders();
       headers[2].values = undefined;
-      let expected = utils.getError('header.values is required.\nDetails: "header index: 2"');
+      let expected = HttpZError.get('header.values is required', 'header index: 2');
 
       let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.headers contains header with values that is not array', () => {
       let headers = getDefaultHeaders();
       headers[2].values = 'values';
-      let expected = utils.getError('header.values must be an array.\nDetails: "header index: 2"');
+      let expected = HttpZError.get('header.values must be an array', 'header index: 2');
 
       let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.headers contains header with empty values array', () => {
       let headers = getDefaultHeaders();
       headers[2].values = [];
-      let expected = utils.getError('header.values must be not empty array.\nDetails: "header index: 2"');
+      let expected = HttpZError.get('header.values must be not empty array', 'header index: 2');
 
       let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.headers.values contains empty value', () => {
       let headers = getDefaultHeaders();
       headers[3].values[0] = {};
-      let expected = utils.getError('header.values.value is required.\nDetails: "header index: 3"');
+      let expected = HttpZError.get('header.values.value is required', 'header index: 3');
 
       let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(Error, expected);
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should return \n when instance.headers is an empty array', () => {
@@ -143,7 +143,7 @@ describe('builders / base', () => {
         let actual = builder._generateBodyRows();
         should(actual).eql(expected);
       } else {
-        should(builder._generateBodyRows.bind(builder)).throw(Error, expected);
+        should(builder._generateBodyRows.bind(builder)).throw(HttpZError, expected);
       }
 
       nassert.assertFn({ inst: builder, fnName: '_generateFormDataBody', expectedArgs: expectedFnArgs.genFormDataBody });
@@ -224,73 +224,73 @@ describe('builders / base', () => {
     it('should throw error when instance.body.formDataParams is nil', () => {
       let body = getDefaultBody();
       body.formDataParams = null;
-      let expected = utils.getError('body.formDataParams is required');
+      let expected = HttpZError.get('body.formDataParams is required');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.formDataParams is not array', () => {
       let body = getDefaultBody();
       body.formDataParams = 'params';
-      let expected = utils.getError('body.formDataParams must be an array');
+      let expected = HttpZError.get('body.formDataParams must be an array');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.formDataParams is an empty array', () => {
       let body = getDefaultBody();
       body.formDataParams = [];
-      let expected = utils.getError('body.formDataParams must be not empty array');
+      let expected = HttpZError.get('body.formDataParams must be not empty array');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.boundary is nil', () => {
       let body = getDefaultBody();
       body.boundary = null;
-      let expected = utils.getError('body.boundary is required');
+      let expected = HttpZError.get('body.boundary is required');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.boundary is not a string', () => {
       let body = getDefaultBody();
       body.boundary = 12345;
-      let expected = utils.getError('body.boundary must be a string');
+      let expected = HttpZError.get('body.boundary must be a string');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.boundary is empty string', () => {
       let body = getDefaultBody();
       body.boundary = '';
-      let expected = utils.getError('body.boundary must be not empty string');
+      let expected = HttpZError.get('body.boundary must be not empty string');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.formDataParams contains param with empty name', () => {
       let body = getDefaultBody();
       body.formDataParams[0].name = '';
-      let expected = utils.getError('body.formDataParams[index].name must be not empty string.\nDetails: "dataParam index: 0"');
+      let expected = HttpZError.get('body.formDataParams[index].name must be not empty string', 'dataParam index: 0');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.formDataParams contains param with empty value', () => {
       let body = getDefaultBody();
       body.formDataParams[1].value = '';
-      let expected = utils.getError('body.formDataParams[index].value must be not empty string.\nDetails: "dataParam index: 1"');
+      let expected = HttpZError.get('body.formDataParams[index].value must be not empty string', 'dataParam index: 1');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(Error, expected);
+      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should return BodyRows when instance.body is not empty and valid', () => {
@@ -326,46 +326,46 @@ describe('builders / base', () => {
     it('should throw error when instance.body.formDataParams is nil', () => {
       let body = getDefaultBody();
       body.formDataParams = null;
-      let expected = utils.getError('body.formDataParams is required');
+      let expected = HttpZError.get('body.formDataParams is required');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.formDataParams is not array', () => {
       let body = getDefaultBody();
       body.formDataParams = 'params';
-      let expected = utils.getError('body.formDataParams must be an array');
+      let expected = HttpZError.get('body.formDataParams must be an array');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.formDataParams is an empty array', () => {
       let body = getDefaultBody();
       body.formDataParams = [];
-      let expected = utils.getError('body.formDataParams must be not empty array');
+      let expected = HttpZError.get('body.formDataParams must be not empty array');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.formDataParams contains param with empty name', () => {
       let body = getDefaultBody();
       body.formDataParams[0].name = '';
-      let expected = utils.getError('body.formDataParams[index].name must be not empty string.\nDetails: "dataParam index: 0"');
+      let expected = HttpZError.get('body.formDataParams[index].name must be not empty string', 'dataParam index: 0');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should throw error when instance.body.formDataParams contains param with empty value', () => {
       let body = getDefaultBody();
       body.formDataParams[1].value = '';
-      let expected = utils.getError('body.formDataParams[index].value must be not empty string.\nDetails: "dataParam index: 1"');
+      let expected = HttpZError.get('body.formDataParams[index].value must be not empty string', 'dataParam index: 1');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(Error, expected);
+      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should return BodyRows when instance.body is not empty and valid', () => {
@@ -391,10 +391,10 @@ describe('builders / base', () => {
     it('should throw error when instance.body.json is nil', () => {
       let body = getDefaultBody();
       body.json = null;
-      let expected = utils.getError('body.json is required');
+      let expected = HttpZError.get('body.json is required');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateJsonBody.bind(builder)).throw(Error, expected);
+      should(builder._generateJsonBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should return BodyRows when instance.body is not empty and valid (body.json is a string)', () => {
@@ -427,11 +427,11 @@ describe('builders / base', () => {
     it('should throw error when instance.body.plain is nil', () => {
       let body = getDefaultBody();
       body.plain = null;
-      let expected = utils.getError('body.plain is required');
+      let expected = HttpZError.get('body.plain is required');
 
 
       let builder = getBuilderInstance({ body });
-      should(builder._generatePlainBody.bind(builder)).throw(Error, expected);
+      should(builder._generatePlainBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should return BodyRows when instance.body is not empty and valid', () => {

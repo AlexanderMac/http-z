@@ -1,12 +1,12 @@
 'use strict';
 
-const utils           = require('../utils');
+const HttpZError      = require('../error');
 const RequestBuilder  = require('./request');
 const ResponseBuilder = require('./response');
 
 module.exports = (messageModel) => {
   if (!messageModel) {
-    throw utils.getError('messageModel is required');
+    throw HttpZError.get('messageModel is required');
   }
 
   if (messageModel.method) {
@@ -15,5 +15,5 @@ module.exports = (messageModel) => {
   if (messageModel.statusCode) {
     return ResponseBuilder.build(messageModel);
   }
-  throw new Error('Unknown messageModel format');
+  throw HttpZError.get('Unknown messageModel format');
 };

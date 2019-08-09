@@ -2,13 +2,13 @@
 
 const _              = require('lodash');
 const consts         = require('../consts');
-const utils          = require('../utils');
+const HttpZError     = require('../error');
 const RequestParser  = require('./request');
 const ResponseParser = require('./response');
 
 module.exports = (plainMessage, eol = '\n') => {
   if (!plainMessage) {
-    throw utils.getError('plainMessage is required');
+    throw HttpZError.get('plainMessage is required');
   }
 
   let firstRow = _.chain(plainMessage).split(eol).head().value();
@@ -19,5 +19,5 @@ module.exports = (plainMessage, eol = '\n') => {
   if (consts.regexps.responseStartRow.test(firstRow)) {
     return ResponseParser.parse(plainMessage, eol);
   }
-  throw new Error('Unknown plainMessage format');
+  throw HttpZError.get('Unknown plainMessage format', firstRow);
 };

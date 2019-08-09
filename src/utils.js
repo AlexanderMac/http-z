@@ -5,6 +5,7 @@ const {
   URL,
   URLSearchParams } = require('url');
 const consts        = require('./consts');
+const HttpZError    = require('./error');
 
 exports.splitIntoTwoParts = (str, delimiter) => {
   if (_.isEmpty(str)) {
@@ -57,33 +58,23 @@ exports.getHeaderName = (name) => {
 // TODO: test it
 exports.getBoundary = (contentType) => {
   if (!contentType || !contentType.params) {
-    throw exports.getError('Request with ContentType=FormData must have a header with boundary');
+    throw HttpZError.get('Request with ContentType=FormData must have a header with boundary');
   }
 
   let boundaryMatch = contentType.params.match(consts.regexps.boundary);
   if (!boundaryMatch) {
-    throw exports.getError('Incorrect boundary, expected: boundary=value', contentType.params);
+    throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentType.params);
   }
 
   let boundaryAndValue = _.split(boundaryMatch, '=');
   if (boundaryAndValue.length !== 2) {
-    throw exports.getError('Incorrect boundary, expected: boundary=value', contentType.params);
+    throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentType.params);
   }
 
   let boundaryValue =  _.trim(boundaryAndValue[1]);
   if (!boundaryValue) {
-    throw exports.getError('Incorrect boundary, expected: boundary=value', contentType.params);
+    throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentType.params);
   }
 
   return boundaryValue;
-};
-
-exports.getError = (msg, data) => {
-  if (data) {
-    msg += `.\nDetails: "${data}"`;
-  }
-
-  let err = new Error(msg);
-  err.type = 'HttpZError';
-  return err;
 };

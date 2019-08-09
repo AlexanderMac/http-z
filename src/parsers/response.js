@@ -1,9 +1,10 @@
 'use strict';
 
-const _      = require('lodash');
-const consts = require('../consts');
-const utils  = require('../utils');
-const Base   = require('./base');
+const _          = require('lodash');
+const consts     = require('../consts');
+const HttpZError = require('../error');
+const utils      = require('../utils');
+const Base       = require('./base');
 
 class HttpZResponseParser extends Base {
   static parse(params) {
@@ -32,7 +33,7 @@ class HttpZResponseParser extends Base {
 
   _parseStartRow() {
     if (!consts.regexps.responseStartRow.test(this.startRow)) {
-      throw utils.getError(
+      throw HttpZError.get(
         'Incorrect startRow format, expected: HTTP-Version SP Status-Code SP Status-Message CRLF',
         this.startRow
       );
@@ -54,7 +55,7 @@ class HttpZResponseParser extends Base {
       // eslint-disable-next-line no-unused-vars
       let [unused, values] = utils.splitIntoTwoParts(cookiesRow, ':');
       if (!values) {
-        throw utils.getError('Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;...', cookiesRow);
+        throw HttpZError.get('Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;...', cookiesRow);
       }
       let params = _.split(values, ';');
 
@@ -66,7 +67,7 @@ class HttpZResponseParser extends Base {
       };
 
       if (!cookie.name) {
-        throw utils.getError('Incorrect cookie pair format, expected: Name1=Value1;...', values);
+        throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values);
       }
       if (_.isEmpty(cookie.params)) {
         cookie.params = null;

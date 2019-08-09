@@ -4,6 +4,7 @@ const _               = require('lodash');
 const sinon           = require('sinon');
 const should          = require('should');
 const nassert         = require('n-assert');
+const HttpZError      = require('../../src/error');
 const ResponseBuilder = require('../../src/builders/response');
 
 describe('builders / response', () => {
@@ -59,7 +60,7 @@ describe('builders / response', () => {
     it('should throw error when protocolVersion is not defined', () => {
       let builder = getBuilderInstance({ protocolVersion: null });
 
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
+      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'protocolVersion is required'
       });
     });
@@ -67,7 +68,7 @@ describe('builders / response', () => {
     it('should throw error when statusCode is not defined', () => {
       let builder = getBuilderInstance({ statusCode: null });
 
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
+      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'statusCode is required'
       });
     });
@@ -75,7 +76,7 @@ describe('builders / response', () => {
     it('should throw error when statusMessage is not defined', () => {
       let builder = getBuilderInstance({ statusMessage: null });
 
-      should(builder._generateStartRow.bind(builder)).throw(Error, {
+      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'statusMessage is required'
       });
     });
@@ -109,7 +110,7 @@ describe('builders / response', () => {
     it('should throw error when instance.cookies is not array', () => {
       let builder = getBuilderInstance({ cookies: 'wrong cookies' });
 
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+      should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
         message: 'cookies must be an array'
       });
     });
@@ -117,7 +118,7 @@ describe('builders / response', () => {
     it('should throw error when instance.cookies is an empty array', () => {
       let builder = getBuilderInstance({ cookies: [] });
 
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
+      should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
         message: 'cookies must be not empty array'
       });
     });
@@ -128,8 +129,9 @@ describe('builders / response', () => {
       });
       builder.cookies[1].name = undefined;
 
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'cookie name is required.\nDetails: "cookie index: 1"'
+      should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
+        message: 'cookie name is required',
+        details: 'cookie index: 1'
       });
     });
 
@@ -139,8 +141,9 @@ describe('builders / response', () => {
       });
       builder.cookies[1].params = 'wrong params';
 
-      should(builder._generateCookieRows.bind(builder)).throw(Error, {
-        message: 'cookie params must be an array.\nDetails: "cookie index: 1"'
+      should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
+        message: 'cookie params must be an array',
+        details: 'cookie index: 1'
       });
     });
 

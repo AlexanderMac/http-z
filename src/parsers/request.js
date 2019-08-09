@@ -2,6 +2,7 @@
 
 const _          = require('lodash');
 const consts     = require('../consts');
+const HttpZError = require('../error');
 const utils      = require('../utils');
 const validators = require('../validators');
 const Base       = require('./base');
@@ -41,14 +42,14 @@ class HttpZRequestParser extends Base {
 
     let res = _.attempt(utils.parseUrl.bind(null, value));
     if (_.isError(res)) {
-      throw utils.getError('Invalid host', value);
+      throw HttpZError.get('Invalid host', value);
     }
     this.host = res.host;
   }
 
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
-      throw utils.getError(
+      throw HttpZError.get(
         'Incorrect startRow format, expected: Method SP Request-URI SP HTTP-Version CRLF',
         this.startRow
       );
@@ -73,7 +74,7 @@ class HttpZRequestParser extends Base {
 
     let [unused, values] = utils.splitIntoTwoParts(this.cookiesRow, ':');
     if (!unused || !values) {
-      throw utils.getError('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow);
+      throw HttpZError.get('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow);
     }
     this.cookies = _.chain(values)
       .split(';')
@@ -84,7 +85,7 @@ class HttpZRequestParser extends Base {
           value: _.trim(value) || null
         };
         if (!cookie.name) {
-          throw utils.getError('Incorrect cookie pair format, expected: Name1=Value1;...', values);
+          throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values);
         }
         return cookie;
       })

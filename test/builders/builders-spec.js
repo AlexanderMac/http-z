@@ -3,6 +3,7 @@
 const sinon           = require('sinon');
 const should          = require('should');
 const nassert         = require('n-assert');
+const HttpZError      = require('../../src/error');
 const builder         = require('../../src/builders');
 const RequestBuilder  = require('../../src/builders/request');
 const ResponseBuilder = require('../../src/builders/response');
@@ -19,7 +20,7 @@ describe('builders / index', () => {
   });
 
   it('should throw error when messageModel is undefined', () => {
-    should(builder.bind(null)).throw(Error, {
+    should(builder.bind(null)).throw(HttpZError, {
       message: 'messageModel is required'
     });
   });
@@ -29,7 +30,7 @@ describe('builders / index', () => {
       data: 'some data'
     };
 
-    should(builder.bind(null, messageModel)).throw(Error, {
+    should(builder.bind(null, messageModel)).throw(HttpZError, {
       message: 'Unknown messageModel format'
     });
   });

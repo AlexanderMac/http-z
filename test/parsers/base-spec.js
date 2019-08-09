@@ -3,6 +3,7 @@
 const sinon      = require('sinon');
 const should     = require('should');
 const nassert    = require('n-assert');
+const HttpZError = require('../../src/error');
 const BaseParser = require('../../src/parsers/base');
 
 describe('parsers / base', () => {
@@ -31,7 +32,7 @@ describe('parsers / base', () => {
       ].join('\n');
       let parser = getParserInstance(plainRequest);
 
-      should(parser._parseMessageForRows.bind(parser)).throw(Error, {
+      should(parser._parseMessageForRows.bind(parser)).throw(HttpZError, {
         message: 'Incorrect message format, it must have headers and body, separated by empty line'
       });
     });
@@ -83,8 +84,9 @@ describe('parsers / base', () => {
         'Header3: values',
       ];
 
-      should(parser._parseHeaderRows.bind(parser)).throw(Error, {
-        message: 'Incorrect header row format, expected: Name: Values.\nDetails: "Header2 - values"'
+      should(parser._parseHeaderRows.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect header row format, expected: Name: Values',
+        details: 'Header2 - values'
       });
     });
 
@@ -96,8 +98,9 @@ describe('parsers / base', () => {
         'Header3: value',
       ];
 
-      should(parser._parseHeaderRows.bind(parser)).throw(Error, {
-        message: 'Incorrect header row format, expected: Name: Values.\nDetails: "Header2: "'
+      should(parser._parseHeaderRows.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect header row format, expected: Name: Values',
+        details: 'Header2: '
       });
     });
 
@@ -109,8 +112,9 @@ describe('parsers / base', () => {
         'Header3: value',
       ];
 
-      should(parser._parseHeaderRows.bind(parser)).throw(Error, {
-        message: 'Incorrect header values format, expected: Value1, Value2, ....\nDetails: "Header2: value1, "'
+      should(parser._parseHeaderRows.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect header values format, expected: Value1, Value2, ...',
+        details: 'Header2: value1, '
       });
     });
 
@@ -245,8 +249,9 @@ describe('parsers / base', () => {
         '--11136253119209--'
       ].join('\n');
 
-      should(parser._parseFormDataBody.bind(parser)).throw(Error, {
-        message: 'Incorrect form-data parameter.\nDetails: "\nContent-Disposition: form-data; name="age"\n25\n"'
+      should(parser._parseFormDataBody.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect form-data parameter',
+        details: '\nContent-Disposition: form-data; name="age"\n25\n'
       });
     });
 
@@ -289,8 +294,9 @@ describe('parsers / base', () => {
       let parser = getParserInstance();
       parser.bodyRows = 'firstName=John&=Smith&age=25';
 
-      should(parser._parseXwwwFormUrlencodedBody.bind(parser)).throw(Error, {
-        message: 'Incorrect x-www-form-urlencoded parameter, expected: Name="Value.\nDetails: "=Smith"'
+      should(parser._parseXwwwFormUrlencodedBody.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect x-www-form-urlencoded parameter, expected: Name="Value',
+        details: '=Smith'
       });
     });
 
@@ -316,7 +322,7 @@ describe('parsers / base', () => {
       let parser = getParserInstance();
       parser.bodyRows = 'Incorrect json';
 
-      should(parser._parseJsonBody.bind(parser)).throw(Error, {
+      should(parser._parseJsonBody.bind(parser)).throw(HttpZError, {
         message: 'Invalid json in body'
       });
     });
