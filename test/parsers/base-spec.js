@@ -7,17 +7,18 @@ const HttpZError = require('../../src/error');
 const BaseParser = require('../../src/parsers/base');
 
 describe('parsers / base', () => {
-  function getParserInstance(params) {
-    return new BaseParser(params);
+  function getParserInstance(...params) {
+    return new BaseParser(...params);
   }
 
   describe('_parseMessageForRows', () => {
     it('should throw error when message does not have headers', () => {
+      let eol = '\n';
       let plainRequest = [
         '',
         'Body'
-      ].join('\n');
-      let parser = getParserInstance(plainRequest);
+      ].join(eol);
+      let parser = getParserInstance(plainRequest, eol);
 
       should(parser._parseMessageForRows.bind(parser)).throw(Error, {
         message: 'Incorrect message format, it must have headers and body, separated by empty line'
@@ -25,19 +26,20 @@ describe('parsers / base', () => {
     });
 
     it('should throw error when message does not have empty line and body', () => {
+      let eol = '\n';
       let plainRequest = [
         'start-line',
         'host-line',
         'Header1'
-      ].join('\n');
-      let parser = getParserInstance(plainRequest);
+      ].join(eol);
+      let parser = getParserInstance(plainRequest, eol);
 
       should(parser._parseMessageForRows.bind(parser)).throw(HttpZError, {
         message: 'Incorrect message format, it must have headers and body, separated by empty line'
       });
     });
 
-    it('should parse message for rows (without body)', () => {
+    function _testParseMessageWithoutBody(eol) {
       let plainRequest = [
         'start-line',
         'host-line',
@@ -46,16 +48,24 @@ describe('parsers / base', () => {
         'Header3',
         'Cookie',
         ''
-      ].join('\n');
-      let parser = getParserInstance(plainRequest);
+      ].join(eol);
+      let parser = getParserInstance(plainRequest, eol);
 
       let actual = parser._parseMessageForRows();
       should(actual.startRow).eql('start-line');
       should(actual.headerRows).eql(['host-line', 'Header1', 'Header2', 'Header3', 'Cookie']);
       should(actual.bodyRows).eql(null);
+    }
+
+    it('should parse message for rows without body when eol is \n', () => {
+      _testParseMessageWithoutBody('\n');
     });
 
-    it('should parse message for rows (with body)', () => {
+    it('should parse message for rows without body when eol is \r\n', () => {
+      _testParseMessageWithoutBody('\r\n');
+    });
+
+    function _testParseMessageWithBody(eol) {
       let plainRequest = [
         'start-line',
         'host-line',
@@ -65,13 +75,21 @@ describe('parsers / base', () => {
         'Cookie',
         '',
         'Body'
-      ].join('\n');
-      let parser = getParserInstance(plainRequest);
+      ].join(eol);
+      let parser = getParserInstance(plainRequest, eol);
 
       let actual = parser._parseMessageForRows();
       should(actual.startRow).eql('start-line');
       should(actual.headerRows).eql(['host-line', 'Header1', 'Header2', 'Header3', 'Cookie']);
       should(actual.bodyRows).eql('Body');
+    }
+
+    it('should parse message for rows with body when eol is \n', () => {
+      _testParseMessageWithBody('\n');
+    });
+
+    it('should parse message for rows with body when eol is \r\n', () => {
+      _testParseMessageWithBody('\r\n');
     });
   });
 
@@ -231,6 +249,8 @@ describe('parsers / base', () => {
   describe('_parseFormDataBody', () => {
     it('should throw error when some param has incorrect format', () => {
       let parser = getParserInstance();
+      let eol = '\n';
+      parser.eol = eol;
       parser.body = {};
       parser.headers = [{
         name: 'Content-Type',
@@ -247,7 +267,7 @@ describe('parsers / base', () => {
         'Content-Disposition: form-data; name="age"',
         '25',
         '--11136253119209--'
-      ].join('\n');
+      ].join(eol);
 
       should(parser._parseFormDataBody.bind(parser)).throw(HttpZError, {
         message: 'Incorrect form-data parameter',
@@ -257,6 +277,8 @@ describe('parsers / base', () => {
 
     it('should set instance.body when all params in body are valid', () => {
       let parser = getParserInstance();
+      let eol = '\n';
+      parser.eol = eol;
       parser.body = {};
       parser.headers = [{
         name: 'Content-Type',
@@ -274,7 +296,7 @@ describe('parsers / base', () => {
         '',
         '25',
         '--11136253119209--'
-      ].join('\n');
+      ].join(eol);
 
       parser._parseFormDataBody();
 

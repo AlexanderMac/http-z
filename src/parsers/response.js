@@ -7,8 +7,8 @@ const utils      = require('../utils');
 const Base       = require('./base');
 
 class HttpZResponseParser extends Base {
-  static parse(params) {
-    let instance = new HttpZResponseParser(params);
+  static parse(...params) {
+    let instance = new HttpZResponseParser(...params);
     return instance.parse();
   }
 

@@ -41,14 +41,14 @@ describe('parsers / index', () => {
     });
   });
 
-  it('should call RequestParser.parse when plainMessage is request (eol is \n)', () => {
+  function _testCallRequestParser(eol) {
     let plainMessage = [
       'get /features http/1.1',
       'host: example.com',
       ''
-    ].join('\n');
+    ].join(eol);
     let expected = 'parsed-request';
-    let expectedMultipleArgs = [plainMessage, '\n'];
+    let expectedMultipleArgs = [plainMessage, eol];
 
     RequestParser.parse.returns('parsed-request');
 
@@ -57,16 +57,24 @@ describe('parsers / index', () => {
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedMultipleArgs });
     nassert.assertFn({ inst: ResponseParser, fnName: 'parse' });
+  }
+
+  it('should call RequestParser.parse when plainMessage is request and eol is \n', () => {
+    _testCallRequestParser('\n');
   });
 
-  it('should call ResponseParser.parse when plainMessage is response (eol is \r\n)', () => {
+  it('should call RequestParser.parse when plainMessage is request and eol is \r\n', () => {
+    _testCallRequestParser('\r\n');
+  });
+
+  function _testCallResponseParser(eol) {
     let plainMessage = [
       'http/1.1 200 Ok',
       'host: example.com',
       ''
-    ].join('\r\n');
+    ].join(eol);
     let expected = 'parsed-response';
-    let expectedMultipleArgs = [plainMessage, '\r\n'];
+    let expectedMultipleArgs = [plainMessage, eol];
 
     ResponseParser.parse.returns('parsed-response');
 
@@ -75,5 +83,13 @@ describe('parsers / index', () => {
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse' });
     nassert.assertFn({ inst: ResponseParser, fnName: 'parse', expectedMultipleArgs });
+  }
+
+  it('should call ResponseParser.parse when plainMessage is response and eol is \n', () => {
+    _testCallResponseParser('\n');
+  });
+
+  it('should call ResponseParser.parse when plainMessage is response and eol is \r\n', () => {
+    _testCallResponseParser('\r\n');
   });
 });

@@ -6,7 +6,7 @@ const HttpZError = require('../error');
 const utils      = require('../utils');
 
 class HttpZBaseParser {
-  constructor(plainMessage, eol = '\n') {
+  constructor(plainMessage, eol) {
     this.plainMessage = plainMessage;
     this.eol = eol;
   }
@@ -16,7 +16,7 @@ class HttpZBaseParser {
     let [headers, body] = utils.splitIntoTwoParts(this.plainMessage, eol2x);
     if (_.isNil(headers) || _.isNil(body)) {
       // special case when the message doesn't contain body
-      let regexp = new RegExp(this.eol + '$', 'g');
+      let regexp = new RegExp(this.eol + '+$', 'g');
       if (regexp.test(this.plainMessage)) {
         headers = this.plainMessage.replace(regexp, '');
         body = null;

@@ -8,8 +8,8 @@ const validators = require('../validators');
 const Base       = require('./base');
 
 class HttpZRequestParser extends Base {
-  static parse(params) {
-    let instance = new HttpZRequestParser(params);
+  static parse(...params) {
+    let instance = new HttpZRequestParser(...params);
     return instance.parse();
   }
 

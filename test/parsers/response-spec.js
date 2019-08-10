@@ -7,8 +7,8 @@ const HttpZError     = require('../../src/error');
 const ResponseParser = require('../../src/parsers/response');
 
 describe('parsers / response', () => {
-  function getParserInstance(params) {
-    return new ResponseParser(params);
+  function getParserInstance(...params) {
+    return new ResponseParser(...params);
   }
 
   describe('static parse', () => {
@@ -21,7 +21,7 @@ describe('parsers / response', () => {
     });
 
     it('should create an instance of ResponseParser and call instance.parse', () => {
-      let params = {};
+      let params = ['plain', '\n'];
       let expected = 'ok';
 
       ResponseParser.prototype.parse.returns('ok');
@@ -58,6 +58,7 @@ describe('parsers / response', () => {
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows, when headers does not contain Set-Cookie rows', () => {
+      let eol = '\n';
       let plainResponse = [
         'start-line',
         'Header1',
@@ -65,9 +66,9 @@ describe('parsers / response', () => {
         'Header3',
         '',
         'Body'
-      ].join('\n');
+      ].join(eol);
 
-      let parser = getParserInstance(plainResponse);
+      let parser = getParserInstance(plainResponse, eol);
       parser._parseMessageForRows();
 
       should(parser.startRow).eql('start-line');
@@ -77,6 +78,7 @@ describe('parsers / response', () => {
     });
 
     it('should parse message for rows, when headers contain Set-Cookie rows', () => {
+      let eol = '\n';
       let plainResponse = [
         'start-line',
         'Header1',
@@ -86,9 +88,9 @@ describe('parsers / response', () => {
         'Set-cookie',
         '',
         'Body'
-      ].join('\n');
+      ].join(eol);
 
-      let parser = getParserInstance(plainResponse);
+      let parser = getParserInstance(plainResponse, eol);
       parser._parseMessageForRows();
 
       should(parser.startRow).eql('start-line');
@@ -198,7 +200,30 @@ describe('parsers / response', () => {
   });
 
   describe('functional tests', () => {
-    it('should parse response without body (header names in lower case)', () => {
+    it('should parse request without headers and body', () => {
+      let eol = '\n';
+      let plainResponse = [
+        'http/1.1 204 No content',
+        '',
+        ''
+      ].join(eol);
+
+      let responseModel = {
+        protocolVersion: 'HTTP/1.1',
+        statusCode: 204,
+        statusMessage: 'No content',
+        headers: [],
+        cookies: null,
+        body: null
+      };
+
+      let parser = getParserInstance(plainResponse, eol);
+      let actual = parser.parse();
+      should(actual).eql(responseModel);
+    });
+
+    it('should parse response without body (header names in lower case, eol is \r\n)', () => {
+      let eol = '\r\n';
       let plainResponse = [
         'http/1.1 201 Created',
         'connection: keep-alive',
@@ -207,7 +232,7 @@ describe('parsers / response', () => {
         'content-encoding: gzip,deflate',
         '',
         ''
-      ].join('\n');
+      ].join(eol);
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
@@ -244,12 +269,13 @@ describe('parsers / response', () => {
         body: null
       };
 
-      let parser = getParserInstance(plainResponse);
+      let parser = getParserInstance(plainResponse, eol);
       let actual = parser.parse();
       should(actual).eql(responseModel);
     });
 
     it('should parse response without cookies and without body', () => {
+      let eol = '\n';
       let plainResponse = [
         'http/1.1 201 Created',
         'Connection: keep-alive',
@@ -261,7 +287,7 @@ describe('parsers / response', () => {
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
         '',
         ''
-      ].join('\n');
+      ].join(eol);
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
@@ -302,12 +328,13 @@ describe('parsers / response', () => {
         body: null
       };
 
-      let parser = getParserInstance(plainResponse);
+      let parser = getParserInstance(plainResponse, eol);
       let actual = parser.parse();
       should(actual).eql(responseModel);
     });
 
     it('should parse response with body and contentType=text/plain', () => {
+      let eol = '\n';
       let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
@@ -317,7 +344,7 @@ describe('parsers / response', () => {
         'Content-Length: 301',
         '',
         'Plain text'
-      ].join('\n');
+      ].join(eol);
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
@@ -363,12 +390,13 @@ describe('parsers / response', () => {
         }
       };
 
-      let parser = getParserInstance(plainResponse);
+      let parser = getParserInstance(plainResponse, eol);
       let actual = parser.parse();
       should(actual).eql(responseModel);
     });
 
     it('should parse response with body and contentType=application/json', () => {
+      let eol = '\n';
       let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
@@ -378,7 +406,7 @@ describe('parsers / response', () => {
         'Content-Length: 301',
         '',
         '{"p1":"v1","p2":"v2"}'
-      ].join('\n');
+      ].join(eol);
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
@@ -424,7 +452,7 @@ describe('parsers / response', () => {
         }
       };
 
-      let parser = getParserInstance(plainResponse);
+      let parser = getParserInstance(plainResponse, eol);
       let actual = parser.parse();
       should(actual).eql(responseModel);
     });
