@@ -37,33 +37,40 @@ describe('parsers / index', () => {
     let params = ['invalid'];
 
     should(parser.bind(null, ...params)).throw(HttpZError, {
-      message: 'Unknown plainMessage format',
-      details: 'invalid'
+      message: 'Unknown plainMessage format'
     });
   });
 
-  it('should call RequestParser.parse when plainMessage is request', () => {
-    let params = ['get /features http/1.1'];
+  it('should call RequestParser.parse when plainMessage is request (eol is \n)', () => {
+    let plainMessage = [
+      'get /features http/1.1',
+      'host: example.com',
+      ''
+    ].join('\n');
     let expected = 'parsed-request';
-    let expectedMultipleArgs = [params[0], '\n'];
+    let expectedMultipleArgs = [plainMessage, '\n'];
 
     RequestParser.parse.returns('parsed-request');
 
-    let actual = parser(...params);
+    let actual = parser(plainMessage);
     should(actual).eql(expected);
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedMultipleArgs });
     nassert.assertFn({ inst: ResponseParser, fnName: 'parse' });
   });
 
-  it('should call ResponseParser.parse when plainMessage is response', () => {
-    let params = ['http/1.1 200 Ok', '\r\n'];
+  it('should call ResponseParser.parse when plainMessage is response (eol is \r\n)', () => {
+    let plainMessage = [
+      'http/1.1 200 Ok',
+      'host: example.com',
+      ''
+    ].join('\r\n');
     let expected = 'parsed-response';
-    let expectedMultipleArgs = params;
+    let expectedMultipleArgs = [plainMessage, '\r\n'];
 
     ResponseParser.parse.returns('parsed-response');
 
-    let actual = parser(...params);
+    let actual = parser(plainMessage);
     should(actual).eql(expected);
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse' });

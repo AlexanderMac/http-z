@@ -88,11 +88,10 @@ Accept-Language: en-US;q=0.6, en;q=0.4
 
 ## API
 
-### parse(plainMessage, eol)
+### parse(plainMessage)
 Parse HTTP request/response plain message and return model.
 
 - `plainMessage` is HTTP plain message.
-- `eol` end of line, `\n` by default.
 
 ### build(messageModel)
 Build HTTP request/response plain message from model.

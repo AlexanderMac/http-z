@@ -15,9 +15,10 @@ class HttpZBaseParser {
     let eol2x = this.eol + this.eol;
     let [headers, body] = utils.splitIntoTwoParts(this.plainMessage, eol2x);
     if (_.isNil(headers) || _.isNil(body)) {
-      // special case when message doesn't contain body
-      if (/\n+$/g.test(this.plainMessage)) {
-        headers = this.plainMessage.replace(/\n+$/g, '');
+      // special case when the message doesn't contain body
+      let regexp = new RegExp(this.eol + '$', 'g');
+      if (regexp.test(this.plainMessage)) {
+        headers = this.plainMessage.replace(regexp, '');
         body = null;
       } else {
         throw HttpZError.get(
