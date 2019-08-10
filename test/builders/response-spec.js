@@ -27,12 +27,12 @@ describe('builders / response', () => {
     });
 
     it('should create an instance of ResponseBuilder and call instance.build', () => {
-      let params = {};
+      let model = {};
       let expected = 'ok';
 
       ResponseBuilder.prototype.build.returns('ok');
 
-      let actual = ResponseBuilder.build(params);
+      let actual = ResponseBuilder.build(model);
       nassert.assert(actual, expected);
 
       nassert.assertFn({ inst: ResponseBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });

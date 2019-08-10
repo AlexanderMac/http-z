@@ -5,8 +5,8 @@ const validators = require('../validators');
 const Base       = require('./base');
 
 class HttpZResponseBuilder extends Base {
-  static build(params) {
-    let instance = new HttpZResponseBuilder(params);
+  static build(model) {
+    let instance = new HttpZResponseBuilder(model);
     return instance.build();
   }
 

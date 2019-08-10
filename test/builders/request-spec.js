@@ -29,12 +29,12 @@ describe('builders / request', () => {
     });
 
     it('should create an instance of RequestBuilder and call instance.build', () => {
-      let params = {};
+      let model = {};
       let expected = 'ok';
 
       RequestBuilder.prototype.build.returns('ok');
 
-      let actual = RequestBuilder.build(params);
+      let actual = RequestBuilder.build(model);
       nassert.assert(actual, expected);
 
       nassert.assertFn({ inst: RequestBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });
@@ -177,7 +177,7 @@ describe('builders / request', () => {
   });
 
   describe('functional tests', () => {
-    it('should build request without body and headers', () => {
+    it('should build request without headers and body', () => {
       let requestModel = {
         method: 'GET',
         protocol: 'HTTPS',
