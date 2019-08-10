@@ -1,6 +1,7 @@
-# <sub>v0.9.0</sub>
+# <sub>v0.9.1</sub>
 #### _Aug_. 10, 2019_
   * Determine eol in parser automatically.
+  * Bug fixes.
 
 # <sub>v0.8.0</sub>
 #### _Aug_. 9, 2019_
