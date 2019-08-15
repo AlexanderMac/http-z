@@ -1,3 +1,7 @@
+# <sub>v0.9.2</sub>
+#### _Aug_. 15, 2019_
+  * Add HTTP consts.
+
 # <sub>v0.9.1</sub>
 #### _Aug_. 10, 2019_
   * Bug fixes.
