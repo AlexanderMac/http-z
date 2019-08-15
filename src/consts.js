@@ -21,17 +21,43 @@ const regexps = {
   quote: /"/g
 };
 
-const http = {
-  contentTypes: {
-    plain: 'text/plain',
-    json: 'application/json',
-    formData: 'multipart/form-data',
-    xWwwFormUrlencoded: 'application/x-www-form-urlencoded'
-  },
-  headers: {
-    contentType: 'Content-Type',
-    contentLength: 'Content-Length'
-  }
+const http = {};
+
+http.protocols = {
+  http: 'HTTP',
+  https: 'HTTPS'
+};
+
+http.protocolVersions = {
+  http10: 'HTTP/1.0',
+  http11: 'HTTP/1.1',
+  http20: 'HTTP/2.0'
+};
+
+http.methods = {
+  get: 'GET',
+  post: 'POST',
+  put: 'PUT',
+  pathch: 'PATCH',
+  delete: 'DELETE'
+};
+
+http.methodsWithBody = [
+  http.methods.post,
+  http.methods.put,
+  http.methods.pathch
+];
+
+http.contentTypes = {
+  plain: 'text/plain',
+  json: 'application/json',
+  formData: 'multipart/form-data',
+  xWwwFormUrlencoded: 'application/x-www-form-urlencoded'
+};
+
+http.headers = {
+  contentType: 'Content-Type',
+  contentLength: 'Content-Length'
 };
 
 module.exports = {
