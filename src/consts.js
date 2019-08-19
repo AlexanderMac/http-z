@@ -50,7 +50,7 @@ http.methodsWithBody = [
 
 http.contentTypes = {
   text: {
-    any: 'text/*',
+    any: 'text/',
     css: 'text/css',
     csv: 'text/csv',
     html: 'text/html',
@@ -59,7 +59,7 @@ http.contentTypes = {
     xml: 'text/xml',
   },
   application: {
-    any: 'application/*',
+    any: 'application/',
     javascript: 'application/javascript',
     json: 'application/json',
     octetStream: 'application/octet-stream',
@@ -72,14 +72,14 @@ http.contentTypes = {
     zip: 'application/zip'
   },
   multipart: {
-    any: 'multipart/*',
+    any: 'multipart/',
     alternative: 'multipart/alternative',
     formData: 'multipart/form-data',
     mixed: 'multipart/mixed',
     related: 'multipart/related'
   },
   image: {
-    any: 'image/*',
+    any: 'image/',
     gif: 'image/gif',
     jpeg: 'image/jpeg',
     png: 'image/png',
@@ -87,13 +87,13 @@ http.contentTypes = {
     icon: 'image/x-icon'
   },
   audio: {
-    any: 'audio/*'
+    any: 'audio/'
   },
   video: {
-    any: 'audio/*'
+    any: 'audio/'
   },
   font: {
-    any: 'font/*'
+    any: 'font/'
   }
 };
 
