@@ -1,6 +1,10 @@
+# <sub>v0.10.0.</sub>
+#### _Aug_. 19, 2019_
+  * Split HTTP contentType into groups.
+
 # <sub>v0.9.2</sub>
 #### _Aug_. 15, 2019_
-  * Add HTTP consts.
+  * Add HTTP constants.
 
 # <sub>v0.9.1</sub>
 #### _Aug_. 10, 2019_
