@@ -49,10 +49,52 @@ http.methodsWithBody = [
 ];
 
 http.contentTypes = {
-  plain: 'text/plain',
-  json: 'application/json',
-  formData: 'multipart/form-data',
-  xWwwFormUrlencoded: 'application/x-www-form-urlencoded'
+  text: {
+    any: 'text/*',
+    css: 'text/css',
+    csv: 'text/csv',
+    html: 'text/html',
+    javascript: 'text/javascript',
+    plain: 'text/plain',
+    xml: 'text/xml',
+  },
+  application: {
+    any: 'application/*',
+    javascript: 'application/javascript',
+    json: 'application/json',
+    octetStream: 'application/octet-stream',
+    ogg: 'application/ogg',
+    pdf: 'application/pdf',
+    xhtml: 'application/xhtml+xml',
+    xml: 'application/xml',
+    xShockwaveFlash: 'application/x-shockwave-flash',
+    xWwwFormUrlencoded: 'application/x-www-form-urlencoded',
+    zip: 'application/zip'
+  },
+  multipart: {
+    any: 'multipart/*',
+    alternative: 'multipart/alternative',
+    formData: 'multipart/form-data',
+    mixed: 'multipart/mixed',
+    related: 'multipart/related'
+  },
+  image: {
+    any: 'image/*',
+    gif: 'image/gif',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    tiff: 'image/tiff',
+    icon: 'image/x-icon'
+  },
+  audio: {
+    any: 'audio/*'
+  },
+  video: {
+    any: 'audio/*'
+  },
+  font: {
+    any: 'font/*'
+  }
 };
 
 http.headers = {

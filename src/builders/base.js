@@ -44,11 +44,11 @@ class HttpZBaseBuilder {
     }
 
     switch (this.body.contentType) {
-      case consts.http.contentTypes.formData:
+      case consts.http.contentTypes.multipart.formData:
         return '\n' + this._generateFormDataBody();
-      case consts.http.contentTypes.xWwwFormUrlencoded:
+      case consts.http.contentTypes.application.xWwwFormUrlencoded:
         return '\n' + this._generateXwwwFormUrlencodedBody();
-      case consts.http.contentTypes.json:
+      case consts.http.contentTypes.application.json:
         return '\n' + this._generateJsonBody();
       default:
         return '\n' + this._generatePlainBody();

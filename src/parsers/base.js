@@ -81,13 +81,13 @@ class HttpZBaseParser {
     }
 
     switch (this.body.contentType) {
-      case consts.http.contentTypes.formData:
+      case consts.http.contentTypes.multipart.formData:
         this._parseFormDataBody();
         break;
-      case consts.http.contentTypes.xWwwFormUrlencoded:
+      case consts.http.contentTypes.application.xWwwFormUrlencoded:
         this._parseXwwwFormUrlencodedBody();
         break;
-      case consts.http.contentTypes.json:
+      case consts.http.contentTypes.application.json:
         this._parseJsonBody();
         break;
       default:
