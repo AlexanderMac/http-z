@@ -1,3 +1,7 @@
+# <sub>v0.10.1.</sub>
+#### _Aug_. 19, 2019_
+  * Remove ending asterisks from http.contentType.any constants.
+
 # <sub>v0.10.0.</sub>
 #### _Aug_. 19, 2019_
   * Split HTTP contentType into groups.
