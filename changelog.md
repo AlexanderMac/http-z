@@ -1,3 +1,8 @@
+# <sub>v0.11.0.</sub>
+#### _Sep_. 4, 2019_
+  * Allow empty values for queryParams, headers.
+  * Don't add field with null values for empty/missing values.
+
 # <sub>v0.10.1.</sub>
 #### _Aug_. 19, 2019_
   * Remove ending asterisks from http.contentType.any constants.
