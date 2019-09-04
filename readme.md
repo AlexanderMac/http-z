@@ -58,18 +58,16 @@ console.log(JSON.stringify(messageModel, null, 2));
   path: '/features',
   params: { p1: 'v1' },
   headers: [
-    { name: 'Accept', values: [ { value: '/', params: null } ] },
+    { name: 'Accept', values: [ { value: '/' } ] },
     { name: 'Accept-Encoding', values: [ 
-      { value: 'gzip', params: null },
-      { value: 'deflate', params: null }
+      { value: 'gzip' },
+      { value: 'deflate' }
     ]},
     { name: 'Accept-Language', values: [
       { value: 'en-US', params: 'q=0.6' },
       { value: 'en', params: 'q=0.4' } 
     ]}
-  ],
-  cookies: null,
-  body: null
+  ]
 }
 */
 
