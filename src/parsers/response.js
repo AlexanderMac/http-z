@@ -47,7 +47,6 @@ class HttpZResponseParser extends Base {
 
   _parseCookieRows() {
     if (_.isEmpty(this.cookieRows)) {
-      this.cookies = null;
       return;
     }
 
@@ -61,16 +60,17 @@ class HttpZResponseParser extends Base {
 
       let [name, value] = _.chain(params).head().split('=').value();
       let cookie = {
-        name: _.trim(name),
-        value: _.trim(value) || null,
-        params: _.chain(params).slice(1).map(p => _.trim(p)).value()
+        name: _.trim(name)
       };
-
       if (!cookie.name) {
         throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values);
       }
-      if (_.isEmpty(cookie.params)) {
-        cookie.params = null;
+
+      if (value) {
+        cookie.value = _.trim(value);
+      }
+      if (_.slice(params, 1).length > 0) {
+        cookie.params = _.chain(params).slice(1).map(p => _.trim(p)).value();
       }
 
       return cookie;
@@ -78,14 +78,22 @@ class HttpZResponseParser extends Base {
   }
 
   _generateModel() {
-    return {
+    let model = {
       protocolVersion: this.protocolVersion,
       statusCode: this.statusCode,
-      statusMessage: this.statusMessage,
-      headers: this.headers,
-      cookies: this.cookies,
-      body: this.body
+      statusMessage: this.statusMessage
     };
+    if (this.headers) {
+      model.headers = this.headers;
+    }
+    if (this.cookies) {
+      model.cookies = this.cookies;
+    }
+    if (this.body) {
+      model.body = this.body;
+    }
+
+    return model;
   }
 }
 

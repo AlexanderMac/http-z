@@ -63,9 +63,10 @@ describe('utils', () => {
         path: '/features',
         queryParams: [
           { name: 'p1', value: 'v1' },
-          { name: 'p2', value: null }
+          { name: 'p2', value: null },
+          { name: 'p3' }
         ]
-      }, '/features?p1=v1&p2=null');
+      }, '/features?p1=v1&p2=null&p3=');
     });
   });
 

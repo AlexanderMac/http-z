@@ -54,7 +54,7 @@ describe('parsers / base', () => {
       let actual = parser._parseMessageForRows();
       should(actual.startRow).eql('start-line');
       should(actual.headerRows).eql(['host-line', 'Header1', 'Header2', 'Header3', 'Cookie']);
-      should(actual.bodyRows).eql(null);
+      should(actual.bodyRows).eql(undefined);
     }
 
     it('should parse message for rows without body when eol is \n', () => {
@@ -126,21 +126,21 @@ describe('parsers / base', () => {
         {
           name: 'Accept',
           values: [
-            { value: '*/*', params: null },
-            { value: 'text/plain', params: null }
+            { value: '*/*' },
+            { value: 'text/plain' }
           ]
         },
         {
           name: 'Accept-Encoding',
           values: [
-            { value: 'gzip', params: null },
-            { value: 'deflate', params: null }
+            { value: 'gzip' },
+            { value: 'deflate' }
           ]
         },
         {
           name: 'Accept-Language',
           values: [
-            { value: 'ru-RU', params: null },
+            { value: 'ru-RU' },
             { value: 'ru', params: 'q=0.8' },
             { value: 'en-US', params: 'q=0.6' },
             { value: 'en', params: 'q=0.4' }
@@ -170,9 +170,9 @@ describe('parsers / base', () => {
       nassert.assertFn({ inst: parser, fnName: '_parsePlainBody', expectedArgs: expectedFnArgs.parsePlainBody });
     }
 
-    it('should set instance.body to null when bodyRows is empty', () => {
-      let bodyRows = null;
-      let expected = null;
+    it('should set instance.body to undefined when bodyRows is empty', () => {
+      let bodyRows = undefined;
+      let expected = undefined;
 
       test({ bodyRows, expected });
     });
@@ -363,31 +363,31 @@ describe('parsers / base', () => {
         {
           name: 'Connection',
           values: [
-            { value: 'keep-alive', params: null }
+            { value: 'keep-alive' }
           ]
         },
         {
           name: 'Accept-Encoding',
           values: [
-            { value: 'gzip', params: null },
-            { value: 'deflate', params: null }
+            { value: 'gzip' },
+            { value: 'deflate' }
           ]
         },
         {
           name: 'Content-Type',
           values: [
-            { value: 'application/json', params: null }
+            { value: 'application/json' }
           ]
         }
       ];
     }
 
-    it('should return null when instance.headers does not include contentType header', () => {
+    it('should return undefined when instance.headers does not include contentType header', () => {
       let parser = getParserInstance();
       parser.headers = getDefaultHeaders();
       parser.headers.splice(2, 1);
 
-      let expected = null;
+      let expected = undefined;
       let actual = parser._getContentType();
 
       should(actual).eql(expected);
@@ -397,7 +397,7 @@ describe('parsers / base', () => {
       let parser = getParserInstance();
       parser.headers = getDefaultHeaders();
 
-      let expected = { value: 'application/json', params: null };
+      let expected = { value: 'application/json' };
       let actual = parser._getContentType();
 
       should(actual).eql(expected);

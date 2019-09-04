@@ -58,7 +58,7 @@ describe('builders / response', () => {
 
   describe('_generateStartRow', () => {
     it('should throw error when protocolVersion is not defined', () => {
-      let builder = getBuilderInstance({ protocolVersion: null });
+      let builder = getBuilderInstance({ protocolVersion: undefined });
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'protocolVersion is required'
@@ -66,7 +66,7 @@ describe('builders / response', () => {
     });
 
     it('should throw error when statusCode is not defined', () => {
-      let builder = getBuilderInstance({ statusCode: null });
+      let builder = getBuilderInstance({ statusCode: undefined });
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'statusCode is required'
@@ -74,7 +74,7 @@ describe('builders / response', () => {
     });
 
     it('should throw error when statusMessage is not defined', () => {
-      let builder = getBuilderInstance({ statusMessage: null });
+      let builder = getBuilderInstance({ statusMessage: undefined });
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'statusMessage is required'
@@ -93,14 +93,14 @@ describe('builders / response', () => {
   describe('_generateCookieRows', () => {
     function getDefaultCookes() {
       return [
-        { name: 'csrftoken', value: '123abc', params: null },
-        { name: 'sessionid', value: null, params: ['Domain=example.com', 'Path=/'] },
+        { name: 'csrftoken', value: '123abc' },
+        { name: 'sessionid', params: ['Domain=example.com', 'Path=/'] },
         { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
       ];
     }
 
     it('should return empty string when instance.cookies is nil', () => {
-      let builder = getBuilderInstance({ cookies: null });
+      let builder = getBuilderInstance({ cookies: undefined });
 
       let expected = '';
       let actual = builder._generateCookieRows();
@@ -176,7 +176,7 @@ describe('builders / response', () => {
           {
             name: 'cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
@@ -188,12 +188,11 @@ describe('builders / response', () => {
           {
             name: 'content-encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           }
-        ],
-        body: null
+        ]
       };
 
       let plainResponse = [
@@ -223,7 +222,7 @@ describe('builders / response', () => {
           {
             name: 'Cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
@@ -235,18 +234,17 @@ describe('builders / response', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           }
         ],
         cookies: [
-          { name: 'csrftoken', value: '123abc', params: null },
+          { name: 'csrftoken', value: '123abc' },
           { name: 'sessionid', value: '456def', params: ['Domain=example.com', 'Path=/'] },
           { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] },
           { name: 'date' }
-        ],
-        body: null
+        ]
       };
 
       let plainResponse = [
@@ -276,13 +274,13 @@ describe('builders / response', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
@@ -294,14 +292,14 @@ describe('builders / response', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
@@ -336,13 +334,13 @@ describe('builders / response', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
@@ -354,14 +352,14 @@ describe('builders / response', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],

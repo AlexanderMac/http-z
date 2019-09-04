@@ -109,7 +109,7 @@ describe('parsers / request', () => {
   describe('_parseHostRow', () => {
     it('should throw error when hostRow is nil', () => {
       let parser = getParserInstance();
-      parser.hostRow = null;
+      parser.hostRow = undefined;
 
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'host header is required'
@@ -249,11 +249,11 @@ describe('parsers / request', () => {
       });
     });
 
-    it('should set instance.cookies to null when cookiesRow is empty', () => {
+    it('should set instance.cookies to undefined when cookiesRow is empty', () => {
       let parser = getParserInstance();
-      parser.cookiesRow = null;
+      parser.cookiesRow = undefined;
 
-      let expected = null;
+      let expected = undefined;
       parser._parseCookiesRow();
       should(parser.cookies).eql(expected);
     });
@@ -265,7 +265,7 @@ describe('parsers / request', () => {
       let expected = [
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', value: '456def' },
-        { name: 'username', value: null }
+        { name: 'username' }
       ];
       parser._parseCookiesRow();
       should(parser.cookies).eql(expected);
@@ -273,6 +273,25 @@ describe('parsers / request', () => {
   });
 
   describe('_generateModel', () => {
+    it('should generate request model using instance fields when some fields are undefined', () => {
+      let parser = getParserInstance();
+      parser.method = 'method';
+      parser.protocol = 'protocol';
+      parser.protocolVersion = 'protocolVersion';
+      parser.path = 'path';
+      parser.host = 'host';
+
+      let expected = {
+        method: 'method',
+        protocol: 'protocol',
+        protocolVersion: 'protocolVersion',
+        path: 'path',
+        host: 'host'
+      };
+      let actual = parser._generateModel();
+      should(actual).eql(expected);
+    });
+
     it('should generate request model using instance fields', () => {
       let parser = getParserInstance();
       parser.method = 'method';
@@ -321,9 +340,7 @@ describe('parsers / request', () => {
           { name: 'p1', value: 'v1' },
           { name: 'p2', value: '' },
         ],
-        headers: [],
-        cookies: null,
-        body: null
+        headers: []
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -360,20 +377,20 @@ describe('parsers / request', () => {
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -382,12 +399,10 @@ describe('parsers / request', () => {
           {
             name: 'User-Agent',
             values: [
-              { value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0', params: null }
+              { value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0' }
             ]
           }
-        ],
-        cookies: null,
-        body: null
+        ]
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -424,20 +439,20 @@ describe('parsers / request', () => {
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -447,9 +462,8 @@ describe('parsers / request', () => {
         cookies: [
           { name: 'csrftoken', value: '123abc' },
           { name: 'sessionid', value: '456def' },
-          { name: 'userid', value: null },
-        ],
-        body: null
+          { name: 'userid' },
+        ]
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -484,26 +498,26 @@ describe('parsers / request', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -518,18 +532,17 @@ describe('parsers / request', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'text/plain',
           plain: 'Plain text'
@@ -568,26 +581,26 @@ describe('parsers / request', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -602,18 +615,17 @@ describe('parsers / request', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'application/json',
           json: { p1: 'v1', p2: 'v2' }
@@ -652,26 +664,26 @@ describe('parsers / request', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -686,18 +698,17 @@ describe('parsers / request', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'application/x-www-form-urlencoded',
           formDataParams: [
@@ -752,26 +763,26 @@ describe('parsers / request', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -786,18 +797,17 @@ describe('parsers / request', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'multipart/form-data',
           boundary: '11136253119209',

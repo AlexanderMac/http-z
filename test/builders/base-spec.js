@@ -44,7 +44,7 @@ describe('builders / base', () => {
     }
 
     it('should throw error when instance.headers is nil', () => {
-      let headers = null;
+      let headers;
       let expected = HttpZError.get('headers is required');
 
       let builder = getBuilderInstance({ headers });
@@ -133,7 +133,7 @@ describe('builders / base', () => {
     }
 
     it('should return empty string when instance.body is nil', () => {
-      let body = null;
+      let body;
       let expected = '';
 
       test({ body, expected });
@@ -204,7 +204,7 @@ describe('builders / base', () => {
 
     it('should throw error when instance.body.formDataParams is nil', () => {
       let body = getDefaultBody();
-      body.formDataParams = null;
+      body.formDataParams = undefined;
       let expected = HttpZError.get('body.formDataParams is required');
 
       let builder = getBuilderInstance({ body });
@@ -231,7 +231,7 @@ describe('builders / base', () => {
 
     it('should throw error when instance.body.boundary is nil', () => {
       let body = getDefaultBody();
-      body.boundary = null;
+      body.boundary = undefined;
       let expected = HttpZError.get('body.boundary is required');
 
       let builder = getBuilderInstance({ body });
@@ -302,7 +302,7 @@ describe('builders / base', () => {
 
     it('should throw error when instance.body.formDataParams is nil', () => {
       let body = getDefaultBody();
-      body.formDataParams = null;
+      body.formDataParams = undefined;
       let expected = HttpZError.get('body.formDataParams is required');
 
       let builder = getBuilderInstance({ body });
@@ -358,7 +358,7 @@ describe('builders / base', () => {
 
     it('should throw error when instance.body.json is nil', () => {
       let body = getDefaultBody();
-      body.json = null;
+      body.json = undefined;
       let expected = HttpZError.get('body.json is required');
 
       let builder = getBuilderInstance({ body });
@@ -394,9 +394,8 @@ describe('builders / base', () => {
 
     it('should throw error when instance.body.plain is nil', () => {
       let body = getDefaultBody();
-      body.plain = null;
+      body.plain = undefined;
       let expected = HttpZError.get('body.plain is required');
-
 
       let builder = getBuilderInstance({ body });
       should(builder._generatePlainBody.bind(builder)).throw(HttpZError, expected);

@@ -153,11 +153,11 @@ describe('parsers / response', () => {
       });
     });
 
-    it('should set instance.cookies to null when cookieRows is an empty array', () => {
+    it('should set instance.cookies to undefined when cookieRows is an empty array', () => {
       let parser = getParserInstance();
       parser.cookieRows = [];
 
-      let expected = null;
+      let expected = undefined;
       parser._parseCookieRows();
       should(parser.cookies).eql(expected);
     });
@@ -167,8 +167,8 @@ describe('parsers / response', () => {
       parser.cookieRows = getDefaultCookies();
 
       let expected = [
-        { name: 'csrftoken', value: '123abc', params: null },
-        { name: 'sessionid', value: null, params: ['Domain=example.com', 'Path=/'] },
+        { name: 'csrftoken', value: '123abc' },
+        { name: 'sessionid', params: ['Domain=example.com', 'Path=/'] },
         { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
       ];
       parser._parseCookieRows();
@@ -177,6 +177,21 @@ describe('parsers / response', () => {
   });
 
   describe('_generateModel', () => {
+    it('should generate response model using instance fields when some fields are undefined', () => {
+      let parser = getParserInstance();
+      parser.protocolVersion = 'protocolVersion';
+      parser.statusCode = 'statusCode';
+      parser.statusMessage = 'statusMessage';
+
+      let expected = {
+        protocolVersion: 'protocolVersion',
+        statusCode: 'statusCode',
+        statusMessage: 'statusMessage'
+      };
+      let actual = parser._generateModel();
+      should(actual).eql(expected);
+    });
+
     it('should generate response model using instance fields', () => {
       let parser = getParserInstance();
       parser.protocolVersion = 'protocolVersion';
@@ -212,9 +227,7 @@ describe('parsers / response', () => {
         protocolVersion: 'HTTP/1.1',
         statusCode: 204,
         statusMessage: 'No content',
-        headers: [],
-        cookies: null,
-        body: null
+        headers: []
       };
 
       let parser = getParserInstance(plainResponse, eol);
@@ -246,7 +259,7 @@ describe('parsers / response', () => {
           {
             name: 'Cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
@@ -258,13 +271,11 @@ describe('parsers / response', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           }
-        ],
-        cookies: null,
-        body: null
+        ]
       };
 
       let parser = getParserInstance(plainResponse, eol);
@@ -299,7 +310,7 @@ describe('parsers / response', () => {
           {
             name: 'Cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
@@ -311,17 +322,16 @@ describe('parsers / response', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           }
         ],
         cookies: [
-          { name: 'csrftoken', value: '123abc', params: null },
+          { name: 'csrftoken', value: '123abc' },
           { name: 'sessionid', value: '456def', params: ['Domain=example.com', 'Path=/'] },
           { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
-        ],
-        body: null
+        ]
       };
 
       let parser = getParserInstance(plainResponse, eol);
@@ -350,13 +360,13 @@ describe('parsers / response', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
@@ -368,18 +378,17 @@ describe('parsers / response', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'text/plain',
           plain: 'Plain text'
@@ -412,13 +421,13 @@ describe('parsers / response', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
@@ -430,18 +439,17 @@ describe('parsers / response', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'application/json',
           json: { p1: 'v1', p2: 'v2' }

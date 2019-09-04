@@ -64,7 +64,7 @@ describe('builders / request', () => {
 
   describe('_generateStartRow', () => {
     it('should throw error when method is not defined', () => {
-      let builder = getBuilderInstance({ method: null });
+      let builder = getBuilderInstance({ method: undefined });
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'method is required'
@@ -72,7 +72,7 @@ describe('builders / request', () => {
     });
 
     it('should throw error when protocol is not defined', () => {
-      let builder = getBuilderInstance({ protocol: null });
+      let builder = getBuilderInstance({ protocol: undefined });
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'protocol is required'
@@ -80,7 +80,7 @@ describe('builders / request', () => {
     });
 
     it('should throw error when protocolVersion is not defined', () => {
-      let builder = getBuilderInstance({ protocolVersion: null });
+      let builder = getBuilderInstance({ protocolVersion: undefined });
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'protocolVersion is required'
@@ -88,7 +88,7 @@ describe('builders / request', () => {
     });
 
     it('should throw error when host is not defined', () => {
-      let builder = getBuilderInstance({ host: null });
+      let builder = getBuilderInstance({ host: undefined });
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'host is required'
@@ -96,7 +96,7 @@ describe('builders / request', () => {
     });
 
     it('should throw error when path is not defined', () => {
-      let builder = getBuilderInstance({ path: null });
+      let builder = getBuilderInstance({ path: undefined });
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'path is required'
@@ -124,7 +124,7 @@ describe('builders / request', () => {
 
   describe('_generateCookiesRow', () => {
     it('should return empty string when instance.cookies is nil', () => {
-      let builder = getBuilderInstance({ cookies: null });
+      let builder = getBuilderInstance({ cookies: undefined });
 
       let expected = '';
       let actual = builder._generateCookiesRow();
@@ -188,8 +188,7 @@ describe('builders / request', () => {
           { name: 'p1', value: 'v1' },
           { name: 'p2' }
         ],
-        headers: [],
-        body: null
+        headers: []
       };
 
       let plainRequest = [
@@ -219,24 +218,23 @@ describe('builders / request', () => {
           {
             name: 'accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'cache-Control',
             values: [
-              { value: 'no-cache', params: null }
+              { value: 'no-cache' }
             ]
           },
           {
             name: 'content-encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           }
-        ],
-        body: null
+        ]
       };
 
       let plainRequest = [
@@ -269,20 +267,20 @@ describe('builders / request', () => {
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -292,9 +290,8 @@ describe('builders / request', () => {
         cookies: [
           { name: 'csrftoken', value: '123abc' },
           { name: 'sessionid', value: '456def' },
-          { name: 'username' },
-        ],
-        body: null
+          { name: 'username' }
+        ]
       };
 
       let plainRequest = [
@@ -324,26 +321,26 @@ describe('builders / request', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -358,18 +355,17 @@ describe('builders / request', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'text/plain',
           plain: 'Plain text'
@@ -406,26 +402,26 @@ describe('builders / request', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -440,18 +436,17 @@ describe('builders / request', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'application/json',
           json: { p1: 'v1', p2: 'v2' }
@@ -488,26 +483,26 @@ describe('builders / request', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -522,18 +517,17 @@ describe('builders / request', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'application/x-www-form-urlencoded',
           formDataParams: [
@@ -574,26 +568,26 @@ describe('builders / request', () => {
           {
             name: 'Connection',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: 'keep-alive' }
             ]
           },
           {
             name: 'Accept',
             values: [
-              { value: '*/*', params: null }
+              { value: '*/*' }
             ]
           },
           {
             name: 'Accept-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Accept-Language',
             values: [
-              { value: 'ru-RU', params: null },
+              { value: 'ru-RU' },
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
@@ -608,18 +602,17 @@ describe('builders / request', () => {
           {
             name: 'Content-Encoding',
             values: [
-              { value: 'gzip', params: null },
-              { value: 'deflate', params: null }
+              { value: 'gzip' },
+              { value: 'deflate' }
             ]
           },
           {
             name: 'Content-Length',
             values: [
-              { value: '301', params: null }
+              { value: '301' }
             ]
           }
         ],
-        cookies: null,
         body: {
           contentType: 'multipart/form-data',
           boundary: '11136253119209',

@@ -19,7 +19,7 @@ class HttpZBaseParser {
       let regexp = new RegExp(this.eol + '+$', 'g');
       if (regexp.test(this.plainMessage)) {
         headers = this.plainMessage.replace(regexp, '');
-        body = null;
+        body = undefined;
       } else {
         throw HttpZError.get(
           'Incorrect message format, it must have headers and body, separated by empty line'
@@ -47,17 +47,19 @@ class HttpZBaseParser {
         valuesWithParams = [];
       } else if (_.toLower(name) === 'user-agent') { // use 'user-agent' as is
         valuesWithParams = [{
-          value: values,
-          params: null
+          value: values
         }];
       } else {
         values = _.split(values, ',');
         valuesWithParams = _.map(values, (value) => {
           let valueAndParams = _.split(value, ';');
-          return {
-            value: _.trim(valueAndParams[0]),
-            params: valueAndParams.length > 1 ? _.trim(valueAndParams[1]) : null
+          let res = {
+            value: _.trim(valueAndParams[0])
           };
+          if (valueAndParams.length > 1) {
+            res.params = _.trim(valueAndParams[1]);
+          }
+          return res;
         });
       }
 
@@ -70,7 +72,6 @@ class HttpZBaseParser {
 
   _parseBodyRows() {
     if (!this.bodyRows) {
-      this.body = null;
       return;
     }
 
@@ -148,7 +149,7 @@ class HttpZBaseParser {
   _getContentType() {
     let contentTypeHeader = _.find(this.headers, { name: consts.http.headers.contentType });
     if (!contentTypeHeader) {
-      return null;
+      return;
     }
     return contentTypeHeader.values[0];
   }
