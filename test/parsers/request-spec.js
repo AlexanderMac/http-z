@@ -305,7 +305,7 @@ describe('parsers / request', () => {
     it('should parse request without headers and body', () => {
       let eol = '\n';
       let plainRequest = [
-        'get /features?p1=v1 http/1.1',
+        'get /features?p1=v1&p2= http/1.1',
         'host: www.example.com',
         '',
         ''
@@ -318,7 +318,8 @@ describe('parsers / request', () => {
         host: 'www.example.com',
         path: '/features',
         queryParams: [
-          { name: 'p1', value: 'v1' }
+          { name: 'p1', value: 'v1' },
+          { name: 'p2', value: '' },
         ],
         headers: [],
         cookies: null,
@@ -335,7 +336,7 @@ describe('parsers / request', () => {
       let plainRequest = [
         'get /features http/1.1',
         'host: example.com',
-        'connection: keep-alive',
+        'connection: ',
         'accept: */*',
         'accept-Encoding: gzip,deflate',
         'accept-language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
@@ -354,9 +355,7 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive', params: null }
-            ]
+            values: []
           },
           {
             name: 'Accept',
@@ -401,11 +400,11 @@ describe('parsers / request', () => {
       let plainRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
-        'Connection: keep-alive',
+        'Connection: ',
         'Accept: */*',
         'Accept-Encoding: gzip,deflate',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-        'Cookie: csrftoken=123abc;sessionid=456def',
+        'Cookie: csrftoken=123abc;sessionid=456def;userid=',
         '',
         ''
       ].join(eol);
@@ -420,9 +419,7 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive', params: null }
-            ]
+            values: []
           },
           {
             name: 'Accept',
@@ -449,7 +446,8 @@ describe('parsers / request', () => {
         ],
         cookies: [
           { name: 'csrftoken', value: '123abc' },
-          { name: 'sessionid', value: '456def' }
+          { name: 'sessionid', value: '456def' },
+          { name: 'userid', value: null },
         ],
         body: null
       };
@@ -640,7 +638,7 @@ describe('parsers / request', () => {
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        'id=11&message=Hello'
+        'firstName=John&lastName=&age=25'
       ].join(eol);
 
       let requestModel = {
@@ -703,8 +701,9 @@ describe('parsers / request', () => {
         body: {
           contentType: 'application/x-www-form-urlencoded',
           formDataParams: [
-            { name: 'id', value: '11' },
-            { name: 'message', value: 'Hello' }
+            { name: 'firstName', value: 'John' },
+            { name: 'lastName', value: '' },
+            { name: 'age', value: '25' }
           ]
         }
       };
@@ -728,11 +727,15 @@ describe('parsers / request', () => {
         'Content-Length: 301',
         '',
         '--11136253119209',
-        'Content-Disposition: form-data; name="Name"',
+        'Content-Disposition: form-data; name="firstName"',
         '',
-        'Smith',
+        'John',
         '--11136253119209',
-        'Content-Disposition: form-data; name="Age"',
+        'Content-Disposition: form-data; name="lastName"',
+        '',
+        '',
+        '--11136253119209',
+        'Content-Disposition: form-data; name="age"',
         '',
         '25',
         '--11136253119209--'
@@ -799,8 +802,9 @@ describe('parsers / request', () => {
           contentType: 'multipart/form-data',
           boundary: '11136253119209',
           formDataParams: [
-            { name: 'Name', value: 'Smith' },
-            { name: 'Age', value: '25' }
+            { name: 'firstName', value: 'John' },
+            { name: 'lastName', value: '' },
+            { name: 'age', value: '25' }
           ]
         }
       };

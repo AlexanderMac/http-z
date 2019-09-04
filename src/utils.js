@@ -36,7 +36,9 @@ exports.parseUrl = (url) => {
 exports.generateRelativeUrl = ({ path, queryParams }) => {
   let queryParamsStr = '';
   if (!_.isEmpty(queryParams)) {
-    let searchParams = _.map(queryParams, ({ name, value }) => [name, value]);
+    let searchParams = _.map(queryParams, ({ name, value }) => {
+      return [name, exports.getEmptyStringForUndefined(value)];
+    });
     let urlSPs = new URLSearchParams(searchParams);
     queryParamsStr = '?' + urlSPs.toString();
   }
@@ -77,4 +79,12 @@ exports.getBoundary = (contentType) => {
   }
 
   return boundaryValue;
+};
+
+// TODO: test it
+exports.getEmptyStringForUndefined = (val) => {
+  if (_.isUndefined(val)) {
+    return '';
+  }
+  return val;
 };

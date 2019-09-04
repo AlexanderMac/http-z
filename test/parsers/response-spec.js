@@ -226,7 +226,7 @@ describe('parsers / response', () => {
       let eol = '\r\n';
       let plainResponse = [
         'http/1.1 201 Created',
-        'connection: keep-alive',
+        'connection: ',
         'cache-Control: no-cache',
         'Content-type: text/plain; charset=UTF-8',
         'content-encoding: gzip,deflate',
@@ -241,9 +241,7 @@ describe('parsers / response', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive', params: null }
-            ]
+            values: []
           },
           {
             name: 'Cache-Control',
@@ -278,7 +276,7 @@ describe('parsers / response', () => {
       let eol = '\n';
       let plainResponse = [
         'http/1.1 201 Created',
-        'Connection: keep-alive',
+        'Connection: ',
         'Cache-Control: no-cache',
         'Content-Type: text/plain; charset=UTF-8',
         'Content-Encoding: gzip,deflate',
@@ -296,9 +294,7 @@ describe('parsers / response', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive', params: null }
-            ]
+            values: []
           },
           {
             name: 'Cache-Control',

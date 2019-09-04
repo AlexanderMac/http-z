@@ -171,9 +171,7 @@ describe('builders / response', () => {
         headers: [
           {
             name: 'connection',
-            values: [
-              { value: 'keep-alive', params: null }
-            ]
+            values: []
           },
           {
             name: 'cache-Control',
@@ -200,7 +198,7 @@ describe('builders / response', () => {
 
       let plainResponse = [
         'HTTP/1.1 201 Created',
-        'Connection: keep-alive',
+        'Connection: ',
         'Cache-Control: no-cache',
         'Content-Type: text/plain;charset=UTF-8',
         'Content-Encoding: gzip, deflate',
@@ -220,9 +218,7 @@ describe('builders / response', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive', params: null }
-            ]
+            values: []
           },
           {
             name: 'Cache-Control',
@@ -247,20 +243,22 @@ describe('builders / response', () => {
         cookies: [
           { name: 'csrftoken', value: '123abc', params: null },
           { name: 'sessionid', value: '456def', params: ['Domain=example.com', 'Path=/'] },
-          { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
+          { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] },
+          { name: 'date' }
         ],
         body: null
       };
 
       let plainResponse = [
         'HTTP/1.1 201 Created',
-        'Connection: keep-alive',
+        'Connection: ',
         'Cache-Control: no-cache',
         'Content-Type: text/plain;charset=UTF-8',
         'Content-Encoding: gzip, deflate',
         'Set-Cookie: csrftoken=123abc',
         'Set-Cookie: sessionid=456def; Domain=example.com; Path=/',
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
+        'Set-Cookie: date=',
         ''
       ].join('\n');
 

@@ -166,7 +166,7 @@ describe('builders / request', () => {
         cookies: [
           { name: 'c1', value: 'v1' },
           { name: 'c2', value: 'v2' },
-          { name: 'c3', value: null }
+          { name: 'c3' }
         ]
       });
 
@@ -185,14 +185,15 @@ describe('builders / request', () => {
         host: 'example.com',
         path: '/features',
         queryParams: [
-          { name: 'p1', value: 'v1' }
+          { name: 'p1', value: 'v1' },
+          { name: 'p2' }
         ],
         headers: [],
         body: null
       };
 
       let plainRequest = [
-        'GET /features?p1=v1 HTTP/1.1',
+        'GET /features?p1=v1&p2= HTTP/1.1',
         'Host: example.com',
         '',
         ''
@@ -213,20 +214,18 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'connection',
+            values: []
+          },
+          {
+            name: 'accept',
             values: [
-              { value: 'keep-alive', params: null }
+              { value: '*/*', params: null }
             ]
           },
           {
             name: 'cache-Control',
             values: [
               { value: 'no-cache', params: null }
-            ]
-          },
-          {
-            name: 'Content-type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
             ]
           },
           {
@@ -243,9 +242,9 @@ describe('builders / request', () => {
       let plainRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
-        'Connection: keep-alive',
+        'Connection: ',
+        'Accept: */*',
         'Cache-Control: no-cache',
-        'Content-Type: text/plain;charset=UTF-8',
         'Content-Encoding: gzip, deflate',
         ''
       ].join('\n');
@@ -265,9 +264,7 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive', params: null }
-            ]
+            values: []
           },
           {
             name: 'Accept',
@@ -294,7 +291,8 @@ describe('builders / request', () => {
         ],
         cookies: [
           { name: 'csrftoken', value: '123abc' },
-          { name: 'sessionid', value: '456def' }
+          { name: 'sessionid', value: '456def' },
+          { name: 'username' },
         ],
         body: null
       };
@@ -302,11 +300,11 @@ describe('builders / request', () => {
       let plainRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
-        'Connection: keep-alive',
+        'Connection: ',
         'Accept: */*',
         'Accept-Encoding: gzip, deflate',
         'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Cookie: csrftoken=123abc; sessionid=456def',
+        'Cookie: csrftoken=123abc; sessionid=456def; username=',
         ''
       ].join('\n');
 
@@ -539,8 +537,9 @@ describe('builders / request', () => {
         body: {
           contentType: 'application/x-www-form-urlencoded',
           formDataParams: [
-            { name: 'id', value: '11' },
-            { name: 'message', value: 'Hello' }
+            { name: 'firstName', value: 'John' },
+            { name: 'lastName' },
+            { name: 'age', value: 25 }
           ]
         }
       };
@@ -556,7 +555,7 @@ describe('builders / request', () => {
         'Content-Encoding: gzip, deflate',
         'Content-Length: 301',
         '',
-        'id=11&message=Hello'
+        'firstName=John&lastName=&age=25'
       ].join('\n');
 
       let builder = getBuilderInstance(requestModel);
@@ -625,8 +624,9 @@ describe('builders / request', () => {
           contentType: 'multipart/form-data',
           boundary: '11136253119209',
           formDataParams: [
-            { name: 'Name', value: 'Smith' },
-            { name: 'Age', value: '25' }
+            { name: 'firstName', value: 'John' },
+            { name: 'lastName' },
+            { name: 'age', value: 25 }
           ]
         }
       };
@@ -643,11 +643,15 @@ describe('builders / request', () => {
         'Content-Length: 301',
         '',
         '--11136253119209',
-        'Content-Disposition: form-data; name="Name"',
+        'Content-Disposition: form-data; name="firstName"',
         '',
-        'Smith',
+        'John',
         '--11136253119209',
-        'Content-Disposition: form-data; name="Age"',
+        'Content-Disposition: form-data; name="lastName"',
+        '',
+        '',
+        '--11136253119209',
+        'Content-Disposition: form-data; name="age"',
         '',
         '25',
         '--11136253119209--'

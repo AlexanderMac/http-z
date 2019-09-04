@@ -108,38 +108,11 @@ describe('parsers / base', () => {
       });
     });
 
-    it('should throw error when header values have invalid format (case 1)', () => {
-      let parser = getParserInstance();
-      parser.headerRows = [
-        'Header1: value1, value2',
-        'Header2: ',
-        'Header3: value',
-      ];
-
-      should(parser._parseHeaderRows.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect header row format, expected: Name: Values',
-        details: 'Header2: '
-      });
-    });
-
-    it('should throw error when header values have invalid format (case 2)', () => {
-      let parser = getParserInstance();
-      parser.headerRows = [
-        'Header1: value1, value2',
-        'Header2: value1, ',
-        'Header3: value',
-      ];
-
-      should(parser._parseHeaderRows.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect header values format, expected: Value1, Value2, ...',
-        details: 'Header2: value1, '
-      });
-    });
-
     it('should set instance.headers when headerRows are valid', () => {
       let parser = getParserInstance();
       parser.headerRows = [
-        'connection: keep-alive',
+        'Connection: ',
+        'Accept: */*, text/plain',
         'accept-Encoding: gzip, deflate   ',
         'Accept-language: ru-RU, ru; q=0.8,en-US;q=0.6,en;  q=0.4'
       ];
@@ -148,8 +121,13 @@ describe('parsers / base', () => {
       let expected = [
         {
           name: 'Connection',
+          values: []
+        },
+        {
+          name: 'Accept',
           values: [
-            { value: 'keep-alive', params: null }
+            { value: '*/*', params: null },
+            { value: 'text/plain', params: null }
           ]
         },
         {
@@ -294,7 +272,7 @@ describe('parsers / base', () => {
         '--11136253119209',
         'Content-Disposition: form-data; name="age"',
         '',
-        '25',
+        '',
         '--11136253119209--'
       ].join(eol);
 
@@ -304,7 +282,7 @@ describe('parsers / base', () => {
         boundary: '11136253119209',
         formDataParams: [
           { name: 'firstName', value: 'John' },
-          { name: 'age', value: '25' }
+          { name: 'age', value: '' }
         ]
       };
       should(parser.body).eql(expected);
@@ -325,14 +303,15 @@ describe('parsers / base', () => {
     it('should set instance.body when all params in body are valid', () => {
       let parser = getParserInstance();
       parser.body = {};
-      parser.bodyRows = 'firstName=John&lastName=Smith=25';
+      parser.bodyRows = 'firstName=John&lastName=Smith&age=';
 
       parser._parseXwwwFormUrlencodedBody();
 
       let expected = {
         formDataParams: [
           { name: 'firstName', value: 'John' },
-          { name: 'lastName', value: 'Smith=25' }
+          { name: 'lastName', value: 'Smith' },
+          { name: 'age', value: '' }
         ]
       };
       should(parser.body).eql(expected);

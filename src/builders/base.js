@@ -17,7 +17,7 @@ class HttpZBaseBuilder {
     let headerRowsStr = _.chain(this.headers)
       .map((header, index) => {
         validators.validateRequired(header.name, 'header name', `header index: ${index}`);
-        validators.validateNotEmptyArray(header.values, 'header.values', `header index: ${index}`);
+        validators.validateArray(header.values, 'header.values', `header index: ${index}`);
 
         let headerValues = _.chain(header.values)
           .map(headerVal => {
@@ -61,14 +61,13 @@ class HttpZBaseBuilder {
 
     let formDataParamsStr = _.map(this.body.formDataParams, (dataParam, index) => {
       validators.validateNotEmptyString(dataParam.name, 'body.formDataParams[index].name', `dataParam index: ${index}`);
-      validators.validateNotEmptyString(dataParam.value, 'body.formDataParams[index].value', `dataParam index: ${index}`);
       return [
         '--' + this.body.boundary,
         '\n',
         `Content-Disposition: form-data; name="${dataParam.name}"`,
         '\n',
         '\n',
-        dataParam.value,
+        utils.getEmptyStringForUndefined(dataParam.value),
         '\n'
       ].join('');
     }).join('');
@@ -81,8 +80,7 @@ class HttpZBaseBuilder {
 
     let formDataParamsStr = _.map(this.body.formDataParams, (dataParam, index) => {
       validators.validateNotEmptyString(dataParam.name, 'body.formDataParams[index].name', `dataParam index: ${index}`);
-      validators.validateNotEmptyString(dataParam.value, 'body.formDataParams[index].value', `dataParam index: ${index}`);
-      return dataParam.name + '=' + dataParam.value;
+      return dataParam.name + '=' + utils.getEmptyStringForUndefined(dataParam.value);
     }).join('&');
 
     return formDataParamsStr;

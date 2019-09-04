@@ -17,9 +17,7 @@ describe('builders / base', () => {
       return [
         {
           name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
+          values: []
         },
         {
           name: 'Accept',
@@ -88,24 +86,6 @@ describe('builders / base', () => {
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.headers contains header with empty values array', () => {
-      let headers = getDefaultHeaders();
-      headers[2].values = [];
-      let expected = HttpZError.get('header.values must be not empty array', 'header index: 2');
-
-      let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
-    });
-
-    it('should throw error when instance.headers.values contains empty value', () => {
-      let headers = getDefaultHeaders();
-      headers[3].values[0] = {};
-      let expected = HttpZError.get('header.values.value is required', 'header index: 3');
-
-      let builder = getBuilderInstance({ headers });
-      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
-    });
-
     it('should return \n when instance.headers is an empty array', () => {
       let headers = [];
       let expected = '\n';
@@ -118,7 +98,7 @@ describe('builders / base', () => {
     it('should return headerRows when instance.headers is non empty array', () => {
       let headers = getDefaultHeaders();
       let expected = [
-        'Connection: keep-alive',
+        'Connection: ',
         'Accept: */*, text/plain',
         'Accept-Encoding: gzip, deflate',
         'Accept-Language: en-US;q=0.6, en;q=0.4',
@@ -214,8 +194,9 @@ describe('builders / base', () => {
     function getDefaultBody() {
       return {
         formDataParams: [
-          { name: 'name', value: 'Smith' },
-          { name: 'age', value: '25' }
+          { name: 'firstName', value: 'John' },
+          { name: 'lastName', value: 'Smith' },
+          { name: 'age', value: '' }
         ],
         boundary: '11136253119209'
       };
@@ -284,26 +265,21 @@ describe('builders / base', () => {
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.body.formDataParams contains param with empty value', () => {
-      let body = getDefaultBody();
-      body.formDataParams[1].value = '';
-      let expected = HttpZError.get('body.formDataParams[index].value must be not empty string', 'dataParam index: 1');
-
-      let builder = getBuilderInstance({ body });
-      should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
-    });
-
     it('should return BodyRows when instance.body is not empty and valid', () => {
       let body = getDefaultBody();
       let expected = [
         '--11136253119209',
-        'Content-Disposition: form-data; name="name"',
+        'Content-Disposition: form-data; name="firstName"',
+        '',
+        'John',
+        '--11136253119209',
+        'Content-Disposition: form-data; name="lastName"',
         '',
         'Smith',
         '--11136253119209',
         'Content-Disposition: form-data; name="age"',
         '',
-        '25',
+        '',
         '--11136253119209--'
       ].join('\n');
 
@@ -317,8 +293,9 @@ describe('builders / base', () => {
     function getDefaultBody() {
       return {
         formDataParams: [
-          { name: 'name', value: 'Smith' },
-          { name: 'age', value: '25' }
+          { name: 'firstName', value: 'John' },
+          { name: 'lastName', value: 'Smith' },
+          { name: 'age', value: '' }
         ]
       };
     }
@@ -359,18 +336,9 @@ describe('builders / base', () => {
       should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.body.formDataParams contains param with empty value', () => {
-      let body = getDefaultBody();
-      body.formDataParams[1].value = '';
-      let expected = HttpZError.get('body.formDataParams[index].value must be not empty string', 'dataParam index: 1');
-
-      let builder = getBuilderInstance({ body });
-      should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
-    });
-
     it('should return BodyRows when instance.body is not empty and valid', () => {
       let body = getDefaultBody();
-      let expected = 'name=Smith&age=25';
+      let expected = 'firstName=John&lastName=Smith&age=';
 
       let builder = getBuilderInstance({ body });
       let actual = builder._generateXwwwFormUrlencodedBody();

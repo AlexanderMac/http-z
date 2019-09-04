@@ -38,21 +38,21 @@ class HttpZBaseParser {
   _parseHeaderRows() {
     this.headers = _.map(this.headerRows, hRow => {
       let [name, values] = utils.splitIntoTwoParts(hRow, ':');
-      if (!name || !values) {
+      if (!name) {
         throw HttpZError.get('Incorrect header row format, expected: Name: Values', hRow);
       }
-      let valuesAndParams;
-      if (_.toLower(name) === 'user-agent') { // use 'user-agent' as is
-        valuesAndParams = [{
+
+      let valuesWithParams;
+      if (_.isNil(values) || values === '') {
+        valuesWithParams = [];
+      } else if (_.toLower(name) === 'user-agent') { // use 'user-agent' as is
+        valuesWithParams = [{
           value: values,
           params: null
         }];
       } else {
         values = _.split(values, ',');
-        if (values.length === 0 || _.some(values, val => _.isEmpty(val))) {
-          throw HttpZError.get('Incorrect header values format, expected: Value1, Value2, ...', hRow);
-        }
-        valuesAndParams = _.map(values, (value) => {
+        valuesWithParams = _.map(values, (value) => {
           let valueAndParams = _.split(value, ';');
           return {
             value: _.trim(valueAndParams[0]),
@@ -63,7 +63,7 @@ class HttpZBaseParser {
 
       return {
         name: utils.getHeaderName(name),
-        values: valuesAndParams
+        values: valuesWithParams
       };
     });
   }

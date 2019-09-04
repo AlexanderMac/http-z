@@ -16,7 +16,7 @@ const regexps = {
   requestStartRow: new RegExp('^' + RegExpStrings.method + ' ' + RegExpStrings.path + ' ' + RegExpStrings.protocolVer + '$', 'i'),
   responseStartRow: new RegExp('^' + RegExpStrings.protocolVer + ' ' + '\\d{3}' + ' ' + '\\w+( \\w+)*$'  + '$', 'i'),
   boundary: /boundary=\w+/im,
-  param: /Content-Disposition:\s+form-data;\s+name="\w+"\n\n/im, // TODO: use eol from paran
+  param: /Content-Disposition:\s+form-data;\s+name="\w+"\n\n/im, // TODO: use real eol
   paramName: /name="\w+"/im,
   quote: /"/g
 };
