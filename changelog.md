@@ -1,3 +1,7 @@
+# <sub>v0.11.1.</sub>
+#### _Oct_. 30, 2019_
+  * Fix regexp for boundary.
+
 # <sub>v0.11.0.</sub>
 #### _Sep_. 4, 2019_
   * Allow empty values for queryParams, headers.
