@@ -38,11 +38,11 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "eslint": "^6.3.0",
-    "mocha": "^6.2.0",
+    "eslint": "^6.6.0",
+    "mocha": "^6.2.2",
     "n-assert": "^5.0.2",
     "nyc": "^14.1.1",
     "should": "^13.2.3",
-    "sinon": "^7.4.2"
+    "sinon": "^7.5.0"
   }
 }
