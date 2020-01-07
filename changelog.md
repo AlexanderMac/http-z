@@ -1,3 +1,7 @@
+# <sub>v0.11.2.</sub>
+#### _Jan. 7, 2020_
+  * Update packages to the latest versions.
+
 # <sub>v0.11.1.</sub>
 #### _Oct. 30, 2019_
   * Fix regexp for boundary.
