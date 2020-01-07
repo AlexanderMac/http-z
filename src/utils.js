@@ -1,7 +1,5 @@
-'use strict';
-
-const _          = require('lodash');
-const consts     = require('./consts');
+const _ = require('lodash');
+const consts = require('./consts');
 const HttpZError = require('./error');
 
 exports.splitIntoTwoParts = (str, delimiter) => {
@@ -70,7 +68,7 @@ exports.getBoundary = (contentType) => {
     throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentType.params);
   }
 
-  let boundaryValue =  _.trim(boundaryAndValue[1]);
+  let boundaryValue = _.trim(boundaryAndValue[1]);
   if (!boundaryValue) {
     throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentType.params);
   }

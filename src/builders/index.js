@@ -1,7 +1,5 @@
-'use strict';
-
-const HttpZError      = require('../error');
-const RequestBuilder  = require('./request');
+const HttpZError = require('../error');
+const RequestBuilder = require('./request');
 const ResponseBuilder = require('./response');
 
 module.exports = (messageModel) => {

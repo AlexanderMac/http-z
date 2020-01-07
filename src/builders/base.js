@@ -1,8 +1,6 @@
-'use strict';
-
-const _          = require('lodash');
-const consts     = require('../consts');
-const utils      = require('../utils');
+const _ = require('lodash');
+const consts = require('../consts');
+const utils = require('../utils');
 const validators = require('../validators');
 
 class HttpZBaseBuilder {

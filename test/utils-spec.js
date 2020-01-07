@@ -1,7 +1,5 @@
-'use strict';
-
 const should = require('should');
-const utils  = require('../src/utils');
+const utils = require('../src/utils');
 
 describe('utils', () => {
   describe('splitIntoTwoParts', () => {

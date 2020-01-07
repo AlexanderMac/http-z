@@ -1,11 +1,9 @@
-'use strict';
-
-const sinon           = require('sinon');
-const should          = require('should');
-const nassert         = require('n-assert');
-const HttpZError      = require('../../src/error');
-const builder         = require('../../src/builders');
-const RequestBuilder  = require('../../src/builders/request');
+const sinon = require('sinon');
+const should = require('should');
+const nassert = require('n-assert');
+const HttpZError = require('../../src/error');
+const builder = require('../../src/builders');
+const RequestBuilder = require('../../src/builders/request');
 const ResponseBuilder = require('../../src/builders/response');
 
 describe('builders / index', () => {

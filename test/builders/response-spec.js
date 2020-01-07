@@ -1,10 +1,8 @@
-'use strict';
-
-const _               = require('lodash');
-const sinon           = require('sinon');
-const should          = require('should');
-const nassert         = require('n-assert');
-const HttpZError      = require('../../src/error');
+const _ = require('lodash');
+const sinon = require('sinon');
+const should = require('should');
+const nassert = require('n-assert');
+const HttpZError = require('../../src/error');
 const ResponseBuilder = require('../../src/builders/response');
 
 describe('builders / response', () => {
@@ -155,7 +153,7 @@ describe('builders / response', () => {
       let expected = [
         'Set-Cookie: csrftoken=123abc',
         'Set-Cookie: sessionid=; Domain=example.com; Path=/',
-        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
+        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
       ].join('\n') + '\n';
       let actual = builder._generateCookieRows();
       should(actual).eql(expected);

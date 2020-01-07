@@ -1,8 +1,6 @@
-'use strict';
-
-const _          = require('lodash');
+const _ = require('lodash');
 const validators = require('../validators');
-const Base       = require('./base');
+const Base = require('./base');
 
 class HttpZResponseBuilder extends Base {
   static build(model) {

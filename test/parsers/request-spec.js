@@ -1,10 +1,8 @@
-'use strict';
-
-const _             = require('lodash');
-const sinon         = require('sinon');
-const should        = require('should');
-const nassert       = require('n-assert');
-const HttpZError    = require('../../src/error');
+const _ = require('lodash');
+const sinon = require('sinon');
+const should = require('should');
+const nassert = require('n-assert');
+const HttpZError = require('../../src/error');
 const RequestParser = require('../../src/parsers/request');
 
 describe('parsers / request', () => {
@@ -78,7 +76,7 @@ describe('parsers / request', () => {
       should(parser.startRow).eql('start-line');
       should(parser.hostRow).eql('host: somehost');
       should(parser.headerRows).eql(['header1', 'header2', 'header3']);
-      should(parser.cookiesRow).is.undefined;
+      should(parser.cookiesRow).eql(undefined);
       should(parser.bodyRows).eql('body');
     });
 
@@ -338,7 +336,7 @@ describe('parsers / request', () => {
         path: '/features',
         queryParams: [
           { name: 'p1', value: 'v1' },
-          { name: 'p2', value: '' },
+          { name: 'p2', value: '' }
         ],
         headers: []
       };
@@ -462,7 +460,7 @@ describe('parsers / request', () => {
         cookies: [
           { name: 'csrftoken', value: '123abc' },
           { name: 'sessionid', value: '456def' },
-          { name: 'userid' },
+          { name: 'userid' }
         ]
       };
 

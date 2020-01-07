@@ -1,5 +1,3 @@
-'use strict';
-
 const RegExpStrings = {
   method: '(get|post|put|patch|delete)',
   protocol: '(https?|ftp)',
@@ -14,7 +12,7 @@ const regexps = {
   httpProtocolVer: new RegExp(RegExpStrings.protocolVer, 'i'),
   url: new RegExp(RegExpStrings.url, 'i'),
   requestStartRow: new RegExp('^' + RegExpStrings.method + ' ' + RegExpStrings.path + ' ' + RegExpStrings.protocolVer + '$', 'i'),
-  responseStartRow: new RegExp('^' + RegExpStrings.protocolVer + ' ' + '\\d{3}' + ' ' + '\\w+( \\w+)*$'  + '$', 'i'),
+  responseStartRow: new RegExp('^' + RegExpStrings.protocolVer + ' ' + '\\d{3}' + ' ' + '\\w+( \\w+)*$' + '$', 'i'),
   boundary: /boundary=\S+/i,
   param: /Content-Disposition:\s+form-data;\s+name="\S+"\n\n/im, // TODO: use real eol
   paramName: /name="\S+"/im,
@@ -56,7 +54,7 @@ http.contentTypes = {
     html: 'text/html',
     javascript: 'text/javascript',
     plain: 'text/plain',
-    xml: 'text/xml',
+    xml: 'text/xml'
   },
   application: {
     any: 'application/',

@@ -1,11 +1,9 @@
-'use strict';
-
-const sinon          = require('sinon');
-const should         = require('should');
-const nassert        = require('n-assert');
-const HttpZError     = require('../../src/error');
-const parser         = require('../../src/parsers');
-const RequestParser  = require('../../src/parsers/request');
+const sinon = require('sinon');
+const should = require('should');
+const nassert = require('n-assert');
+const HttpZError = require('../../src/error');
+const parser = require('../../src/parsers');
+const RequestParser = require('../../src/parsers/request');
 const ResponseParser = require('../../src/parsers/response');
 
 describe('parsers / index', () => {

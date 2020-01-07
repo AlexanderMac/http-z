@@ -1,10 +1,8 @@
-'use strict';
-
-const _              = require('lodash');
-const sinon          = require('sinon');
-const should         = require('should');
-const nassert        = require('n-assert');
-const HttpZError     = require('../../src/error');
+const _ = require('lodash');
+const sinon = require('sinon');
+const should = require('should');
+const nassert = require('n-assert');
+const HttpZError = require('../../src/error');
 const RequestBuilder = require('../../src/builders/request');
 
 describe('builders / request', () => {

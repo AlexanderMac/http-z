@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = class HttpZError extends Error {
   static get(...params) {
     return new HttpZError(...params);

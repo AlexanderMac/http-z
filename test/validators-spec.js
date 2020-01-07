@@ -1,6 +1,4 @@
-'use strict';
-
-const should     = require('should');
+const should = require('should');
 const HttpZError = require('../src/error');
 const validators = require('../src/validators');
 

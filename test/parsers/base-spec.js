@@ -1,8 +1,6 @@
-'use strict';
-
-const sinon      = require('sinon');
-const should     = require('should');
-const nassert    = require('n-assert');
+const sinon = require('sinon');
+const should = require('should');
+const nassert = require('n-assert');
 const HttpZError = require('../../src/error');
 const BaseParser = require('../../src/parsers/base');
 
@@ -99,7 +97,7 @@ describe('parsers / base', () => {
       parser.headerRows = [
         'Header1: values',
         'Header2 - values',
-        'Header3: values',
+        'Header3: values'
       ];
 
       should(parser._parseHeaderRows.bind(parser)).throw(HttpZError, {

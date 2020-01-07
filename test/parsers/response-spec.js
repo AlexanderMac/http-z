@@ -1,9 +1,7 @@
-'use strict';
-
-const sinon          = require('sinon');
-const should         = require('should');
-const nassert        = require('n-assert');
-const HttpZError     = require('../../src/error');
+const sinon = require('sinon');
+const should = require('should');
+const nassert = require('n-assert');
+const HttpZError = require('../../src/error');
 const ResponseParser = require('../../src/parsers/response');
 
 describe('parsers / response', () => {
@@ -127,7 +125,7 @@ describe('parsers / response', () => {
       return [
         'Set-Cookie: csrftoken=123abc',
         'Set-Cookie: sessionid=; Domain=example.com; Path=/',
-        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
+        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
       ];
     }
 

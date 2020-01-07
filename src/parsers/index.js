@@ -1,9 +1,7 @@
-'use strict';
-
-const _              = require('lodash');
-const consts         = require('../consts');
-const HttpZError     = require('../error');
-const RequestParser  = require('./request');
+const _ = require('lodash');
+const consts = require('../consts');
+const HttpZError = require('../error');
+const RequestParser = require('./request');
 const ResponseParser = require('./response');
 
 module.exports = (plainMessage) => {
