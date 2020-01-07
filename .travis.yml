@@ -16,3 +16,7 @@ notifications:
   email:
     on_success: never # default: change
     on_failure: always # default: always
+
+cache:
+  directories:
+    - node_modules
