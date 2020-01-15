@@ -1,6 +1,10 @@
+# <sub>v0.12.0.</sub>
+#### _Jan. 15, 2020_
+  * Drop support for Node v8.
+
 # <sub>v0.11.2.</sub>
 #### _Jan. 7, 2020_
-  * Update packages to the latest versions.
+  * Drop support for Node v8.
 
 # <sub>v0.11.1.</sub>
 #### _Oct. 30, 2019_
