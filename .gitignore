@@ -10,12 +10,19 @@ npm-debug.log
 coverage
 .nyc_output
 
+# Compiled
+build/Release
+dist
+
 # Dependency directory
 node_modules
 
 # Users Environment Variables
+.lock-wscript
 .vscode
 .idea
 .brackets.json
 .jsbeautifyrc
+tsd.json
+typings
 .nvmrc
