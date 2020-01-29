@@ -26,10 +26,16 @@ class HttpZBaseParser {
     }
 
     let headerRows = _.split(headers, this.eol);
+    let startRow = headerRows[0];
+    headerRows = headerRows.splice(1);
+    let bodyRows = body;
+
+    this._calcSizes(headerRows, bodyRows);
+
     return {
-      startRow: headerRows[0],
-      headerRows: headerRows.splice(1),
-      bodyRows: body
+      startRow,
+      headerRows,
+      bodyRows
     };
   }
 
@@ -98,7 +104,7 @@ class HttpZBaseParser {
   _parseFormDataBody() {
     this.body.boundary = utils.getBoundary(this._getContentType());
 
-    this.body.formDataParams = _.chain(this.bodyRows)
+    this.body.params = _.chain(this.bodyRows)
       .split(`--${this.body.boundary}`)
       .filter((unused, index, params) => index > 0 && index < params.length - 1)
       .map(param => {
@@ -120,7 +126,7 @@ class HttpZBaseParser {
   }
 
   _parseXwwwFormUrlencodedBody() {
-    this.body.formDataParams = _.chain(this.bodyRows)
+    this.body.params = _.chain(this.bodyRows)
       .split('&')
       .map(pair => {
         let [name, value] = utils.splitIntoTwoParts(pair, '=');
@@ -142,6 +148,12 @@ class HttpZBaseParser {
 
   _parsePlainBody() {
     this.body.plain = this.bodyRows;
+  }
+
+  _calcSizes(headerRows, bodyRows) {
+    this.messageSize = this.plainMessage.length;
+    this.headersSize = _.join(headerRows, '').length;
+    this.bodySize = _.join(bodyRows, '').length;
   }
 
   _getContentType() {

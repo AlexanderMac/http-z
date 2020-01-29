@@ -97,7 +97,10 @@ class HttpZRequestParser extends Base {
       protocol: this.protocol,
       protocolVersion: this.protocolVersion,
       host: this.host,
-      path: this.path
+      path: this.path,
+      messageSize: this.messageSize,
+      headersSize: this.headersSize,
+      bodySize: this.bodySize
     };
     if (this.queryParams) {
       model.queryParams = this.queryParams;

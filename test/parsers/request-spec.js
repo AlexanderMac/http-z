@@ -273,6 +273,9 @@ describe('parsers / request', () => {
   describe('_generateModel', () => {
     it('should generate request model using instance fields when some fields are undefined', () => {
       let parser = getParserInstance();
+      parser.messageSize = 100;
+      parser.headersSize = 80;
+      parser.bodySize = 20;
       parser.method = 'method';
       parser.protocol = 'protocol';
       parser.protocolVersion = 'protocolVersion';
@@ -284,7 +287,10 @@ describe('parsers / request', () => {
         protocol: 'protocol',
         protocolVersion: 'protocolVersion',
         path: 'path',
-        host: 'host'
+        host: 'host',
+        messageSize: 100,
+        headersSize: 80,
+        bodySize: 20
       };
       let actual = parser._generateModel();
       should(actual).eql(expected);
@@ -292,6 +298,9 @@ describe('parsers / request', () => {
 
     it('should generate request model using instance fields', () => {
       let parser = getParserInstance();
+      parser.messageSize = 100;
+      parser.headersSize = 80;
+      parser.bodySize = 20;
       parser.method = 'method';
       parser.protocol = 'protocol';
       parser.protocolVersion = 'protocolVersion';
@@ -311,7 +320,11 @@ describe('parsers / request', () => {
         queryParams: 'queryParams',
         headers: 'headers',
         cookies: 'cookies',
-        body: 'body'
+        body: 'body',
+        messageSize: 100,
+        headersSize: 80,
+        bodySize: 20
+
       };
       let actual = parser._generateModel();
       should(actual).eql(expected);
@@ -338,7 +351,10 @@ describe('parsers / request', () => {
           { name: 'p1', value: 'v1' },
           { name: 'p2', value: '' }
         ],
-        headers: []
+        headers: [],
+        messageSize: 56,
+        headersSize: 21,
+        bodySize: 0
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -400,7 +416,10 @@ describe('parsers / request', () => {
               { value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0' }
             ]
           }
-        ]
+        ],
+        messageSize: 249,
+        headersSize: 211,
+        bodySize: 0
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -461,7 +480,10 @@ describe('parsers / request', () => {
           { name: 'csrftoken', value: '123abc' },
           { name: 'sessionid', value: '456def' },
           { name: 'userid' }
-        ]
+        ],
+        messageSize: 200,
+        headersSize: 170,
+        bodySize: 0
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -544,7 +566,10 @@ describe('parsers / request', () => {
         body: {
           contentType: 'text/plain',
           plain: 'Plain text'
-        }
+        },
+        messageSize: 262,
+        headersSize: 219,
+        bodySize: 10
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -627,7 +652,10 @@ describe('parsers / request', () => {
         body: {
           contentType: 'application/json',
           json: { p1: 'v1', p2: 'v2' }
-        }
+        },
+        messageSize: 279,
+        headersSize: 225,
+        bodySize: 21
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -709,12 +737,15 @@ describe('parsers / request', () => {
         ],
         body: {
           contentType: 'application/x-www-form-urlencoded',
-          formDataParams: [
+          params: [
             { name: 'firstName', value: 'John' },
             { name: 'lastName', value: '' },
             { name: 'age', value: '25' }
           ]
-        }
+        },
+        messageSize: 306,
+        headersSize: 242,
+        bodySize: 31
       };
 
       let parser = getParserInstance(plainRequest, eol);
@@ -809,12 +840,15 @@ describe('parsers / request', () => {
         body: {
           contentType: 'multipart/form-data',
           boundary: '11136253119209',
-          formDataParams: [
+          params: [
             { name: 'firstName', value: 'John' },
             { name: 'lastName', value: '' },
             { name: 'age', value: '25' }
           ]
-        }
+        },
+        messageSize: 492,
+        headersSize: 238,
+        bodySize: 221
       };
 
       let parser = getParserInstance(plainRequest, eol);

@@ -152,8 +152,8 @@ describe('parsers / base', () => {
   describe('_parseBodyRows', () => {
     function test({ headers, bodyRows, expected, expectedFnArgs = {}}) {
       let parser = getParserInstance();
-      sinon.stub(parser, '_parseFormDataBody').callsFake(() => parser.body.formDataParams = 'body');
-      sinon.stub(parser, '_parseXwwwFormUrlencodedBody').callsFake(() => parser.body.formDataParams = 'body');
+      sinon.stub(parser, '_parseFormDataBody').callsFake(() => parser.body.params = 'body');
+      sinon.stub(parser, '_parseXwwwFormUrlencodedBody').callsFake(() => parser.body.params = 'body');
       sinon.stub(parser, '_parseJsonBody').callsFake(() => parser.body.json = 'body');
       sinon.stub(parser, '_parsePlainBody').callsFake(() => parser.body.plain = 'body');
       parser.headers = headers;
@@ -180,7 +180,7 @@ describe('parsers / base', () => {
       let bodyRows = 'body';
       let expected = {
         contentType: 'multipart/form-data',
-        formDataParams: 'body'
+        params: 'body'
       };
       let expectedFnArgs = { parseFormDataBody: '_without-args_' };
 
@@ -192,7 +192,7 @@ describe('parsers / base', () => {
       let bodyRows = 'body';
       let expected = {
         contentType: 'application/x-www-form-urlencoded',
-        formDataParams: 'body'
+        params: 'body'
       };
       let expectedFnArgs = { parseXwwwFormUrlencodedBody: '_without-args_' };
 
@@ -278,7 +278,7 @@ describe('parsers / base', () => {
 
       let expected = {
         boundary: '11136253119209',
-        formDataParams: [
+        params: [
           { name: 'firstName', value: 'John' },
           { name: 'age', value: '' }
         ]
@@ -306,7 +306,7 @@ describe('parsers / base', () => {
       parser._parseXwwwFormUrlencodedBody();
 
       let expected = {
-        formDataParams: [
+        params: [
           { name: 'firstName', value: 'John' },
           { name: 'lastName', value: 'Smith' },
           { name: 'age', value: '' }
@@ -352,6 +352,22 @@ describe('parsers / base', () => {
         plain: 'body'
       };
       should(parser.body).eql(expected);
+    });
+  });
+
+  describe('_calcSizes', () => {
+    it('should calc instance.sizes using header and body rows', () => {
+      let parser = getParserInstance('plain message');
+      parser._calcSizes('headers', 'body');
+
+      let expected = {
+        messageSize: 13,
+        headersSize: 7,
+        bodySize: 4
+      };
+      should(parser.messageSize).eql(expected.messageSize);
+      should(parser.headersSize).eql(expected.headersSize);
+      should(parser.bodySize).eql(expected.bodySize);
     });
   });
 

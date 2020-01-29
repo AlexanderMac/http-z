@@ -191,7 +191,7 @@ describe('builders / base', () => {
   describe('_generateFormDataBody', () => {
     function getDefaultBody() {
       return {
-        formDataParams: [
+        params: [
           { name: 'firstName', value: 'John' },
           { name: 'lastName', value: 'Smith' },
           { name: 'age', value: '' }
@@ -200,28 +200,28 @@ describe('builders / base', () => {
       };
     }
 
-    it('should throw error when instance.body.formDataParams is nil', () => {
+    it('should throw error when instance.body.params is nil', () => {
       let body = getDefaultBody();
-      body.formDataParams = undefined;
-      let expected = HttpZError.get('body.formDataParams is required');
+      body.params = undefined;
+      let expected = HttpZError.get('body.params is required');
 
       let builder = getBuilderInstance({ body });
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.body.formDataParams is not array', () => {
+    it('should throw error when instance.body.params is not array', () => {
       let body = getDefaultBody();
-      body.formDataParams = 'params';
-      let expected = HttpZError.get('body.formDataParams must be an array');
+      body.params = 'params';
+      let expected = HttpZError.get('body.params must be an array');
 
       let builder = getBuilderInstance({ body });
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.body.formDataParams is an empty array', () => {
+    it('should throw error when instance.body.params is an empty array', () => {
       let body = getDefaultBody();
-      body.formDataParams = [];
-      let expected = HttpZError.get('body.formDataParams must be not empty array');
+      body.params = [];
+      let expected = HttpZError.get('body.params must be not empty array');
 
       let builder = getBuilderInstance({ body });
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
@@ -254,10 +254,10 @@ describe('builders / base', () => {
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.body.formDataParams contains param with empty name', () => {
+    it('should throw error when instance.body.params contains param with empty name', () => {
       let body = getDefaultBody();
-      body.formDataParams[0].name = '';
-      let expected = HttpZError.get('body.formDataParams[index].name must be not empty string', 'dataParam index: 0');
+      body.params[0].name = '';
+      let expected = HttpZError.get('body.params[index].name must be not empty string', 'dataParam index: 0');
 
       let builder = getBuilderInstance({ body });
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected);
@@ -290,7 +290,7 @@ describe('builders / base', () => {
   describe('_generateXwwwFormUrlencodedBody', () => {
     function getDefaultBody() {
       return {
-        formDataParams: [
+        params: [
           { name: 'firstName', value: 'John' },
           { name: 'lastName', value: 'Smith' },
           { name: 'age', value: '' }
@@ -298,37 +298,37 @@ describe('builders / base', () => {
       };
     }
 
-    it('should throw error when instance.body.formDataParams is nil', () => {
+    it('should throw error when instance.body.params is nil', () => {
       let body = getDefaultBody();
-      body.formDataParams = undefined;
-      let expected = HttpZError.get('body.formDataParams is required');
+      body.params = undefined;
+      let expected = HttpZError.get('body.params is required');
 
       let builder = getBuilderInstance({ body });
       should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.body.formDataParams is not array', () => {
+    it('should throw error when instance.body.params is not array', () => {
       let body = getDefaultBody();
-      body.formDataParams = 'params';
-      let expected = HttpZError.get('body.formDataParams must be an array');
+      body.params = 'params';
+      let expected = HttpZError.get('body.params must be an array');
 
       let builder = getBuilderInstance({ body });
       should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.body.formDataParams is an empty array', () => {
+    it('should throw error when instance.body.params is an empty array', () => {
       let body = getDefaultBody();
-      body.formDataParams = [];
-      let expected = HttpZError.get('body.formDataParams must be not empty array');
+      body.params = [];
+      let expected = HttpZError.get('body.params must be not empty array');
 
       let builder = getBuilderInstance({ body });
       should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should throw error when instance.body.formDataParams contains param with empty name', () => {
+    it('should throw error when instance.body.params contains param with empty name', () => {
       let body = getDefaultBody();
-      body.formDataParams[0].name = '';
-      let expected = HttpZError.get('body.formDataParams[index].name must be not empty string', 'dataParam index: 0');
+      body.params[0].name = '';
+      let expected = HttpZError.get('body.params[index].name must be not empty string', 'dataParam index: 0');
 
       let builder = getBuilderInstance({ body });
       should(builder._generateXwwwFormUrlencodedBody.bind(builder)).throw(HttpZError, expected);

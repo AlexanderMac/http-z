@@ -528,7 +528,7 @@ describe('builders / request', () => {
         ],
         body: {
           contentType: 'application/x-www-form-urlencoded',
-          formDataParams: [
+          params: [
             { name: 'firstName', value: 'John' },
             { name: 'lastName' },
             { name: 'age', value: 25 }
@@ -614,7 +614,7 @@ describe('builders / request', () => {
         body: {
           contentType: 'multipart/form-data',
           boundary: '11136253119209',
-          formDataParams: [
+          params: [
             { name: 'firstName', value: 'John' },
             { name: 'lastName' },
             { name: 'age', value: 25 }

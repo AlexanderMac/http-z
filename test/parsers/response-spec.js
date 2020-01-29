@@ -177,6 +177,9 @@ describe('parsers / response', () => {
   describe('_generateModel', () => {
     it('should generate response model using instance fields when some fields are undefined', () => {
       let parser = getParserInstance();
+      parser.messageSize = 100;
+      parser.headersSize = 80;
+      parser.bodySize = 20;
       parser.protocolVersion = 'protocolVersion';
       parser.statusCode = 'statusCode';
       parser.statusMessage = 'statusMessage';
@@ -184,7 +187,10 @@ describe('parsers / response', () => {
       let expected = {
         protocolVersion: 'protocolVersion',
         statusCode: 'statusCode',
-        statusMessage: 'statusMessage'
+        statusMessage: 'statusMessage',
+        messageSize: 100,
+        headersSize: 80,
+        bodySize: 20
       };
       let actual = parser._generateModel();
       should(actual).eql(expected);
@@ -192,6 +198,9 @@ describe('parsers / response', () => {
 
     it('should generate response model using instance fields', () => {
       let parser = getParserInstance();
+      parser.messageSize = 100;
+      parser.headersSize = 80;
+      parser.bodySize = 20;
       parser.protocolVersion = 'protocolVersion';
       parser.statusCode = 'statusCode';
       parser.statusMessage = 'statusMessage';
@@ -205,7 +214,10 @@ describe('parsers / response', () => {
         statusMessage: 'statusMessage',
         headers: 'headers',
         cookies: 'cookies',
-        body: 'body'
+        body: 'body',
+        messageSize: 100,
+        headersSize: 80,
+        bodySize: 20
       };
       let actual = parser._generateModel();
       should(actual).eql(expected);
@@ -225,7 +237,10 @@ describe('parsers / response', () => {
         protocolVersion: 'HTTP/1.1',
         statusCode: 204,
         statusMessage: 'No content',
-        headers: []
+        headers: [],
+        messageSize: 25,
+        headersSize: 0,
+        bodySize: 0
       };
 
       let parser = getParserInstance(plainResponse, eol);
@@ -273,7 +288,10 @@ describe('parsers / response', () => {
               { value: 'deflate' }
             ]
           }
-        ]
+        ],
+        messageSize: 136,
+        headersSize: 104,
+        bodySize: 0
       };
 
       let parser = getParserInstance(plainResponse, eol);
@@ -329,7 +347,10 @@ describe('parsers / response', () => {
           { name: 'csrftoken', value: '123abc' },
           { name: 'sessionid', value: '456def', params: ['Domain=example.com', 'Path=/'] },
           { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
-        ]
+        ],
+        messageSize: 300,
+        headersSize: 271,
+        bodySize: 0
       };
 
       let parser = getParserInstance(plainResponse, eol);
@@ -390,7 +411,10 @@ describe('parsers / response', () => {
         body: {
           contentType: 'text/plain',
           plain: 'Plain text'
-        }
+        },
+        messageSize: 165,
+        headersSize: 133,
+        bodySize: 10
       };
 
       let parser = getParserInstance(plainResponse, eol);
@@ -451,7 +475,10 @@ describe('parsers / response', () => {
         body: {
           contentType: 'application/json',
           json: { p1: 'v1', p2: 'v2' }
-        }
+        },
+        messageSize: 182,
+        headersSize: 139,
+        bodySize: 21
       };
 
       let parser = getParserInstance(plainResponse, eol);

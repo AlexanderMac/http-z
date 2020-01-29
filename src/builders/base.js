@@ -54,11 +54,11 @@ class HttpZBaseBuilder {
   }
 
   _generateFormDataBody() {
-    validators.validateNotEmptyArray(this.body.formDataParams, 'body.formDataParams');
+    validators.validateNotEmptyArray(this.body.params, 'body.params');
     validators.validateNotEmptyString(this.body.boundary, 'body.boundary');
 
-    let formDataParamsStr = _.map(this.body.formDataParams, (dataParam, index) => {
-      validators.validateNotEmptyString(dataParam.name, 'body.formDataParams[index].name', `dataParam index: ${index}`);
+    let paramsStr = _.map(this.body.params, (dataParam, index) => {
+      validators.validateNotEmptyString(dataParam.name, 'body.params[index].name', `dataParam index: ${index}`);
       return [
         '--' + this.body.boundary,
         '\n',
@@ -70,18 +70,18 @@ class HttpZBaseBuilder {
       ].join('');
     }).join('');
 
-    return `${formDataParamsStr}--${this.body.boundary}--`;
+    return `${paramsStr}--${this.body.boundary}--`;
   }
 
   _generateXwwwFormUrlencodedBody() {
-    validators.validateNotEmptyArray(this.body.formDataParams, 'body.formDataParams');
+    validators.validateNotEmptyArray(this.body.params, 'body.params');
 
-    let formDataParamsStr = _.map(this.body.formDataParams, (dataParam, index) => {
-      validators.validateNotEmptyString(dataParam.name, 'body.formDataParams[index].name', `dataParam index: ${index}`);
+    let paramsStr = _.map(this.body.params, (dataParam, index) => {
+      validators.validateNotEmptyString(dataParam.name, 'body.params[index].name', `dataParam index: ${index}`);
       return dataParam.name + '=' + utils.getEmptyStringForUndefined(dataParam.value);
     }).join('&');
 
-    return formDataParamsStr;
+    return paramsStr;
   }
 
   _generateJsonBody() {

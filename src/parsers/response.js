@@ -79,7 +79,10 @@ class HttpZResponseParser extends Base {
     let model = {
       protocolVersion: this.protocolVersion,
       statusCode: this.statusCode,
-      statusMessage: this.statusMessage
+      statusMessage: this.statusMessage,
+      messageSize: this.messageSize,
+      headersSize: this.headersSize,
+      bodySize: this.bodySize
     };
     if (this.headers) {
       model.headers = this.headers;

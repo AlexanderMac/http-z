@@ -13,7 +13,8 @@
   - body, supported contentTypes:
     - `multipart/form-data`
     - `application/x-www-form-urlencoded`
-    - `application/json`, `text/plain`
+    - `application/json`,
+    - `text/plain`
 * Build HTTP request/response plain message from model:
   - path params
   - headers
@@ -67,7 +68,10 @@ console.log(JSON.stringify(messageModel, null, 2));
       { value: 'en-US', params: 'q=0.6' },
       { value: 'en', params: 'q=0.4' } 
     ]}
-  ]
+  ],
+  messageSize: 129,
+  headersSize: 98,
+  bodySize: 0
 }
 */
 
