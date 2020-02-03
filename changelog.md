@@ -1,3 +1,10 @@
+# <sub>v1.0.0.</sub>
+#### _Feb. 3, 2020_
+  * Add `messageSize`, `headersSize`, `bodySize` to request and response models.
+  * Rename `body.formDataParams` to `body.params`.
+  * Create type definitions file.
+  * Stabilize api.
+
 # <sub>v0.12.0.</sub>
 #### _Jan. 15, 2020_
   * Drop support for Node v8.
