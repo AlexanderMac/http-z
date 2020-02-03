@@ -1,8 +1,8 @@
 const RegExpStrings = {
-  method: '(get|post|put|patch|delete)',
-  protocol: '(https?|ftp)',
-  protocolVer: '(http)\\/(1\\.0|1\\.1|2\\.0)',
-  url: '((https?|ftp)://)*(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?',
+  method: '(get|post|put|patch|delete|options|describe|pause|play|setup|get_parameter|set_parameter|teardown)',
+  protocol: '(https?|ftp|rtsp)',
+  protocolVer: '(http|rtsp)\\/(1\\.0|1\\.1|2\\.0)',
+  url: '((https?|ftp|rtsp)://)*(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?',
   path: '\\/\\S*'
 };
 
@@ -23,13 +23,15 @@ const http = {};
 
 http.protocols = {
   http: 'HTTP',
-  https: 'HTTPS'
+  https: 'HTTPS',
+  rtsp: 'RTSP'
 };
 
 http.protocolVersions = {
   http10: 'HTTP/1.0',
   http11: 'HTTP/1.1',
-  http20: 'HTTP/2.0'
+  http20: 'HTTP/2.0',
+  rtsp10: 'RTSP/1.0'
 };
 
 http.methods = {
@@ -37,7 +39,15 @@ http.methods = {
   post: 'POST',
   put: 'PUT',
   pathch: 'PATCH',
-  delete: 'DELETE'
+  delete: 'DELETE',
+  options: 'OPTIONS',
+  describe: 'DESCRIBE',
+  pause: 'PAUSE',
+  play: 'PLAY',
+  setup: 'SETUP',
+  get_parameter: 'GET_PARAMETER',
+  set_parameter: 'SET_PARAMETER',
+  teardown: 'TEARDOWN'
 };
 
 http.methodsWithBody = [
@@ -63,6 +73,7 @@ http.contentTypes = {
     octetStream: 'application/octet-stream',
     ogg: 'application/ogg',
     pdf: 'application/pdf',
+    sdp: 'application/sdp',
     xhtml: 'application/xhtml+xml',
     xml: 'application/xml',
     xShockwaveFlash: 'application/x-shockwave-flash',
