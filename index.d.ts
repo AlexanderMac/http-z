@@ -1,6 +1,6 @@
-declare class HttpZConsts {}
+export namespace consts {}
 
-declare class HttpZError extends Error {}
+export class HttpZError extends Error {}
 
 declare class HttpZParam {
   name: string;
@@ -10,7 +10,7 @@ declare class HttpZParam {
 declare class HttpZBody {
   contentType: string;
   boundary: string;
-  params: [HttpZParam];
+  params: HttpZParam[];
   json: object;
   plain: string;
 }
@@ -24,9 +24,9 @@ declare class HttpZRequestModel {
   messageSize: number;
   headersSize: number;
   bodySize: number;
-  queryParams?: [HttpZParam];
-  headers?: [HttpZParam];
-  cookies?: [HttpZParam];
+  queryParams?: HttpZParam[];
+  headers?: HttpZParam[];
+  cookies?: HttpZParam[];
   body: HttpZBody;
 }
 
@@ -37,18 +37,11 @@ declare class HttpZResponseModel {
   messageSize: number;
   headersSize: number;
   bodySize: number;
-  headers?: [HttpZParam];
-  cookies?: [HttpZParam];
+  headers?: HttpZParam[];
+  cookies?: HttpZParam[];
   body: HttpZBody;
 }
 
-declare function parse(plainMessage: string): HttpZRequestModel | HttpZResponseModel;
+export function parse(plainMessage: string): HttpZRequestModel | HttpZResponseModel;
 
-declare function build(messageModel: HttpZRequestModel | HttpZResponseModel): string;
-
-export class HttpZ {
-  parse;
-  build;
-  consts: HttpZConsts;
-  HttpZError: HttpZError;
-}
+export function build(messageModel: HttpZRequestModel | HttpZResponseModel): string;
