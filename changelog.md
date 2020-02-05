@@ -1,3 +1,7 @@
+# <sub>v1.0.1.</sub>
+#### _Feb. 5, 2020_
+  * Fix util method for url parsing.
+
 # <sub>v1.0.0.</sub>
 #### _Feb. 3, 2020_
   * Add `messageSize`, `headersSize`, `bodySize` to request and response models.
