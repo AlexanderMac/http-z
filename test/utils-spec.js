@@ -44,6 +44,30 @@ describe('utils', () => {
     });
   });
 
+  describe('parseUrl', () => {
+    function test(url, expected) {
+      let actual = utils.parseUrl(url);
+      should(actual.href).eql(expected.href);
+      should(actual.protocol).eql(expected.protocol);
+    }
+
+    it('should parse url started with http', () => {
+      test('http://example.com', { href: 'http://example.com/', protocol: 'http:' });
+    });
+
+    it('should parse url started with https', () => {
+      test('https://example.com', { href: 'https://example.com/', protocol: 'https:' });
+    });
+
+    it('should parse url started with ftp', () => {
+      test('ftp://example.com', { href: 'ftp://example.com/', protocol: 'ftp:' });
+    });
+
+    it('should add http for url without protocol and parse it', () => {
+      test('example.com', { href: 'http://example.com/', protocol: 'http:' });
+    });
+  });
+
   describe('generateRelativeUrl', () => {
     function test(params, expected) {
       let actual = utils.generateRelativeUrl(params);

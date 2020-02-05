@@ -19,9 +19,9 @@ exports.splitIntoTwoParts = (str, delimiter) => {
   return res;
 };
 
-// TODO: test it
 exports.parseUrl = (url) => {
-  if (!_.startsWith('http://') && !_.startsWith('https://')) {
+  const knownProtocols = ['http', 'https', 'ftp'];
+  if (!_.find(knownProtocols, known => _.startsWith(url, known + '://'))) {
     url = 'http://' + url;
   }
   return new URL(url);
