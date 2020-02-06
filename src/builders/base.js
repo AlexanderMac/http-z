@@ -46,10 +46,8 @@ class HttpZBaseBuilder {
         return '\n' + this._generateFormDataBody();
       case consts.http.contentTypes.application.xWwwFormUrlencoded:
         return '\n' + this._generateXwwwFormUrlencodedBody();
-      case consts.http.contentTypes.application.json:
-        return '\n' + this._generateJsonBody();
       default:
-        return '\n' + this._generatePlainBody();
+        return '\n' + this._generateTextBody();
     }
   }
 
@@ -84,14 +82,9 @@ class HttpZBaseBuilder {
     return paramsStr;
   }
 
-  _generateJsonBody() {
-    validators.validateRequired(this.body.json, 'body.json');
-    return _.isString(this.body.json) ? this.body.json : JSON.stringify(this.body.json);
-  }
-
-  _generatePlainBody() {
-    validators.validateRequired(this.body.plain, 'body.plain');
-    return this.body.plain;
+  _generateTextBody() {
+    validators.validateRequired(this.body.text, 'body.text');
+    return this.body.text;
   }
 }
 

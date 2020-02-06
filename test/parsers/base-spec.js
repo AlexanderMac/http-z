@@ -154,8 +154,7 @@ describe('parsers / base', () => {
       let parser = getParserInstance();
       sinon.stub(parser, '_parseFormDataBody').callsFake(() => parser.body.params = 'body');
       sinon.stub(parser, '_parseXwwwFormUrlencodedBody').callsFake(() => parser.body.params = 'body');
-      sinon.stub(parser, '_parseJsonBody').callsFake(() => parser.body.json = 'body');
-      sinon.stub(parser, '_parsePlainBody').callsFake(() => parser.body.plain = 'body');
+      sinon.stub(parser, '_parseTextBody').callsFake(() => parser.body.text = 'body');
       parser.headers = headers;
       parser.bodyRows = bodyRows;
 
@@ -164,8 +163,7 @@ describe('parsers / base', () => {
 
       nassert.assertFn({ inst: parser, fnName: '_parseFormDataBody', expectedArgs: expectedFnArgs.parseFormDataBody });
       nassert.assertFn({ inst: parser, fnName: '_parseXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.parseXwwwFormUrlencodedBody });
-      nassert.assertFn({ inst: parser, fnName: '_parseJsonBody', expectedArgs: expectedFnArgs.parseJsonBody });
-      nassert.assertFn({ inst: parser, fnName: '_parsePlainBody', expectedArgs: expectedFnArgs.parsePlainBody });
+      nassert.assertFn({ inst: parser, fnName: '_parseTextBody', expectedArgs: expectedFnArgs.parseTextBody });
     }
 
     it('should set instance.body to undefined when bodyRows is empty', () => {
@@ -199,14 +197,14 @@ describe('parsers / base', () => {
       test({ headers, bodyRows, expected, expectedFnArgs });
     });
 
-    it('should set instance.body when bodyRows are valid and contentType header is application/json', () => {
-      let headers = [{ name: 'Content-Type', values: [{ value: 'application/json' }] }];
+    it('should set instance.body when bodyRows are valid and contentType header is text/plain', () => {
+      let headers = [{ name: 'Content-Type', values: [{ value: 'text/plain' }] }];
       let bodyRows = 'body';
       let expected = {
-        contentType: 'application/json',
-        json: 'body'
+        contentType: 'text/plain',
+        text: 'body'
       };
-      let expectedFnArgs = { parseJsonBody: '_without-args_' };
+      let expectedFnArgs = { parseTextBody: '_without-args_' };
 
       test({ headers, bodyRows, expected, expectedFnArgs });
     });
@@ -214,9 +212,9 @@ describe('parsers / base', () => {
     it('should set instance.body when bodyRows are valid and contentType header is missing', () => {
       let bodyRows = 'body';
       let expected = {
-        plain: 'body'
+        text: 'body'
       };
-      let expectedFnArgs = { parsePlainBody: '_without-args_' };
+      let expectedFnArgs = { parseTextBody: '_without-args_' };
 
       test({ bodyRows, expected, expectedFnArgs });
     });
@@ -316,40 +314,16 @@ describe('parsers / base', () => {
     });
   });
 
-  describe('_parseJsonBody', () => {
-    it('should parse body and throw error when json is invalid', () => {
-      let parser = getParserInstance();
-      parser.bodyRows = 'Incorrect json';
-
-      should(parser._parseJsonBody.bind(parser)).throw(HttpZError, {
-        message: 'Invalid json in body'
-      });
-    });
-
-    it('should parse body and set instance.body to parsed object when json is valid', () => {
-      let parser = getParserInstance();
-      parser.body = {};
-      parser.bodyRows = '{"name":"John"}';
-
-      parser._parseJsonBody();
-
-      let expected = {
-        json: { name : 'John' }
-      };
-      should(parser.body).eql(expected);
-    });
-  });
-
-  describe('_parsePlainBody', () => {
+  describe('_parseTextBody', () => {
     it('should set instance.body using bodyRows', () => {
       let parser = getParserInstance();
       parser.body = {};
       parser.bodyRows = 'body';
 
-      parser._parsePlainBody();
+      parser._parseTextBody();
 
       let expected = {
-        plain: 'body'
+        text: 'body'
       };
       should(parser.body).eql(expected);
     });

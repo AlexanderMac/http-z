@@ -504,7 +504,7 @@ describe('parsers / request', () => {
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        'Plain text'
+        'Text data'
       ].join(eol);
 
       let requestModel = {
@@ -565,97 +565,11 @@ describe('parsers / request', () => {
         ],
         body: {
           contentType: 'text/plain',
-          plain: 'Plain text'
+          text: 'Text data'
         },
-        messageSize: 262,
+        messageSize: 261,
         headersSize: 219,
-        bodySize: 10
-      };
-
-      let parser = getParserInstance(plainRequest, eol);
-      let actual = parser.parse();
-      should(actual).eql(requestModel);
-    });
-
-    it('should parse request with body and contentType=application/json', () => {
-      let eol = '\n';
-      let plainRequest = [
-        'POST /features HTTP/1.1',
-        'Host: example.com',
-        'Connection: keep-alive',
-        'Accept: */*',
-        'Accept-Encoding: gzip,deflate',
-        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-        'Content-Type: application/json; charset=UTF-8',
-        'Content-Encoding: gzip,deflate',
-        'Content-Length: 301',
-        '',
-        '{"p1":"v1","p2":"v2"}'
-      ].join(eol);
-
-      let requestModel = {
-        method: 'POST',
-        protocol: 'HTTP',
-        protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
-        queryParams: [],
-        headers: [
-          {
-            name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
-          },
-          {
-            name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
-          },
-          {
-            name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
-          },
-          {
-            name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
-          },
-          {
-            name: 'Content-Type',
-            values: [
-              { value: 'application/json', params: 'charset=UTF-8' }
-            ]
-          },
-          {
-            name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
-          },
-          {
-            name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
-          }
-        ],
-        body: {
-          contentType: 'application/json',
-          json: { p1: 'v1', p2: 'v2' }
-        },
-        messageSize: 279,
-        headersSize: 225,
-        bodySize: 21
+        bodySize: 9
       };
 
       let parser = getParserInstance(plainRequest, eol);

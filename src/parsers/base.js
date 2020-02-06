@@ -92,11 +92,8 @@ class HttpZBaseParser {
       case consts.http.contentTypes.application.xWwwFormUrlencoded:
         this._parseXwwwFormUrlencodedBody();
         break;
-      case consts.http.contentTypes.application.json:
-        this._parseJsonBody();
-        break;
       default:
-        this._parsePlainBody();
+        this._parseTextBody();
         break;
     }
   }
@@ -138,16 +135,8 @@ class HttpZBaseParser {
       .value();
   }
 
-  _parseJsonBody() {
-    let json = _.attempt(JSON.parse.bind(null, this.bodyRows));
-    if (_.isError(json)) {
-      throw HttpZError.get('Invalid json in body');
-    }
-    this.body.json = json;
-  }
-
-  _parsePlainBody() {
-    this.body.plain = this.bodyRows;
+  _parseTextBody() {
+    this.body.text = this.bodyRows;
   }
 
   _calcSizes(headerRows, bodyRows) {

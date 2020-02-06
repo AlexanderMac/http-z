@@ -368,7 +368,7 @@ describe('parsers / response', () => {
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        'Plain text'
+        'Text data'
       ].join(eol);
 
       let responseModel = {
@@ -410,75 +410,11 @@ describe('parsers / response', () => {
         ],
         body: {
           contentType: 'text/plain',
-          plain: 'Plain text'
+          text: 'Text data'
         },
-        messageSize: 165,
+        messageSize: 164,
         headersSize: 133,
-        bodySize: 10
-      };
-
-      let parser = getParserInstance(plainResponse, eol);
-      let actual = parser.parse();
-      should(actual).eql(responseModel);
-    });
-
-    it('should parse response with body and contentType=application/json', () => {
-      let eol = '\n';
-      let plainResponse = [
-        'HTTP/1.1 200 Ok',
-        'Connection: keep-alive',
-        'Cache-Control: no-cache',
-        'Content-Type: application/json; charset=UTF-8',
-        'Content-Encoding: gzip,deflate',
-        'Content-Length: 301',
-        '',
-        '{"p1":"v1","p2":"v2"}'
-      ].join(eol);
-
-      let responseModel = {
-        protocolVersion: 'HTTP/1.1',
-        statusCode: 200,
-        statusMessage: 'Ok',
-        headers: [
-          {
-            name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
-          },
-          {
-            name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
-          },
-          {
-            name: 'Content-Type',
-            values: [
-              { value: 'application/json', params: 'charset=UTF-8' }
-            ]
-          },
-          {
-            name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
-          },
-          {
-            name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
-          }
-        ],
-        body: {
-          contentType: 'application/json',
-          json: { p1: 'v1', p2: 'v2' }
-        },
-        messageSize: 182,
-        headersSize: 139,
-        bodySize: 21
+        bodySize: 9
       };
 
       let parser = getParserInstance(plainResponse, eol);

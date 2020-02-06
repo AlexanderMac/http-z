@@ -303,7 +303,7 @@ describe('builders / response', () => {
         ],
         body: {
           contentType: 'text/plain',
-          plain: 'Plain text'
+          text: 'Text data'
         }
       };
 
@@ -315,67 +315,7 @@ describe('builders / response', () => {
         'Content-Encoding: gzip, deflate',
         'Content-Length: 301',
         '',
-        'Plain text'
-      ].join('\n');
-
-      let builder = getBuilderInstance(responseModel);
-      let actual = builder.build();
-      should(actual).eql(plainResponse);
-    });
-
-    it('should build response message with body and contentType=application/json', () => {
-      let responseModel = {
-        protocolVersion: 'HTTP/1.1',
-        statusCode: 200,
-        statusMessage: 'Ok',
-        headers: [
-          {
-            name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
-          },
-          {
-            name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
-          },
-          {
-            name: 'Content-Type',
-            values: [
-              { value: 'application/json', params: 'charset=UTF-8' }
-            ]
-          },
-          {
-            name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
-          },
-          {
-            name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
-          }
-        ],
-        body: {
-          contentType: 'application/json',
-          json: { p1: 'v1', p2: 'v2' }
-        }
-      };
-
-      let plainResponse = [
-        'HTTP/1.1 200 Ok',
-        'Connection: keep-alive',
-        'Cache-Control: no-cache',
-        'Content-Type: application/json;charset=UTF-8',
-        'Content-Encoding: gzip, deflate',
-        'Content-Length: 301',
-        '',
-        '{"p1":"v1","p2":"v2"}'
+        'Text data'
       ].join('\n');
 
       let builder = getBuilderInstance(responseModel);

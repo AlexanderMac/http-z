@@ -11,8 +11,7 @@ declare class HttpZBody {
   contentType: string;
   boundary: string;
   params: HttpZParam[];
-  json: object;
-  plain: string;
+  text: string;
 }
 
 declare class HttpZRequestModel {

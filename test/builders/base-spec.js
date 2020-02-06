@@ -114,8 +114,7 @@ describe('builders / base', () => {
       let builder = getBuilderInstance({ body });
       sinon.stub(builder, '_generateFormDataBody').returns('FormDataBody');
       sinon.stub(builder, '_generateXwwwFormUrlencodedBody').returns('XwwwFormUrlencodedBody');
-      sinon.stub(builder, '_generateJsonBody').returns('JsonBody');
-      sinon.stub(builder, '_generatePlainBody').returns('PlainBody');
+      sinon.stub(builder, '_generateTextBody').returns('TextBody');
 
       if (!_.isError(expected)) {
         let actual = builder._generateBodyRows();
@@ -126,8 +125,7 @@ describe('builders / base', () => {
 
       nassert.assertFn({ inst: builder, fnName: '_generateFormDataBody', expectedArgs: expectedFnArgs.genFormDataBody });
       nassert.assertFn({ inst: builder, fnName: '_generateXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.genXwwwFormUrlencodedBody });
-      nassert.assertFn({ inst: builder, fnName: '_generateJsonBody', expectedArgs: expectedFnArgs.genJsonBody });
-      nassert.assertFn({ inst: builder, fnName: '_generatePlainBody', expectedArgs: expectedFnArgs.genPlainBody });
+      nassert.assertFn({ inst: builder, fnName: '_generateTextBody', expectedArgs: expectedFnArgs.genTextBody });
     }
 
     it('should return empty string when instance.body is nil', () => {
@@ -157,32 +155,22 @@ describe('builders / base', () => {
       test({ body, expected, expectedFnArgs });
     });
 
-    it('should return JsonBody when instance.body is not empty and contentType is application/json', () => {
-      let body = {
-        contentType: 'application/json'
-      };
-      let expected = '\nJsonBody';
-      let expectedFnArgs = { genJsonBody: '_without-args_' };
-
-      test({ body, expected, expectedFnArgs });
-    });
-
-    it('should return PlainBody when instance.body is not empty and contentType is text/plain', () => {
+    it('should return TextBody when instance.body is not empty and contentType is text/plain', () => {
       let body = {
         contentType: 'text/plain'
       };
-      let expected = '\nPlainBody';
-      let expectedFnArgs = { genPlainBody: '_without-args_' };
+      let expected = '\nTextBody';
+      let expectedFnArgs = { genTextBody: '_without-args_' };
 
       test({ body, expected, expectedFnArgs });
     });
 
-    it('should return PlainBody when instance.body is not empty and contentType is unsupported', () => {
+    it('should return TextBody when instance.body is not empty and contentType is unsupported', () => {
       let body = {
         contentType: 'unsupported'
       };
-      let expected = '\nPlainBody';
-      let expectedFnArgs = { genPlainBody: '_without-args_' };
+      let expected = '\nTextBody';
+      let expectedFnArgs = { genTextBody: '_without-args_' };
 
       test({ body, expected, expectedFnArgs });
     });
@@ -344,67 +332,28 @@ describe('builders / base', () => {
     });
   });
 
-  describe('_generateJsonBody', () => {
+  describe('_generateTextBody', () => {
     function getDefaultBody() {
       return {
-        json: {
-          name: 'Smith',
-          age: 25
-        }
+        text: 'text data'
       };
     }
 
-    it('should throw error when instance.body.json is nil', () => {
+    it('should throw error when instance.body.text is nil', () => {
       let body = getDefaultBody();
-      body.json = undefined;
-      let expected = HttpZError.get('body.json is required');
+      body.text = undefined;
+      let expected = HttpZError.get('body.text is required');
 
       let builder = getBuilderInstance({ body });
-      should(builder._generateJsonBody.bind(builder)).throw(HttpZError, expected);
-    });
-
-    it('should return BodyRows when instance.body is not empty and valid (body.json is a string)', () => {
-      let body = getDefaultBody();
-      body.json = 'some data';
-      let expected = 'some data';
-
-      let builder = getBuilderInstance({ body });
-      let actual = builder._generateJsonBody();
-      should(actual).eql(expected);
+      should(builder._generateTextBody.bind(builder)).throw(HttpZError, expected);
     });
 
     it('should return BodyRows when instance.body is not empty and valid', () => {
       let body = getDefaultBody();
-      let expected = '{"name":"Smith","age":25}';
+      let expected = 'text data';
 
       let builder = getBuilderInstance({ body });
-      let actual = builder._generateJsonBody();
-      should(actual).eql(expected);
-    });
-  });
-
-  describe('_generatePlainBody', () => {
-    function getDefaultBody() {
-      return {
-        plain: 'plain data'
-      };
-    }
-
-    it('should throw error when instance.body.plain is nil', () => {
-      let body = getDefaultBody();
-      body.plain = undefined;
-      let expected = HttpZError.get('body.plain is required');
-
-      let builder = getBuilderInstance({ body });
-      should(builder._generatePlainBody.bind(builder)).throw(HttpZError, expected);
-    });
-
-    it('should return BodyRows when instance.body is not empty and valid', () => {
-      let body = getDefaultBody();
-      let expected = 'plain data';
-
-      let builder = getBuilderInstance({ body });
-      let actual = builder._generatePlainBody();
+      let actual = builder._generateTextBody();
       should(actual).eql(expected);
     });
   });
