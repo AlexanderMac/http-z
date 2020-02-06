@@ -1,3 +1,8 @@
+# <sub>v2.0.0.</sub>
+#### _Feb. 6, 2020_
+  * Add support for all known HTTP-methods .
+  * Merge `body.json` and `body.plain` and rename it to `body.text`.
+
 # <sub>v1.0.1.</sub>
 #### _Feb. 5, 2020_
   * Fix util method for url parsing.
