@@ -33,6 +33,10 @@ http.protocolVersions = {
 };
 
 http.methods = {
+  head: 'HEAD',
+  connect: 'CONNECT',
+  options: 'OPTIONS',
+  trace: 'TRACE',
   get: 'GET',
   post: 'POST',
   put: 'PUT',
