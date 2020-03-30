@@ -1,3 +1,7 @@
+# <sub>v2.0.1.</sub>
+#### _Mar. 30, 2020_
+  * Allow to parse `response.statusCode` equals zero.
+
 # <sub>v2.0.0.</sub>
 #### _Feb. 6, 2020_
   * Add support for all known HTTP-methods .
