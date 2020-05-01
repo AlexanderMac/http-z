@@ -1,8 +1,12 @@
-# <sub>v2.0.1.</sub>
+# <sub>v2.1.0.</sub>
+#### _May. 1, 2020_
+  * Filter out `host` and `cookie` headers in request builder. They must be provided via own fields in model.
+
+# <sub>v2.0.2.</sub>
 #### _Mar. 30, 2020_
   * Disallow `response.statusCode` equals zero.
 
-# <sub>v2.0.2.</sub>
+# <sub>v2.0.1.</sub>
 #### _Mar. 30, 2020_
   * Allow `response.statusCode` equals zero.
 
