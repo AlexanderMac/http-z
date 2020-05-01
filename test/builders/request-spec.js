@@ -259,6 +259,12 @@ describe('builders / request', () => {
         path: '/features',
         headers: [
           {
+            name: 'Host',
+            values: [
+              { value: 'www.example.com' }
+            ]
+          },
+          {
             name: 'Connection',
             values: []
           },
@@ -282,6 +288,12 @@ describe('builders / request', () => {
               { value: 'ru', params: 'q=0.8' },
               { value: 'en-US', params: 'q=0.6' },
               { value: 'en', params: 'q=0.4' }
+            ]
+          },
+          {
+            name: 'Cookie',
+            values: [
+              { value: 'firstName=John; lastName=Smith' }
             ]
           }
         ],

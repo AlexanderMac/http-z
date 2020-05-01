@@ -50,6 +50,15 @@ class HttpZRequestBuilder extends Base {
     return `Host: ${this.host}\n`;
   }
 
+  _generateHeaderRows() {
+    validators.validateArray(this.headers, 'headers');
+    _.remove(this.headers, h => {
+      let hName = _.toLower(h.name);
+      return hName === 'host' || hName === 'cookie';
+    });
+    return super._generateHeaderRows();
+  }
+
   _generateCookiesRow() {
     if (!this.cookies) {
       return '';
