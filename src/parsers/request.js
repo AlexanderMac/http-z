@@ -76,7 +76,7 @@ class HttpZRequestParser extends Base {
     this.cookies = _.chain(values)
       .split(';')
       .map(pair => {
-        let [name, value] = _.split(pair, '=');
+        let [name, value] = utils.splitIntoTwoParts(pair, '=');
         let cookie = {
           name: _.trim(name)
         };

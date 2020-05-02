@@ -436,7 +436,7 @@ describe('parsers / request', () => {
         'Accept: */*',
         'Accept-Encoding: gzip,deflate',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-        'Cookie: csrftoken=123abc;sessionid=456def;userid=',
+        'Cookie: csrftoken=123abc;sessionid=sd=456def;userid=',
         '',
         ''
       ].join(eol);
@@ -478,11 +478,11 @@ describe('parsers / request', () => {
         ],
         cookies: [
           { name: 'csrftoken', value: '123abc' },
-          { name: 'sessionid', value: '456def' },
+          { name: 'sessionid', value: 'sd=456def' },
           { name: 'userid' }
         ],
-        messageSize: 200,
-        headersSize: 170,
+        messageSize: 203,
+        headersSize: 173,
         bodySize: 0
       };
 

@@ -54,17 +54,19 @@ class HttpZBaseParser {
           value: values
         }];
       } else {
-        values = _.split(values, ',');
-        valuesWithParams = _.map(values, (value) => {
-          let valueAndParams = _.split(value, ';');
-          let res = {
-            value: _.trim(valueAndParams[0])
-          };
-          if (valueAndParams.length > 1) {
-            res.params = _.trim(valueAndParams[1]);
-          }
-          return res;
-        });
+        valuesWithParams = _.chain(values)
+          .split(',')
+          .map(value => {
+            let valueAndParams = _.split(value, ';');
+            let res = {
+              value: _.trim(valueAndParams[0])
+            };
+            if (valueAndParams.length > 1) {
+              res.params = _.trim(valueAndParams[1]);
+            }
+            return res;
+          })
+          .value();
       }
 
       return {
