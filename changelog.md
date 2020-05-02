@@ -1,3 +1,7 @@
+# <sub>v2.1.1.</sub>
+#### _May. 2, 2020_
+  * Fix cookies parser with value containing `=` (equals) symbol.
+
 # <sub>v2.1.0.</sub>
 #### _May. 1, 2020_
   * Filter out `host` and `cookie` headers in request builder. They must be provided via own fields in model.
