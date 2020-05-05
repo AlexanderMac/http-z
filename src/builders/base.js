@@ -68,7 +68,7 @@ class HttpZBaseBuilder {
       ].join('');
     }).join('');
 
-    return `${paramsStr}--${this.body.boundary}--`;
+    return `${paramsStr}--${this.body.boundary}--\n`;
   }
 
   _generateXwwwFormUrlencodedBody() {

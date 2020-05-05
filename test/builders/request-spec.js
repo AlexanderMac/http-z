@@ -576,7 +576,8 @@ describe('builders / request', () => {
         'Content-Disposition: form-data; name="age"',
         '',
         '25',
-        '--11136253119209--'
+        '--11136253119209--',
+        ''
       ].join('\n');
 
       let builder = getBuilderInstance(requestModel);
