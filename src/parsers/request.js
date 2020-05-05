@@ -78,10 +78,10 @@ class HttpZRequestParser extends Base {
       .map(pair => {
         let [name, value] = utils.splitIntoTwoParts(pair, '=');
         let cookie = {
-          name: _.trim(name)
+          name
         };
         if (value) {
-          cookie.value = _.trim(value);
+          cookie.value = value;
         }
         if (!cookie.name) {
           throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values);
