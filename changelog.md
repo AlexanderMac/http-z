@@ -1,3 +1,7 @@
+# <sub>v2.1.2.</sub>
+#### _May. 11, 2020_
+  * Add ending \n in multipart/formdata body.
+
 # <sub>v2.1.1.</sub>
 #### _May. 2, 2020_
   * Fix cookies parser with value containing `=` (equals) symbol.
