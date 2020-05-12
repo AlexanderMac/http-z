@@ -1,3 +1,7 @@
+# <sub>v2.2.0</sub>
+#### _May. 12, 2020_
+  * Encode/decode url path and www-url-encoded body in builder and parser.
+
 # <sub>v2.1.2.</sub>
 #### _May. 11, 2020_
   * Add ending \n in multipart/formdata body.
