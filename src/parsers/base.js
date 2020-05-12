@@ -70,7 +70,7 @@ class HttpZBaseParser {
       }
 
       return {
-        name: utils.getHeaderName(name),
+        name: utils.capitalizeHeaderName(name),
         values: valuesWithParams
       };
     });

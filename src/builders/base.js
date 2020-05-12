@@ -28,7 +28,7 @@ class HttpZBaseBuilder {
           .join(', ')
           .value();
 
-        return utils.getHeaderName(header.name) + ': ' + headerValues;
+        return utils.capitalizeHeaderName(header.name) + ': ' + headerValues;
       })
       .join('\n')
       .value();

@@ -68,33 +68,34 @@ describe('utils', () => {
     });
   });
 
-  describe('generateRelativeUrl', () => {
+  describe('generatePath', () => {
     function test(params, expected) {
-      let actual = utils.generateRelativeUrl(params);
+      let actual = utils.generatePath(params);
       should(actual).eql(expected);
     }
 
-    it('should generate relative url', () => {
+    it('should generate path without params', () => {
       test({
         path: '/features'
       }, '/features');
     });
 
-    it('should generate relative url with params', () => {
+    it('should generate path with params', () => {
       test({
         path: '/features',
         queryParams: [
           { name: 'p1', value: 'v1' },
           { name: 'p2', value: null },
-          { name: 'p3' }
+          { name: 'p3&[', value: 'some &[] "' },
+          { name: 'p4' }
         ]
-      }, '/features?p1=v1&p2=null&p3=');
+      }, '/features?p1=v1&p2=&p3%26%5B=some%20%26%5B%5D%20%22&p4=');
     });
   });
 
-  describe('getHeaderName', () => {
+  describe('capitalizeHeaderName', () => {
     function test(name, expected) {
-      let actual = utils.getHeaderName(name);
+      let actual = utils.capitalizeHeaderName(name);
       should(actual).eql(expected);
     }
 

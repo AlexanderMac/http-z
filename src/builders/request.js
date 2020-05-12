@@ -38,7 +38,7 @@ class HttpZRequestBuilder extends Base {
 
     return '' +
       this.method.toUpperCase() + ' ' +
-      utils.generateRelativeUrl({
+      utils.generatePath({
         path: this.path,
         queryParams: this.queryParams
       }) + ' ' +

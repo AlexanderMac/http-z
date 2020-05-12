@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const qs = require('querystring');
 const consts = require('./consts');
 const HttpZError = require('./error');
 
@@ -27,24 +28,20 @@ exports.parseUrl = (url) => {
   return new URL(url);
 };
 
-// TODO: test it
-exports.generateRelativeUrl = ({ path, queryParams }) => {
-  let queryParamsStr = '';
-  if (!_.isEmpty(queryParams)) {
-    let searchParams = _.map(queryParams, ({ name, value }) => {
-      return [name, exports.getEmptyStringForUndefined(value)];
-    });
-    let urlSPs = new URLSearchParams(searchParams);
-    queryParamsStr = '?' + urlSPs.toString();
+exports.generatePath = ({ path, queryParams }) => {
+  if (_.isEmpty(queryParams)) {
+    return path;
   }
 
-  return '' +
-    path +
-    queryParamsStr;
+  let queryParamsObj = _.reduce(queryParams, (result, param) => {
+    result[param.name] = param.value || '';
+    return result;
+  }, {});
+  return path + '?' + qs.stringify(queryParamsObj);
 };
 
-exports.getHeaderName = (name) => {
-  // capitalize: accept => Accept, accept-encoding => Accept-Encoding, etc
+exports.capitalizeHeaderName = (name) => {
+  // accept => Accept, accept-encoding => Accept-Encoding, etc
   return _.chain(name)
     .split('-')
     .map(_.capitalize)
