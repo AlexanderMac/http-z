@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const qs = require('querystring');
 const consts = require('../consts');
 const HttpZError = require('../error');
 const utils = require('../utils');
@@ -125,16 +126,12 @@ class HttpZBaseParser {
   }
 
   _parseXwwwFormUrlencodedBody() {
-    this.body.params = _.chain(this.bodyRows)
-      .split('&')
-      .map(pair => {
-        let [name, value] = utils.splitIntoTwoParts(pair, '=');
-        if (!name) {
-          throw HttpZError.get('Incorrect x-www-form-urlencoded parameter, expected: Name="Value', pair);
-        }
-        return { name, value };
-      })
-      .value();
+    if (this.bodyRows) {
+      let params = qs.parse(this.bodyRows);
+      this.body.params = _.map(params, (value, name) => ({ name, value }));
+    } else {
+      this.body.params = [];
+    }
   }
 
   _parseTextBody() {

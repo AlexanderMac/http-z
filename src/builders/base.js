@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const qs = require('querystring');
 const consts = require('../consts');
 const utils = require('../utils');
 const validators = require('../validators');
@@ -74,12 +75,13 @@ class HttpZBaseBuilder {
   _generateXwwwFormUrlencodedBody() {
     validators.validateNotEmptyArray(this.body.params, 'body.params');
 
-    let paramsStr = _.map(this.body.params, (dataParam, index) => {
+    let params = _.reduce(this.body.params, (result, dataParam, index) => {
       validators.validateNotEmptyString(dataParam.name, 'body.params[index].name', `dataParam index: ${index}`);
-      return dataParam.name + '=' + utils.getEmptyStringForUndefined(dataParam.value);
-    }).join('&');
+      result[dataParam.name] = utils.getEmptyStringForUndefined(dataParam.value);
+      return result;
+    }, {});
 
-    return paramsStr;
+    return qs.stringify(params);
   }
 
   _generateTextBody() {

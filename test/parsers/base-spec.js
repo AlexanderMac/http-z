@@ -286,16 +286,6 @@ describe('parsers / base', () => {
   });
 
   describe('_parseXwwwFormUrlencodedBody', () => {
-    it('should throw error when some param has incorrect format', () => {
-      let parser = getParserInstance();
-      parser.bodyRows = 'firstName=John&=Smith&age=25';
-
-      should(parser._parseXwwwFormUrlencodedBody.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect x-www-form-urlencoded parameter, expected: Name="Value',
-        details: '=Smith'
-      });
-    });
-
     it('should set instance.body when all params in body are valid', () => {
       let parser = getParserInstance();
       parser.body = {};
