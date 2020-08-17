@@ -1,5 +1,5 @@
 const RegExpStrings = {
-  method: '(get|post|put|patch|delete)',
+  method: '(trace|connect|options|head|get|post|put|patch|delete)',
   protocol: '(https?|ftp)',
   protocolVer: '(http)\\/(1\\.0|1\\.1|2\\.0)',
   url: '((https?|ftp)://)*(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?',
