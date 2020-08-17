@@ -1,3 +1,7 @@
+# <sub>v2.2.1</sub>
+#### _Aug. 17, 2020_
+  * Add support for new HTTP methods.
+
 # <sub>v2.2.0</sub>
 #### _May. 12, 2020_
   * Encode/decode url path and www-url-encoded body in builder and parser.
