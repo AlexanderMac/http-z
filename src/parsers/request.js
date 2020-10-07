@@ -48,7 +48,7 @@ class HttpZRequestParser extends Base {
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
       throw HttpZError.get(
-        'Incorrect startRow format, expected: Method SP Request-URI SP HTTP-Version CRLF',
+        'Incorrect startRow format, expected: METHOD SP request-target SP HTTP-VERSION CRLF',
         this.startRow
       );
     }

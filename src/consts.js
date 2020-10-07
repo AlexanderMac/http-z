@@ -1,18 +1,13 @@
 const RegExpStrings = {
-  method: '(trace|connect|options|head|get|post|put|patch|delete)',
-  protocol: '(https?|ftp)',
-  protocolVer: '(http)\\/(1\\.0|1\\.1|2\\.0)',
+  method: '(TRACE|CONNECT|OPTIONS|HEAD|GET|POST|PUT|PATCH|DELETE)',
+  protocolVer: '(HTTP)\\/(1\\.0|1\\.1|2\\.0)',
   url: '((https?|ftp)://)*(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?',
   path: '\\/\\S*'
 };
 
 const regexps = {
-  httpMethod: new RegExp(RegExpStrings.method, 'i'),
-  httpProtocol: new RegExp(RegExpStrings.protocol, 'i'),
-  httpProtocolVer: new RegExp(RegExpStrings.protocolVer, 'i'),
-  url: new RegExp(RegExpStrings.url, 'i'),
-  requestStartRow: new RegExp('^' + RegExpStrings.method + ' ' + RegExpStrings.path + ' ' + RegExpStrings.protocolVer + '$', 'i'),
-  responseStartRow: new RegExp('^' + RegExpStrings.protocolVer + ' ' + '\\d{3}' + ' ' + '\\w+( \\w+)*$' + '$', 'i'),
+  requestStartRow: new RegExp(`^${RegExpStrings.method} ${RegExpStrings.path} ${RegExpStrings.protocolVer}$`),
+  responseStartRow: new RegExp(`^${RegExpStrings.protocolVer} \\d{3} [\\u0009\\u0020-\\u007E\\u0080-\\u00FF]*$`),
   boundary: /boundary=\S+/i,
   param: /Content-Disposition:\s+form-data;\s+name="\S+"\n\n/im, // TODO: use real eol
   paramName: /name="\S+"/im,

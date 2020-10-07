@@ -104,14 +104,14 @@ describe('parsers / response', () => {
       parser.startRow = 'Invalid response startRow';
 
       should(parser._parseStartRow.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect startRow format, expected: HTTP-Version SP Status-Code SP Status-Message CRLF',
+        message: 'Incorrect startRow format, expected: HTTP-VERSION SP status-code SP reason-phrase CRLF',
         details: 'Invalid response startRow'
       });
     });
 
     it('should init instance fields when startRow has valid format', () => {
       let parser = getParserInstance();
-      parser.startRow = 'http/1.1 201 Created';
+      parser.startRow = 'HTTP/1.1 201 Created';
 
       parser._parseStartRow();
       should(parser.protocolVersion).eql('HTTP/1.1');
@@ -228,7 +228,7 @@ describe('parsers / response', () => {
     it('should parse request without headers and body', () => {
       let eol = '\n';
       let plainResponse = [
-        'http/1.1 204 No content',
+        'HTTP/1.1 204 No content',
         '',
         ''
       ].join(eol);
@@ -251,7 +251,7 @@ describe('parsers / response', () => {
     it('should parse response without body (header names in lower case, eol is \r\n)', () => {
       let eol = '\r\n';
       let plainResponse = [
-        'http/1.1 201 Created',
+        'HTTP/1.1 201 Created',
         'connection: ',
         'cache-Control: no-cache',
         'Content-type: text/plain; charset=UTF-8',
@@ -302,7 +302,7 @@ describe('parsers / response', () => {
     it('should parse response without cookies and without body', () => {
       let eol = '\n';
       let plainResponse = [
-        'http/1.1 201 Created',
+        'HTTP/1.1 201 Created',
         'Connection: ',
         'Cache-Control: no-cache',
         'Content-Type: text/plain; charset=UTF-8',

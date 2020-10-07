@@ -174,13 +174,13 @@ describe('parsers / request', () => {
       parser.startRow = 'Invalid request startRow';
 
       should(parser._parseStartRow.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect startRow format, expected: Method SP Request-URI SP HTTP-Version CRLF',
+        message: 'Incorrect startRow format, expected: METHOD SP request-target SP HTTP-VERSION CRLF',
         details: 'Invalid request startRow'
       });
     });
 
     it('should parse valid startRow (GET method)', () => {
-      let startRow = 'get /features http/1.1';
+      let startRow = 'GET /features HTTP/1.1';
       let expected = getDefaultExpected();
 
       test({ startRow, expected });
@@ -335,7 +335,7 @@ describe('parsers / request', () => {
     it('should parse request without headers and body', () => {
       let eol = '\n';
       let plainRequest = [
-        'get /features?p1=v1&p2= http/1.1',
+        'GET /features?p1=v1&p2= HTTP/1.1',
         'host: www.example.com',
         '',
         ''
@@ -365,7 +365,7 @@ describe('parsers / request', () => {
     it('should parse request without body (header names in lower case, eol is \r\n)', () => {
       let eol = '\r\n';
       let plainRequest = [
-        'get /features http/1.1',
+        'GET /features HTTP/1.1',
         'host: example.com',
         'connection: ',
         'accept: */*',

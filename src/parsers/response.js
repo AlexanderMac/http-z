@@ -32,7 +32,7 @@ class HttpZResponseParser extends Base {
   _parseStartRow() {
     if (!consts.regexps.responseStartRow.test(this.startRow)) {
       throw HttpZError.get(
-        'Incorrect startRow format, expected: HTTP-Version SP Status-Code SP Status-Message CRLF',
+        'Incorrect startRow format, expected: HTTP-VERSION SP status-code SP reason-phrase CRLF',
         this.startRow
       );
     }

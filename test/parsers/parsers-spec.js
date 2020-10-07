@@ -41,7 +41,7 @@ describe('parsers / index', () => {
 
   function _testCallRequestParser(eol) {
     let plainMessage = [
-      'get /features http/1.1',
+      'GET /features HTTP/1.1',
       'host: example.com',
       ''
     ].join(eol);
@@ -67,7 +67,7 @@ describe('parsers / index', () => {
 
   function _testCallResponseParser(eol) {
     let plainMessage = [
-      'http/1.1 200 Ok',
+      'HTTP/1.1 200 Ok',
       'host: example.com',
       ''
     ].join(eol);
