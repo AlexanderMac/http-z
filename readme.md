@@ -45,7 +45,7 @@ let plainMessage = [
   'Accept-Language: en-US;q=0.6, en;q=0.4',
   '',
   ''
-].join('\n');
+].join('\r\n');
 
 let messageModel = httpZ.parse(plainMessage);
 console.log(JSON.stringify(messageModel, null, 2));

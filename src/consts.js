@@ -5,11 +5,13 @@ const RegExpStrings = {
   path: '\\/\\S*'
 };
 
+const eol = '\r\n';
+
 const regexps = {
   requestStartRow: new RegExp(`^${RegExpStrings.method} ${RegExpStrings.path} ${RegExpStrings.protocolVer}$`),
   responseStartRow: new RegExp(`^${RegExpStrings.protocolVer} \\d{3} [\\u0009\\u0020-\\u007E\\u0080-\\u00FF]*$`),
   boundary: /boundary=\S+/i,
-  param: /Content-Disposition:\s+form-data;\s+name="\S+"\n\n/im, // TODO: use real eol
+  param: /Content-Disposition:\s+form-data;\s+name="\S+"\r\n\r\n/im,
   paramName: /name="\S+"/im,
   quote: /"/g
 };
@@ -100,6 +102,7 @@ http.headers = {
 };
 
 module.exports = {
+  eol,
   regexps,
   http
 };

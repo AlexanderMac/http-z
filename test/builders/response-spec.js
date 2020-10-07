@@ -2,6 +2,7 @@ const _ = require('lodash');
 const sinon = require('sinon');
 const should = require('should');
 const nassert = require('n-assert');
+const HttpZConsts = require('../../src/consts');
 const HttpZError = require('../../src/error');
 const ResponseBuilder = require('../../src/builders/response');
 
@@ -40,11 +41,15 @@ describe('builders / response', () => {
   describe('build', () => {
     it('should call related methods and return response message', () => {
       let builder = getBuilderInstance();
-      sinon.stub(builder, '_generateStartRow').returns('startRow\n');
-      sinon.stub(builder, '_generateHeaderRows').returns('headerRows\n');
+      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.eol);
+      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.eol);
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows');
 
-      let expected = 'startRow\nheaderRows\nbodyRows';
+      let expected = [
+        'startRow',
+        'headerRows',
+        'bodyRows'
+      ].join(HttpZConsts.eol);
       let actual = builder.build();
       should(actual).eql(expected);
 
@@ -82,7 +87,7 @@ describe('builders / response', () => {
     it('should build startRow when all params are valid', () => {
       let builder = getBuilderInstance();
 
-      let expected = 'HTTP/1.1 200 Ok\n';
+      let expected = 'HTTP/1.1 200 Ok' + HttpZConsts.eol;
       let actual = builder._generateStartRow();
       should(actual).eql(expected);
     });
@@ -154,7 +159,7 @@ describe('builders / response', () => {
         'Set-Cookie: csrftoken=123abc',
         'Set-Cookie: sessionid=; Domain=example.com; Path=/',
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
-      ].join('\n') + '\n';
+      ].join(HttpZConsts.eol) + HttpZConsts.eol;
       let actual = builder._generateCookieRows();
       should(actual).eql(expected);
     });
@@ -200,7 +205,7 @@ describe('builders / response', () => {
         'Content-Type: text/plain;charset=UTF-8',
         'Content-Encoding: gzip, deflate',
         ''
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
@@ -256,7 +261,7 @@ describe('builders / response', () => {
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
         'Set-Cookie: date=',
         ''
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
@@ -316,7 +321,7 @@ describe('builders / response', () => {
         'Content-Length: 301',
         '',
         'Text data'
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();

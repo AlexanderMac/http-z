@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const consts = require('../consts');
 const utils = require('../utils');
 const validators = require('../validators');
 const Base = require('./base');
@@ -43,11 +44,11 @@ class HttpZRequestBuilder extends Base {
         queryParams: this.queryParams
       }) + ' ' +
       this.protocolVersion.toUpperCase() +
-      '\n';
+      consts.eol;
   }
 
   _generateHostRow() {
-    return `Host: ${this.host}\n`;
+    return 'Host: ' + this.host + consts.eol;
   }
 
   _generateHeaderRows() {
@@ -71,7 +72,7 @@ class HttpZRequestBuilder extends Base {
       return name + '=' + (value || '');
     });
 
-    return 'Cookie: ' + cookiesStr.join('; ') + '\n';
+    return 'Cookie: ' + cookiesStr.join('; ') + consts.eol;
   }
 }
 

@@ -1,6 +1,7 @@
 const sinon = require('sinon');
 const should = require('should');
 const nassert = require('n-assert');
+const HttpZConsts = require('../../src/consts');
 const HttpZError = require('../../src/error');
 const BaseParser = require('../../src/parsers/base');
 
@@ -11,33 +12,31 @@ describe('parsers / base', () => {
 
   describe('_parseMessageForRows', () => {
     it('should throw error when message does not have headers', () => {
-      let eol = '\n';
       let plainRequest = [
         '',
         'Body'
-      ].join(eol);
-      let parser = getParserInstance(plainRequest, eol);
+      ].join(HttpZConsts.eol);
+      let parser = getParserInstance(plainRequest);
 
       should(parser._parseMessageForRows.bind(parser)).throw(Error, {
-        message: 'Incorrect message format, it must have headers and body, separated by empty line'
+        message: 'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
       });
     });
 
     it('should throw error when message does not have empty line and body', () => {
-      let eol = '\n';
       let plainRequest = [
         'start-line',
         'host-line',
         'Header1'
-      ].join(eol);
-      let parser = getParserInstance(plainRequest, eol);
+      ].join(HttpZConsts.eol);
+      let parser = getParserInstance(plainRequest);
 
       should(parser._parseMessageForRows.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect message format, it must have headers and body, separated by empty line'
+        message: 'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
       });
     });
 
-    function _testParseMessageWithoutBody(eol) {
+    function _testParseMessageWithoutBody() {
       let plainRequest = [
         'start-line',
         'host-line',
@@ -46,8 +45,8 @@ describe('parsers / base', () => {
         'Header3',
         'Cookie',
         ''
-      ].join(eol);
-      let parser = getParserInstance(plainRequest, eol);
+      ].join(HttpZConsts.eol);
+      let parser = getParserInstance(plainRequest);
 
       let actual = parser._parseMessageForRows();
       should(actual.startRow).eql('start-line');
@@ -55,15 +54,11 @@ describe('parsers / base', () => {
       should(actual.bodyRows).eql(undefined);
     }
 
-    it('should parse message for rows without body when eol is \n', () => {
-      _testParseMessageWithoutBody('\n');
+    it('should parse message for rows without body', () => {
+      _testParseMessageWithoutBody();
     });
 
-    it('should parse message for rows without body when eol is \r\n', () => {
-      _testParseMessageWithoutBody('\r\n');
-    });
-
-    function _testParseMessageWithBody(eol) {
+    function _testParseMessageWithBody() {
       let plainRequest = [
         'start-line',
         'host-line',
@@ -73,8 +68,8 @@ describe('parsers / base', () => {
         'Cookie',
         '',
         'Body'
-      ].join(eol);
-      let parser = getParserInstance(plainRequest, eol);
+      ].join(HttpZConsts.eol);
+      let parser = getParserInstance(plainRequest);
 
       let actual = parser._parseMessageForRows();
       should(actual.startRow).eql('start-line');
@@ -82,12 +77,8 @@ describe('parsers / base', () => {
       should(actual.bodyRows).eql('Body');
     }
 
-    it('should parse message for rows with body when eol is \n', () => {
-      _testParseMessageWithBody('\n');
-    });
-
-    it('should parse message for rows with body when eol is \r\n', () => {
-      _testParseMessageWithBody('\r\n');
+    it('should parse message for rows with body', () => {
+      _testParseMessageWithBody();
     });
   });
 
@@ -223,8 +214,6 @@ describe('parsers / base', () => {
   describe('_parseFormDataBody', () => {
     it('should throw error when some param has incorrect format', () => {
       let parser = getParserInstance();
-      let eol = '\n';
-      parser.eol = eol;
       parser.body = {};
       parser.headers = [{
         name: 'Content-Type',
@@ -241,18 +230,22 @@ describe('parsers / base', () => {
         'Content-Disposition: form-data; name="age"',
         '25',
         '--11136253119209--'
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
       should(parser._parseFormDataBody.bind(parser)).throw(HttpZError, {
         message: 'Incorrect form-data parameter',
-        details: '\nContent-Disposition: form-data; name="age"\n25\n'
+        details: [
+          HttpZConsts.eol,
+          'Content-Disposition: form-data; name="age"',
+          HttpZConsts.eol,
+          '25',
+          HttpZConsts.eol
+        ].join('')
       });
     });
 
     it('should set instance.body when all params in body are valid', () => {
       let parser = getParserInstance();
-      let eol = '\n';
-      parser.eol = eol;
       parser.body = {};
       parser.headers = [{
         name: 'Content-Type',
@@ -270,7 +263,7 @@ describe('parsers / base', () => {
         '',
         '',
         '--11136253119209--'
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
       parser._parseFormDataBody();
 

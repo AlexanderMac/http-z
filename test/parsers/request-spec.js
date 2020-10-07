@@ -2,6 +2,7 @@ const _ = require('lodash');
 const sinon = require('sinon');
 const should = require('should');
 const nassert = require('n-assert');
+const HttpZConsts = require('../../src/consts');
 const HttpZError = require('../../src/error');
 const RequestParser = require('../../src/parsers/request');
 
@@ -20,7 +21,7 @@ describe('parsers / request', () => {
     });
 
     it('should create an instance of RequestParser and call instance.parse', () => {
-      let params = ['plain', '\n'];
+      let params = 'plain';
       let expected = 'ok';
 
       RequestParser.prototype.parse.returns('ok');
@@ -59,7 +60,6 @@ describe('parsers / request', () => {
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows, when headers does not contain Cookies row', () => {
-      let eol = '\n';
       let plainRequest = [
         'start-line',
         'host: somehost',
@@ -68,9 +68,9 @@ describe('parsers / request', () => {
         'header3',
         '',
         'body'
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
-      let parser = getParserInstance(plainRequest, eol);
+      let parser = getParserInstance(plainRequest);
       parser._parseMessageForRows();
 
       should(parser.startRow).eql('start-line');
@@ -81,7 +81,6 @@ describe('parsers / request', () => {
     });
 
     it('should parse message for rows when headers contain Cookies row', () => {
-      let eol = '\n';
       let plainRequest = [
         'start-line',
         'host: somehost',
@@ -91,9 +90,9 @@ describe('parsers / request', () => {
         'cookie: somecookies',
         '',
         'body'
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
-      let parser = getParserInstance(plainRequest, eol);
+      let parser = getParserInstance(plainRequest);
       parser._parseMessageForRows();
 
       should(parser.startRow).eql('start-line');
@@ -333,13 +332,12 @@ describe('parsers / request', () => {
 
   describe('functional tests', () => {
     it('should parse request without headers and body', () => {
-      let eol = '\n';
       let plainRequest = [
         'GET /features?p1=v1&p2= HTTP/1.1',
         'host: www.example.com',
         '',
         ''
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
       let requestModel = {
         method: 'GET',
@@ -352,18 +350,17 @@ describe('parsers / request', () => {
           { name: 'p2', value: '' }
         ],
         headers: [],
-        messageSize: 56,
+        messageSize: 59,
         headersSize: 21,
         bodySize: 0
       };
 
-      let parser = getParserInstance(plainRequest, eol);
+      let parser = getParserInstance(plainRequest);
       let actual = parser.parse();
       should(actual).eql(requestModel);
     });
 
-    it('should parse request without body (header names in lower case, eol is \r\n)', () => {
-      let eol = '\r\n';
+    it('should parse request without body (header names in lower case)', () => {
       let plainRequest = [
         'GET /features HTTP/1.1',
         'host: example.com',
@@ -374,7 +371,7 @@ describe('parsers / request', () => {
         'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0',
         '',
         ''
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
       let requestModel = {
         method: 'GET',
@@ -422,13 +419,12 @@ describe('parsers / request', () => {
         bodySize: 0
       };
 
-      let parser = getParserInstance(plainRequest, eol);
+      let parser = getParserInstance(plainRequest);
       let actual = parser.parse();
       should(actual).eql(requestModel);
     });
 
     it('should parse request with cookies and without body', () => {
-      let eol = '\n';
       let plainRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
@@ -439,7 +435,7 @@ describe('parsers / request', () => {
         'Cookie: csrftoken=123abc;sessionid=sd=456def;userid=',
         '',
         ''
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
       let requestModel = {
         method: 'GET',
@@ -481,18 +477,17 @@ describe('parsers / request', () => {
           { name: 'sessionid', value: 'sd=456def' },
           { name: 'userid' }
         ],
-        messageSize: 203,
+        messageSize: 211,
         headersSize: 173,
         bodySize: 0
       };
 
-      let parser = getParserInstance(plainRequest, eol);
+      let parser = getParserInstance(plainRequest);
       let actual = parser.parse();
       should(actual).eql(requestModel);
     });
 
     it('should parse request with body and contentType=text/plain', () => {
-      let eol = '\n';
       let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
@@ -505,7 +500,7 @@ describe('parsers / request', () => {
         'Content-Length: 301',
         '',
         'Text data'
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
       let requestModel = {
         method: 'POST',
@@ -567,18 +562,17 @@ describe('parsers / request', () => {
           contentType: 'text/plain',
           text: 'Text data'
         },
-        messageSize: 261,
+        messageSize: 271,
         headersSize: 219,
         bodySize: 9
       };
 
-      let parser = getParserInstance(plainRequest, eol);
+      let parser = getParserInstance(plainRequest);
       let actual = parser.parse();
       should(actual).eql(requestModel);
     });
 
     it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
-      let eol = '\n';
       let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
@@ -591,7 +585,7 @@ describe('parsers / request', () => {
         'Content-Length: 301',
         '',
         'firstName=John&lastName=&age=25'
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
       let requestModel = {
         method: 'POST',
@@ -657,18 +651,17 @@ describe('parsers / request', () => {
             { name: 'age', value: '25' }
           ]
         },
-        messageSize: 306,
+        messageSize: 316,
         headersSize: 242,
         bodySize: 31
       };
 
-      let parser = getParserInstance(plainRequest, eol);
+      let parser = getParserInstance(plainRequest);
       let actual = parser.parse();
       should(actual).eql(requestModel);
     });
 
     it('should parse request with body and contentType=multipart/form-data', () => {
-      let eol = '\n';
       let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
@@ -693,7 +686,7 @@ describe('parsers / request', () => {
         '',
         '25',
         '--11136253119209--'
-      ].join(eol);
+      ].join(HttpZConsts.eol);
 
       let requestModel = {
         method: 'POST',
@@ -760,12 +753,12 @@ describe('parsers / request', () => {
             { name: 'age', value: '25' }
           ]
         },
-        messageSize: 492,
+        messageSize: 514,
         headersSize: 238,
-        bodySize: 221
+        bodySize: 233
       };
 
-      let parser = getParserInstance(plainRequest, eol);
+      let parser = getParserInstance(plainRequest);
       let actual = parser.parse();
       should(actual).eql(requestModel);
     });

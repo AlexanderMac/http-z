@@ -2,6 +2,7 @@ const _ = require('lodash');
 const sinon = require('sinon');
 const should = require('should');
 const nassert = require('n-assert');
+const HttpZConsts = require('../../src/consts');
 const HttpZError = require('../../src/error');
 const RequestBuilder = require('../../src/builders/request');
 
@@ -42,13 +43,19 @@ describe('builders / request', () => {
   describe('build', () => {
     it('should call related methods and return request message', () => {
       let builder = getBuilderInstance();
-      sinon.stub(builder, '_generateStartRow').returns('startRow\n');
-      sinon.stub(builder, '_generateHostRow').returns('hostRow\n');
-      sinon.stub(builder, '_generateHeaderRows').returns('headerRows\n');
-      sinon.stub(builder, '_generateCookiesRow').returns('cookieRow\n');
+      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.eol);
+      sinon.stub(builder, '_generateHostRow').returns('hostRow' + HttpZConsts.eol);
+      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.eol);
+      sinon.stub(builder, '_generateCookiesRow').returns('cookieRow' + HttpZConsts.eol);
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows');
 
-      let expected = 'startRow\nhostRow\nheaderRows\ncookieRow\nbodyRows';
+      let expected = [
+        'startRow',
+        'hostRow',
+        'headerRows',
+        'cookieRow',
+        'bodyRows'
+      ].join(HttpZConsts.eol);
       let actual = builder.build();
       should(actual).eql(expected);
 
@@ -104,7 +111,7 @@ describe('builders / request', () => {
     it('should build startRow when all params are valid', () => {
       let builder = getBuilderInstance();
 
-      let expected = 'GET / HTTP/1.1\n';
+      let expected = 'GET / HTTP/1.1' + HttpZConsts.eol;
       let actual = builder._generateStartRow();
       should(actual).eql(expected);
     });
@@ -114,7 +121,7 @@ describe('builders / request', () => {
     it('should build hostRow', () => {
       let builder = getBuilderInstance({ host: 'example.com' });
 
-      let expected = 'Host: example.com\n';
+      let expected = 'Host: example.com' + HttpZConsts.eol;
       let actual = builder._generateHostRow();
       should(actual).eql(expected);
     });
@@ -168,7 +175,7 @@ describe('builders / request', () => {
         ]
       });
 
-      let expected = 'Cookie: c1=v1; c2=v2; c3=\n';
+      let expected = 'Cookie: c1=v1; c2=v2; c3=' + HttpZConsts.eol;
       let actual = builder._generateCookiesRow();
       should(actual).eql(expected);
     });
@@ -194,7 +201,7 @@ describe('builders / request', () => {
         'Host: example.com',
         '',
         ''
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -243,7 +250,7 @@ describe('builders / request', () => {
         'Cache-Control: no-cache',
         'Content-Encoding: gzip, deflate',
         ''
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -313,7 +320,7 @@ describe('builders / request', () => {
         'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
         'Cookie: csrftoken=123abc; sessionid=456def; username=',
         ''
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -394,7 +401,7 @@ describe('builders / request', () => {
         'Content-Length: 301',
         '',
         'Text data'
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -479,7 +486,7 @@ describe('builders / request', () => {
         'Content-Length: 301',
         '',
         'firstName=John&lastName=&age=25'
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -578,7 +585,7 @@ describe('builders / request', () => {
         '25',
         '--11136253119209--',
         ''
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();

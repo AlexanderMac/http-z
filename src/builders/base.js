@@ -31,10 +31,10 @@ class HttpZBaseBuilder {
 
         return utils.capitalizeHeaderName(header.name) + ': ' + headerValues;
       })
-      .join('\n')
+      .join(consts.eol)
       .value();
 
-    return headerRowsStr + '\n';
+    return headerRowsStr + consts.eol;
   }
 
   _generateBodyRows() {
@@ -44,11 +44,11 @@ class HttpZBaseBuilder {
 
     switch (this.body.contentType) {
       case consts.http.contentTypes.multipart.formData:
-        return '\n' + this._generateFormDataBody();
+        return consts.eol + this._generateFormDataBody();
       case consts.http.contentTypes.application.xWwwFormUrlencoded:
-        return '\n' + this._generateXwwwFormUrlencodedBody();
+        return consts.eol + this._generateXwwwFormUrlencodedBody();
       default:
-        return '\n' + this._generateTextBody();
+        return consts.eol + this._generateTextBody();
     }
   }
 
@@ -60,16 +60,16 @@ class HttpZBaseBuilder {
       validators.validateNotEmptyString(dataParam.name, 'body.params[index].name', `dataParam index: ${index}`);
       return [
         '--' + this.body.boundary,
-        '\n',
+        consts.eol,
         `Content-Disposition: form-data; name="${dataParam.name}"`,
-        '\n',
-        '\n',
+        consts.eol,
+        consts.eol,
         utils.getEmptyStringForUndefined(dataParam.value),
-        '\n'
+        consts.eol
       ].join('');
     }).join('');
 
-    return `${paramsStr}--${this.body.boundary}--\n`;
+    return `${paramsStr}--${this.body.boundary}--${consts.eol}`;
   }
 
   _generateXwwwFormUrlencodedBody() {

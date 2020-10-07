@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const should = require('should');
+const HttpZConsts = require('../src/consts');
 const RequestBuilder = require('../src/builders/request');
 const RequestParser = require('../src/parsers/request');
 
@@ -51,7 +52,7 @@ describe('parse-build-parse', ()=> {
           { name: 'p1 !@#$%^&*()-=_+(){}', value: 'v1 !@#$%^&*()-=_+(){}[]' }
         ]
       },
-      messageSize: 342,
+      messageSize: 347,
       headersSize: 111,
       bodySize: 108
     };
@@ -63,12 +64,12 @@ describe('parse-build-parse', ()=> {
       'Auth-Token: vmbH^=%%mbJkq.lh-8!<}',
       '',
       'firstName=John&p1%20!%40%23%24%25%5E%26*()-%3D_%2B()%7B%7D=v1%20!%40%23%24%25%5E%26*()-%3D_%2B()%7B%7D%5B%5D'
-    ].join('\n');
+    ].join(HttpZConsts.eol);
 
     let builder = getBuilderInstance(requestModel);
     should(builder.build()).eql(plainRequest);
 
-    let parser = getParserInstance(plainRequest, '\n');
+    let parser = getParserInstance(plainRequest, HttpZConsts.eol);
     should(parser.parse()).eql(requestModel);
   });
 });

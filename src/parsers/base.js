@@ -5,28 +5,27 @@ const HttpZError = require('../error');
 const utils = require('../utils');
 
 class HttpZBaseParser {
-  constructor(plainMessage, eol) {
+  constructor(plainMessage) {
     this.plainMessage = plainMessage;
-    this.eol = eol;
   }
 
   _parseMessageForRows() {
-    let eol2x = this.eol + this.eol;
+    let eol2x = consts.eol + consts.eol;
     let [headers, body] = utils.splitIntoTwoParts(this.plainMessage, eol2x);
     if (_.isNil(headers) || _.isNil(body)) {
       // special case when the message doesn't contain body
-      let regexp = new RegExp(this.eol + '+$', 'g');
+      let regexp = new RegExp(consts.eol + '+$', 'g');
       if (regexp.test(this.plainMessage)) {
         headers = this.plainMessage.replace(regexp, '');
         body = undefined;
       } else {
         throw HttpZError.get(
-          'Incorrect message format, it must have headers and body, separated by empty line'
+          'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
         );
       }
     }
 
-    let headerRows = _.split(headers, this.eol);
+    let headerRows = _.split(headers, consts.eol);
     let startRow = headerRows[0];
     headerRows = headerRows.splice(1);
     let bodyRows = body;
@@ -119,7 +118,7 @@ class HttpZBaseParser {
 
         return {
           name: paramName.replace(consts.regexps.quote, ''),
-          value: param.replace(paramMatch, '').trim(this.eol)
+          value: param.replace(paramMatch, '').trim(consts.eol)
         };
       })
       .value();

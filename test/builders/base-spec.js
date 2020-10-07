@@ -2,6 +2,7 @@ const _ = require('lodash');
 const sinon = require('sinon');
 const should = require('should');
 const nassert = require('n-assert');
+const HttpZConsts = require('../../src/consts');
 const HttpZError = require('../../src/error');
 const BaseBuilder = require('../../src/builders/base');
 
@@ -84,9 +85,9 @@ describe('builders / base', () => {
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected);
     });
 
-    it('should return \n when instance.headers is an empty array', () => {
+    it('should return <eol> when instance.headers is an empty array', () => {
       let headers = [];
-      let expected = '\n';
+      let expected = HttpZConsts.eol;
 
       let builder = getBuilderInstance({ headers });
       let actual = builder._generateHeaderRows();
@@ -101,7 +102,7 @@ describe('builders / base', () => {
         'Accept-Encoding: gzip, deflate',
         'Accept-Language: en-US;q=0.6, en;q=0.4',
         ''
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance({ headers });
       let actual = builder._generateHeaderRows();
@@ -139,7 +140,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'multipart/form-data'
       };
-      let expected = '\nFormDataBody';
+      let expected = HttpZConsts.eol + 'FormDataBody';
       let expectedFnArgs = { genFormDataBody: '_without-args_' };
 
       test({ body, expected, expectedFnArgs });
@@ -149,7 +150,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'application/x-www-form-urlencoded'
       };
-      let expected = '\nXwwwFormUrlencodedBody';
+      let expected = HttpZConsts.eol + 'XwwwFormUrlencodedBody';
       let expectedFnArgs = { genXwwwFormUrlencodedBody: '_without-args_' };
 
       test({ body, expected, expectedFnArgs });
@@ -159,7 +160,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'text/plain'
       };
-      let expected = '\nTextBody';
+      let expected = HttpZConsts.eol + 'TextBody';
       let expectedFnArgs = { genTextBody: '_without-args_' };
 
       test({ body, expected, expectedFnArgs });
@@ -169,7 +170,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'unsupported'
       };
-      let expected = '\nTextBody';
+      let expected = HttpZConsts.eol + 'TextBody';
       let expectedFnArgs = { genTextBody: '_without-args_' };
 
       test({ body, expected, expectedFnArgs });
@@ -268,7 +269,7 @@ describe('builders / base', () => {
         '',
         '--11136253119209--',
         ''
-      ].join('\n');
+      ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance({ body });
       let actual = builder._generateFormDataBody();

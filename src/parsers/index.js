@@ -9,25 +9,12 @@ module.exports = (plainMessage) => {
     throw HttpZError.get('plainMessage is required');
   }
 
-  let res;
-  res = _tryParse(plainMessage, '\r\n');
-  if (res) {
-    return res;
-  }
-  res = _tryParse(plainMessage, '\n');
-  if (res) {
-    return res;
-  }
-
-  throw HttpZError.get('Unknown plainMessage format');
-};
-
-function _tryParse(plainMessage, eol) {
-  let firstRow = _.chain(plainMessage).split(eol).head().value();
+  let firstRow = _.chain(plainMessage).split(consts.eol).head().value();
   if (consts.regexps.requestStartRow.test(firstRow)) {
-    return RequestParser.parse(plainMessage, eol);
+    return RequestParser.parse(plainMessage);
   }
   if (consts.regexps.responseStartRow.test(firstRow)) {
-    return ResponseParser.parse(plainMessage, eol);
+    return ResponseParser.parse(plainMessage);
   }
-}
+  throw HttpZError.get('Unknown plainMessage format');
+};

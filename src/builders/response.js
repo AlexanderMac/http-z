@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const consts = require('../consts');
 const validators = require('../validators');
 const Base = require('./base');
 
@@ -30,7 +31,7 @@ class HttpZResponseBuilder extends Base {
     validators.validateNotEmptyString(this.statusMessage, 'statusMessage');
 
     let protocolVersion = this.protocolVersion.toUpperCase();
-    return `${protocolVersion} ${this.statusCode} ${this.statusMessage}\n`;
+    return `${protocolVersion} ${this.statusCode} ${this.statusMessage}` + consts.eol;
   }
 
   _generateCookieRows() {
@@ -50,10 +51,10 @@ class HttpZResponseBuilder extends Base {
         }
         return `Set-Cookie: ${name}=${value || ''}` + paramsStr;
       })
-      .join('\n')
+      .join(consts.eol)
       .value();
 
-    return cookieRowsStr + '\n';
+    return cookieRowsStr + consts.eol;
   }
 }
 
