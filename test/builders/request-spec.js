@@ -144,14 +144,6 @@ describe('builders / request', () => {
       });
     });
 
-    it('should throw error when instance.cookies is an empty array', () => {
-      let builder = getBuilderInstance({ cookies: [] });
-
-      should(builder._generateCookiesRow.bind(builder)).throw(HttpZError, {
-        message: 'cookies must be not empty array'
-      });
-    });
-
     it('should throw error when instance.cookies contains element with undefined name', () => {
       let builder = getBuilderInstance({
         cookies: [

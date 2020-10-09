@@ -1,9 +1,7 @@
 const _ = require('lodash');
 const qs = require('querystring');
-const consts = require('./consts');
-const HttpZError = require('./error');
 
-exports.splitIntoTwoParts = (str, delimiter) => {
+exports.splitByDelimeter = (str, delimiter) => {
   if (_.isEmpty(str)) {
     return [];
   }
@@ -47,30 +45,6 @@ exports.capitalizeHeaderName = (name) => {
     .map(_.capitalize)
     .join('-')
     .value();
-};
-
-// TODO: test it
-exports.getBoundary = (contentType) => {
-  if (!contentType || !contentType.params) {
-    throw HttpZError.get('Request with ContentType=FormData must have a header with boundary');
-  }
-
-  let boundaryMatch = contentType.params.match(consts.regexps.boundary);
-  if (!boundaryMatch) {
-    throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentType.params);
-  }
-
-  let boundaryAndValue = _.split(boundaryMatch, '=');
-  if (boundaryAndValue.length !== 2) {
-    throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentType.params);
-  }
-
-  let boundaryValue = _.trim(boundaryAndValue[1]);
-  if (!boundaryValue) {
-    throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentType.params);
-  }
-
-  return boundaryValue;
 };
 
 // TODO: test it

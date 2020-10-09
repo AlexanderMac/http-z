@@ -65,7 +65,7 @@ class HttpZRequestBuilder extends Base {
       return '';
     }
 
-    validators.validateNotEmptyArray(this.cookies, 'cookies');
+    validators.validateArray(this.cookies, 'cookies');
 
     let cookiesStr = _.map(this.cookies, ({ name, value }, index) => {
       validators.validateNotEmptyString(name, 'cookie name', `cookie index: ${index}`);

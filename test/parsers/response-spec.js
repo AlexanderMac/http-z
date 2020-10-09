@@ -103,7 +103,7 @@ describe('parsers / response', () => {
       parser.startRow = 'Invalid response startRow';
 
       should(parser._parseStartRow.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect startRow format, expected: HTTP-VERSION SP status-code SP reason-phrase CRLF',
+        message: 'Incorrect startRow format, expected: HTTP-Version status-code reason-phrase',
         details: 'Invalid response startRow'
       });
     });

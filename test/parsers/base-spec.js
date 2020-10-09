@@ -44,6 +44,7 @@ describe('parsers / base', () => {
         'Header2',
         'Header3',
         'Cookie',
+        '',
         ''
       ].join(HttpZConsts.eol);
       let parser = getParserInstance(plainRequest);
@@ -51,7 +52,7 @@ describe('parsers / base', () => {
       let actual = parser._parseMessageForRows();
       should(actual.startRow).eql('start-line');
       should(actual.headerRows).eql(['host-line', 'Header1', 'Header2', 'Header3', 'Cookie']);
-      should(actual.bodyRows).eql(undefined);
+      should(actual.bodyRows).eql('');
     }
 
     it('should parse message for rows without body', () => {
@@ -88,7 +89,7 @@ describe('parsers / base', () => {
       parser.headerRows = [
         'Header1: values',
         'Header2 - values',
-        'Header3: values'
+        'Header3:    values   '
       ];
 
       should(parser._parseHeaderRows.bind(parser)).throw(HttpZError, {
@@ -100,7 +101,7 @@ describe('parsers / base', () => {
     it('should set instance.headers when headerRows are valid', () => {
       let parser = getParserInstance();
       parser.headerRows = [
-        'Connection: ',
+        'Connection:',
         'Accept: */*, text/plain',
         'accept-Encoding: gzip, deflate   ',
         'Accept-language: ru-RU, ru; q=0.8,en-US;q=0.6,en;  q=0.4'
@@ -144,7 +145,7 @@ describe('parsers / base', () => {
     function test({ headers, bodyRows, expected, expectedFnArgs = {}}) {
       let parser = getParserInstance();
       sinon.stub(parser, '_parseFormDataBody').callsFake(() => parser.body.params = 'body');
-      sinon.stub(parser, '_parseXwwwFormUrlencodedBody').callsFake(() => parser.body.params = 'body');
+      sinon.stub(parser, '_parseUrlencodedBody').callsFake(() => parser.body.params = 'body');
       sinon.stub(parser, '_parseTextBody').callsFake(() => parser.body.text = 'body');
       parser.headers = headers;
       parser.bodyRows = bodyRows;
@@ -153,7 +154,7 @@ describe('parsers / base', () => {
       should(parser.body).eql(expected);
 
       nassert.assertFn({ inst: parser, fnName: '_parseFormDataBody', expectedArgs: expectedFnArgs.parseFormDataBody });
-      nassert.assertFn({ inst: parser, fnName: '_parseXwwwFormUrlencodedBody', expectedArgs: expectedFnArgs.parseXwwwFormUrlencodedBody });
+      nassert.assertFn({ inst: parser, fnName: '_parseUrlencodedBody', expectedArgs: expectedFnArgs.parseXwwwFormUrlencodedBody });
       nassert.assertFn({ inst: parser, fnName: '_parseTextBody', expectedArgs: expectedFnArgs.parseTextBody });
     }
 
@@ -203,6 +204,7 @@ describe('parsers / base', () => {
     it('should set instance.body when bodyRows are valid and contentType header is missing', () => {
       let bodyRows = 'body';
       let expected = {
+        contentType: undefined,
         text: 'body'
       };
       let expectedFnArgs = { parseTextBody: '_without-args_' };
@@ -235,11 +237,7 @@ describe('parsers / base', () => {
       should(parser._parseFormDataBody.bind(parser)).throw(HttpZError, {
         message: 'Incorrect form-data parameter',
         details: [
-          HttpZConsts.eol,
-          'Content-Disposition: form-data; name="age"',
-          HttpZConsts.eol,
-          '25',
-          HttpZConsts.eol
+          '25'
         ].join('')
       });
     });
@@ -278,13 +276,13 @@ describe('parsers / base', () => {
     });
   });
 
-  describe('_parseXwwwFormUrlencodedBody', () => {
+  describe('_parseUrlencodedBody', () => {
     it('should set instance.body when all params in body are valid', () => {
       let parser = getParserInstance();
       parser.body = {};
       parser.bodyRows = 'firstName=John&lastName=Smith&age=';
 
-      parser._parseXwwwFormUrlencodedBody();
+      parser._parseUrlencodedBody();
 
       let expected = {
         params: [
@@ -328,7 +326,7 @@ describe('parsers / base', () => {
     });
   });
 
-  describe('_getContentType', () => {
+  describe('_getContentTypeHeader', () => {
     function getDefaultHeaders() {
       return [
         {
@@ -359,7 +357,7 @@ describe('parsers / base', () => {
       parser.headers.splice(2, 1);
 
       let expected = undefined;
-      let actual = parser._getContentType();
+      let actual = parser._getContentTypeHeader();
 
       should(actual).eql(expected);
     });
@@ -369,6 +367,53 @@ describe('parsers / base', () => {
       parser.headers = getDefaultHeaders();
 
       let expected = { value: 'application/json' };
+      let actual = parser._getContentTypeHeader();
+
+      should(actual).eql(expected);
+    });
+  });
+
+  describe('_getContentType', () => {
+    function getDefaultHeaders() {
+      return [
+        {
+          name: 'Connection',
+          values: [
+            { value: 'keep-alive' }
+          ]
+        },
+        {
+          name: 'Accept-Encoding',
+          values: [
+            { value: 'gzip' },
+            { value: 'deflate' }
+          ]
+        },
+        {
+          name: 'Content-Type',
+          values: [
+            { value: 'Application/json' }
+          ]
+        }
+      ];
+    }
+
+    it('should return undefined when instance.headers does not include contentType header', () => {
+      let parser = getParserInstance();
+      parser.headers = getDefaultHeaders();
+      parser.headers.splice(2, 1);
+
+      let expected = undefined;
+      let actual = parser._getContentType();
+
+      should(actual).eql(expected);
+    });
+
+    it('should return contentType value', () => {
+      let parser = getParserInstance();
+      parser.headers = getDefaultHeaders();
+
+      let expected = 'application/json';
       let actual = parser._getContentType();
 
       should(actual).eql(expected);

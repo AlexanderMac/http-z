@@ -32,7 +32,7 @@ class HttpZResponseParser extends Base {
   _parseStartRow() {
     if (!consts.regexps.responseStartRow.test(this.startRow)) {
       throw HttpZError.get(
-        'Incorrect startRow format, expected: HTTP-VERSION SP status-code SP reason-phrase CRLF',
+        'Incorrect startRow format, expected: HTTP-Version status-code reason-phrase',
         this.startRow
       );
     }
@@ -50,7 +50,7 @@ class HttpZResponseParser extends Base {
 
     this.cookies = _.map(this.cookieRows, cookiesRow => {
       // eslint-disable-next-line no-unused-vars
-      let [unused, values] = utils.splitIntoTwoParts(cookiesRow, ':');
+      let [unused, values] = utils.splitByDelimeter(cookiesRow, ':');
       if (!values) {
         throw HttpZError.get('Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;...', cookiesRow);
       }
