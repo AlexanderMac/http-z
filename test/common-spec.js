@@ -1,8 +1,8 @@
-const _ = require('lodash');
-const should = require('should');
-const HttpZConsts = require('../src/consts');
-const RequestBuilder = require('../src/builders/request');
-const RequestParser = require('../src/parsers/request');
+const _ = require('lodash')
+const should = require('should')
+const HttpZConsts = require('../src/consts')
+const RequestBuilder = require('../src/builders/request')
+const RequestParser = require('../src/parsers/request')
 
 describe('parse-build-parse', ()=> {
   function getBuilderInstance(exRequestModel) {
@@ -12,12 +12,12 @@ describe('parse-build-parse', ()=> {
       protocolVersion: 'http/1.1',
       host: 'example.com',
       path: '/'
-    }, exRequestModel);
-    return new RequestBuilder(requestModel);
+    }, exRequestModel)
+    return new RequestBuilder(requestModel)
   }
 
   function getParserInstance(...params) {
-    return new RequestParser(...params);
+    return new RequestParser(...params)
   }
 
   it('validate that build and parse are pure functions', () => {
@@ -55,7 +55,7 @@ describe('parse-build-parse', ()=> {
       messageSize: 347,
       headersSize: 111,
       bodySize: 108
-    };
+    }
 
     let plainRequest = [
       'POST /features?p1!%40%23%24%25%5E%26*-%3D_%2B()%7B%7D=v1%20!%40%23%24%25%5E%26*()-%3D_%2B()%7B%7D%5B%5D&p2=v2 HTTP/1.1',
@@ -64,12 +64,12 @@ describe('parse-build-parse', ()=> {
       'Auth-Token: vmbH^=%%mbJkq.lh-8!<}',
       '',
       'firstName=John&p1%20!%40%23%24%25%5E%26*()-%3D_%2B()%7B%7D=v1%20!%40%23%24%25%5E%26*()-%3D_%2B()%7B%7D%5B%5D'
-    ].join(HttpZConsts.EOL);
+    ].join(HttpZConsts.EOL)
 
-    let builder = getBuilderInstance(requestModel);
-    should(builder.build()).eql(plainRequest);
+    let builder = getBuilderInstance(requestModel)
+    should(builder.build()).eql(plainRequest)
 
-    let parser = getParserInstance(plainRequest, HttpZConsts.EOL);
-    should(parser.parse()).eql(requestModel);
-  });
-});
+    let parser = getParserInstance(plainRequest, HttpZConsts.EOL)
+    should(parser.parse()).eql(requestModel)
+  })
+})

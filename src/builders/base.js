@@ -1,46 +1,46 @@
-const _ = require('lodash');
-const qs = require('querystring');
-const consts = require('../consts');
-const utils = require('../utils');
-const validators = require('../validators');
+const _ = require('lodash')
+const qs = require('querystring')
+const consts = require('../consts')
+const utils = require('../utils')
+const validators = require('../validators')
 
 class HttpZBaseBuilder {
   constructor({ headers, body }) {
-    this.headers = headers;
-    this.body = body;
+    this.headers = headers
+    this.body = body
   }
 
   _generateHeaderRows() {
-    validators.validateArray(this.headers, 'headers');
+    validators.validateArray(this.headers, 'headers')
 
     let headerRowsStr = _.chain(this.headers)
       .map((header, index) => {
-        validators.validateRequired(header.name, 'header name', `header index: ${index}`);
-        validators.validateArray(header.values, 'header.values', `header index: ${index}`);
+        validators.validateRequired(header.name, 'header name', `header index: ${index}`)
+        validators.validateArray(header.values, 'header.values', `header index: ${index}`)
 
-        let headerName = utils.pretifyHeaderName(header.name);
+        let headerName = utils.pretifyHeaderName(header.name)
         let headerValues = _.chain(header.values)
           .map(headerVal => {
-            let value = utils.getEmptyStringForUndefined(headerVal.value);
+            let value = utils.getEmptyStringForUndefined(headerVal.value)
             if (value && headerVal.params) {
-              return value + ';' + headerVal.params;
+              return value + ';' + headerVal.params
             }
-            return value;
+            return value
           })
           .join(', ')
-          .value();
+          .value()
 
-        return headerName + ': ' + headerValues;
+        return headerName + ': ' + headerValues
       })
       .join(consts.EOL)
-      .value();
+      .value()
 
-    return headerRowsStr + consts.EOL;
+    return headerRowsStr + consts.EOL
   }
 
   _generateBodyRows() {
     if (!this.body) {
-      return '';
+      return ''
     }
 
     switch (this.body.contentType) {
@@ -48,61 +48,61 @@ class HttpZBaseBuilder {
       case consts.http.contentTypes.multipart.alternative:
       case consts.http.contentTypes.multipart.mixed:
       case consts.http.contentTypes.multipart.related:
-        return consts.EOL + this._generateFormDataBody();
+        return consts.EOL + this._generateFormDataBody()
       case consts.http.contentTypes.application.xWwwFormUrlencoded:
-        return consts.EOL + this._generateUrlencodedBody();
+        return consts.EOL + this._generateUrlencodedBody()
       default:
-        return consts.EOL + this._generateTextBody();
+        return consts.EOL + this._generateTextBody()
     }
   }
 
   _generateFormDataBody() {
-    validators.validateArray(this.body.params, 'body.params');
-    validators.validateNotEmptyString(this.body.boundary, 'body.boundary');
+    validators.validateArray(this.body.params, 'body.params')
+    validators.validateNotEmptyString(this.body.boundary, 'body.boundary')
 
     // eslint-disable-next-line max-statements
     let paramsStr = _.map(this.body.params, (param, index) => {
       if (!param.type) {
-        validators.validateNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`);
+        validators.validateNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`)
       }
-      let paramGroupStr = '--' + this.body.boundary;
-      paramGroupStr += consts.EOL;
-      paramGroupStr += `Content-Disposition: ${param.type || 'form-data'}`;
+      let paramGroupStr = '--' + this.body.boundary
+      paramGroupStr += consts.EOL
+      paramGroupStr += `Content-Disposition: ${param.type || 'form-data'}`
       if (param.name) {
-        paramGroupStr += `; name="${param.name}"`;
+        paramGroupStr += `; name="${param.name}"`
       }
       if (param.fileName) {
-        paramGroupStr += `; filename="${param.fileName}"`;
+        paramGroupStr += `; filename="${param.fileName}"`
       }
-      paramGroupStr += consts.EOL;
+      paramGroupStr += consts.EOL
       if (param.contentType) {
-        paramGroupStr += `Content-Type: ${param.contentType}`;
-        paramGroupStr += consts.EOL;
+        paramGroupStr += `Content-Type: ${param.contentType}`
+        paramGroupStr += consts.EOL
       }
-      paramGroupStr += consts.EOL;
-      paramGroupStr += utils.getEmptyStringForUndefined(param.value);
-      paramGroupStr += consts.EOL;
-      return paramGroupStr;
-    }).join('');
+      paramGroupStr += consts.EOL
+      paramGroupStr += utils.getEmptyStringForUndefined(param.value)
+      paramGroupStr += consts.EOL
+      return paramGroupStr
+    }).join('')
 
-    return `${paramsStr}--${this.body.boundary}--`;
+    return `${paramsStr}--${this.body.boundary}--`
   }
 
   _generateUrlencodedBody() {
-    validators.validateArray(this.body.params, 'body.params');
+    validators.validateArray(this.body.params, 'body.params')
 
     let params = _.reduce(this.body.params, (result, dataParam, index) => {
-      validators.validateNotEmptyString(dataParam.name, 'body.params[index].name', `dataParam index: ${index}`);
-      result[dataParam.name] = utils.getEmptyStringForUndefined(dataParam.value);
-      return result;
-    }, {});
+      validators.validateNotEmptyString(dataParam.name, 'body.params[index].name', `dataParam index: ${index}`)
+      result[dataParam.name] = utils.getEmptyStringForUndefined(dataParam.value)
+      return result
+    }, {})
 
-    return qs.stringify(params);
+    return qs.stringify(params)
   }
 
   _generateTextBody() {
-    return utils.getEmptyStringForUndefined(this.body.text);
+    return utils.getEmptyStringForUndefined(this.body.text)
   }
 }
 
-module.exports = HttpZBaseBuilder;
+module.exports = HttpZBaseBuilder

@@ -1,10 +1,10 @@
-const _ = require('lodash');
-const sinon = require('sinon');
-const should = require('should');
-const nassert = require('n-assert');
-const HttpZConsts = require('../../src/consts');
-const HttpZError = require('../../src/error');
-const ResponseBuilder = require('../../src/builders/response');
+const _ = require('lodash')
+const sinon = require('sinon')
+const should = require('should')
+const nassert = require('n-assert')
+const HttpZConsts = require('../../src/consts')
+const HttpZError = require('../../src/error')
+const ResponseBuilder = require('../../src/builders/response')
 
 describe('builders / response', () => {
   function getBuilderInstance(exResponseModel) {
@@ -12,86 +12,86 @@ describe('builders / response', () => {
       protocolVersion: 'http/1.1',
       statusCode: 200,
       statusMessage: 'Ok'
-    }, exResponseModel);
-    return new ResponseBuilder(responseModel);
+    }, exResponseModel)
+    return new ResponseBuilder(responseModel)
   }
 
   describe('static build', () => {
     beforeEach(() => {
-      sinon.stub(ResponseBuilder.prototype, 'build');
-    });
+      sinon.stub(ResponseBuilder.prototype, 'build')
+    })
 
     afterEach(() => {
-      ResponseBuilder.prototype.build.restore();
-    });
+      ResponseBuilder.prototype.build.restore()
+    })
 
     it('should create an instance of ResponseBuilder and call instance.build', () => {
-      let model = {};
-      let expected = 'ok';
+      let model = {}
+      let expected = 'ok'
 
-      ResponseBuilder.prototype.build.returns('ok');
+      ResponseBuilder.prototype.build.returns('ok')
 
-      let actual = ResponseBuilder.build(model);
-      nassert.assert(actual, expected);
+      let actual = ResponseBuilder.build(model)
+      nassert.assert(actual, expected)
 
-      nassert.assertFn({ inst: ResponseBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' });
-    });
-  });
+      nassert.assertFn({ inst: ResponseBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' })
+    })
+  })
 
   describe('build', () => {
     it('should call related methods and return response message', () => {
-      let builder = getBuilderInstance();
-      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL);
-      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL);
-      sinon.stub(builder, '_generateBodyRows').returns('bodyRows');
+      let builder = getBuilderInstance()
+      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL)
+      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
+      sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
 
       let expected = [
         'startRow',
         'headerRows',
         'bodyRows'
-      ].join(HttpZConsts.EOL);
-      let actual = builder.build();
-      should(actual).eql(expected);
+      ].join(HttpZConsts.EOL)
+      let actual = builder.build()
+      should(actual).eql(expected)
 
-      nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' });
-      nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' });
-      nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' });
-    });
-  });
+      nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' })
+    })
+  })
 
   describe('_generateStartRow', () => {
     it('should throw error when protocolVersion is not defined', () => {
-      let builder = getBuilderInstance({ protocolVersion: undefined });
+      let builder = getBuilderInstance({ protocolVersion: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'protocolVersion is required'
-      });
-    });
+      })
+    })
 
     it('should throw error when statusCode is not defined', () => {
-      let builder = getBuilderInstance({ statusCode: undefined });
+      let builder = getBuilderInstance({ statusCode: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'statusCode is required'
-      });
-    });
+      })
+    })
 
     it('should throw error when statusMessage is not defined', () => {
-      let builder = getBuilderInstance({ statusMessage: undefined });
+      let builder = getBuilderInstance({ statusMessage: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
         message: 'statusMessage is required'
-      });
-    });
+      })
+    })
 
     it('should build startRow when all params are valid', () => {
-      let builder = getBuilderInstance();
+      let builder = getBuilderInstance()
 
-      let expected = 'HTTP/1.1 200 Ok' + HttpZConsts.EOL;
-      let actual = builder._generateStartRow();
-      should(actual).eql(expected);
-    });
-  });
+      let expected = 'HTTP/1.1 200 Ok' + HttpZConsts.EOL
+      let actual = builder._generateStartRow()
+      should(actual).eql(expected)
+    })
+  })
 
   describe('_generateCookieRows', () => {
     function getDefaultCookes() {
@@ -99,63 +99,63 @@ describe('builders / response', () => {
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', params: ['Domain=example.com', 'Path=/'] },
         { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
-      ];
+      ]
     }
 
     it('should return empty string when instance.cookies is nil', () => {
-      let builder = getBuilderInstance({ cookies: undefined });
+      let builder = getBuilderInstance({ cookies: undefined })
 
-      let expected = '';
-      let actual = builder._generateCookieRows();
-      should(actual).eql(expected);
-    });
+      let expected = ''
+      let actual = builder._generateCookieRows()
+      should(actual).eql(expected)
+    })
 
     it('should throw error when instance.cookies is not array', () => {
-      let builder = getBuilderInstance({ cookies: 'wrong cookies' });
+      let builder = getBuilderInstance({ cookies: 'wrong cookies' })
 
       should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
         message: 'cookies must be an array'
-      });
-    });
+      })
+    })
 
     it('should throw error when instance.cookies contains element with undefined name', () => {
       let builder = getBuilderInstance({
         cookies: getDefaultCookes()
-      });
-      builder.cookies[1].name = undefined;
+      })
+      builder.cookies[1].name = undefined
 
       should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
         message: 'cookie name is required',
         details: 'cookie index: 1'
-      });
-    });
+      })
+    })
 
     it('should throw error when instance.cookies contains element with non array params', () => {
       let builder = getBuilderInstance({
         cookies: getDefaultCookes()
-      });
-      builder.cookies[1].params = 'wrong params';
+      })
+      builder.cookies[1].params = 'wrong params'
 
       should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
         message: 'cookie params must be an array',
         details: 'cookie index: 1'
-      });
-    });
+      })
+    })
 
     it('should build cookie rows when instance.cookies are valid', () => {
       let builder = getBuilderInstance({
         cookies: getDefaultCookes()
-      });
+      })
 
       let expected = [
         'Set-Cookie: csrftoken=123abc',
         'Set-Cookie: sessionid=; Domain=example.com; Path=/',
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
-      ].join(HttpZConsts.EOL) + HttpZConsts.EOL;
-      let actual = builder._generateCookieRows();
-      should(actual).eql(expected);
-    });
-  });
+      ].join(HttpZConsts.EOL) + HttpZConsts.EOL
+      let actual = builder._generateCookieRows()
+      should(actual).eql(expected)
+    })
+  })
 
   describe('functional tests', () => {
     it('should build response message without body (names in lower case)', () => {
@@ -188,7 +188,7 @@ describe('builders / response', () => {
             ]
           }
         ]
-      };
+      }
 
       let plainResponse = [
         'HTTP/1.1 201 Created',
@@ -197,12 +197,12 @@ describe('builders / response', () => {
         'Content-Type: text/plain;charset=UTF-8',
         'Content-Encoding: gzip, deflate',
         ''
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
-      let builder = getBuilderInstance(responseModel);
-      let actual = builder.build();
-      should(actual).eql(plainResponse);
-    });
+      let builder = getBuilderInstance(responseModel)
+      let actual = builder.build()
+      should(actual).eql(plainResponse)
+    })
 
     it('should build response message with cookies and without body', () => {
       let responseModel = {
@@ -240,7 +240,7 @@ describe('builders / response', () => {
           { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] },
           { name: 'date' }
         ]
-      };
+      }
 
       let plainResponse = [
         'HTTP/1.1 201 Created',
@@ -253,12 +253,12 @@ describe('builders / response', () => {
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
         'Set-Cookie: date=',
         ''
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
-      let builder = getBuilderInstance(responseModel);
-      let actual = builder.build();
-      should(actual).eql(plainResponse);
-    });
+      let builder = getBuilderInstance(responseModel)
+      let actual = builder.build()
+      should(actual).eql(plainResponse)
+    })
 
     it('should build response message with body and contentType=text/plain', () => {
       let responseModel = {
@@ -302,7 +302,7 @@ describe('builders / response', () => {
           contentType: 'text/plain',
           text: 'Text data'
         }
-      };
+      }
 
       let plainResponse = [
         'HTTP/1.1 200 Ok',
@@ -313,12 +313,12 @@ describe('builders / response', () => {
         'Content-Type: text/plain;charset=UTF-8',
         '',
         'Text data'
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
-      let builder = getBuilderInstance(responseModel);
-      let actual = builder.build();
-      should(actual).eql(plainResponse);
-    });
+      let builder = getBuilderInstance(responseModel)
+      let actual = builder.build()
+      should(actual).eql(plainResponse)
+    })
 
     it('should parse response with body and contentType=multipart/alternative (inline)', () => {
       let responseModel = {
@@ -371,7 +371,7 @@ describe('builders / response', () => {
         messageSize: 370,
         headersSize: 243,
         bodySize: 84
-      };
+      }
       let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
@@ -385,12 +385,12 @@ describe('builders / response', () => {
         '',
         '<base64-data>',
         '--111362-53119209--'
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
-      let builder = getBuilderInstance(responseModel);
-      let actual = builder.build();
-      should(actual).eql(plainResponse);
-    });
+      let builder = getBuilderInstance(responseModel)
+      let actual = builder.build()
+      should(actual).eql(plainResponse)
+    })
 
     it('should parse response with body and contentType=multipart/mixed (attachment)', () => {
       let responseModel = {
@@ -445,7 +445,7 @@ describe('builders / response', () => {
         messageSize: 428,
         headersSize: 236,
         bodySize: 149
-      };
+      }
       let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
@@ -460,11 +460,11 @@ describe('builders / response', () => {
         '',
         '<binary-data>',
         '--11136253119209--'
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
-      let builder = getBuilderInstance(responseModel);
-      let actual = builder.build();
-      should(actual).eql(plainResponse);
-    });
-  });
-});
+      let builder = getBuilderInstance(responseModel)
+      let actual = builder.build()
+      should(actual).eql(plainResponse)
+    })
+  })
+})

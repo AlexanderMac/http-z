@@ -54,7 +54,7 @@
     "prefer-rest-params": "error",
     "prefer-spread": "error",
     "require-await": "warn",
-    "semi": ["error", "always"],
+    "semi": ["error", "never"],
     "space-infix-ops": "error",
     "space-unary-ops": "error",
     "strict": "error",

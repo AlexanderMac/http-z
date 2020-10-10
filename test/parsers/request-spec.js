@@ -1,62 +1,62 @@
-const _ = require('lodash');
-const sinon = require('sinon');
-const should = require('should');
-const nassert = require('n-assert');
-const HttpZConsts = require('../../src/consts');
-const HttpZError = require('../../src/error');
-const RequestParser = require('../../src/parsers/request');
+const _ = require('lodash')
+const sinon = require('sinon')
+const should = require('should')
+const nassert = require('n-assert')
+const HttpZConsts = require('../../src/consts')
+const HttpZError = require('../../src/error')
+const RequestParser = require('../../src/parsers/request')
 
 describe('parsers / request', () => {
   function getParserInstance(...params) {
-    return new RequestParser(...params);
+    return new RequestParser(...params)
   }
 
   describe('static parse', () => {
     beforeEach(() => {
-      sinon.stub(RequestParser.prototype, 'parse');
-    });
+      sinon.stub(RequestParser.prototype, 'parse')
+    })
 
     afterEach(() => {
-      RequestParser.prototype.parse.restore();
-    });
+      RequestParser.prototype.parse.restore()
+    })
 
     it('should create an instance of RequestParser and call instance.parse', () => {
-      let params = 'plain';
-      let expected = 'ok';
+      let params = 'plain'
+      let expected = 'ok'
 
-      RequestParser.prototype.parse.returns('ok');
+      RequestParser.prototype.parse.returns('ok')
 
-      let actual = RequestParser.parse(params);
-      nassert.assert(actual, expected);
+      let actual = RequestParser.parse(params)
+      nassert.assert(actual, expected)
 
-      nassert.assertFn({ inst: RequestParser.prototype, fnName: 'parse', expectedArgs: '_without-args_' });
-    });
-  });
+      nassert.assertFn({ inst: RequestParser.prototype, fnName: 'parse', expectedArgs: '_without-args_' })
+    })
+  })
 
   describe('parse', () => {
     it('should call related methods and return request model', () => {
-      let parser = getParserInstance('plainRequest', 'EOL');
-      sinon.stub(parser, '_parseMessageForRows');
-      sinon.stub(parser, '_parseHostRow');
-      sinon.stub(parser, '_parseStartRow');
-      sinon.stub(parser, '_parseHeaderRows');
-      sinon.stub(parser, '_parseCookiesRow');
-      sinon.stub(parser, '_parseBodyRows');
-      sinon.stub(parser, '_generateModel').returns('requestModel');
+      let parser = getParserInstance('plainRequest', 'EOL')
+      sinon.stub(parser, '_parseMessageForRows')
+      sinon.stub(parser, '_parseHostRow')
+      sinon.stub(parser, '_parseStartRow')
+      sinon.stub(parser, '_parseHeaderRows')
+      sinon.stub(parser, '_parseCookiesRow')
+      sinon.stub(parser, '_parseBodyRows')
+      sinon.stub(parser, '_generateModel').returns('requestModel')
 
-      let expected = 'requestModel';
-      let actual = parser.parse();
-      should(actual).eql(expected);
+      let expected = 'requestModel'
+      let actual = parser.parse()
+      should(actual).eql(expected)
 
-      nassert.assertFn({ inst: parser, fnName: '_parseMessageForRows', expectedArgs: '_without-args_' });
-      nassert.assertFn({ inst: parser, fnName: '_parseHostRow', expectedArgs: '_without-args_' });
-      nassert.assertFn({ inst: parser, fnName: '_parseStartRow', expectedArgs: '_without-args_' });
-      nassert.assertFn({ inst: parser, fnName: '_parseHeaderRows', expectedArgs: '_without-args_' });
-      nassert.assertFn({ inst: parser, fnName: '_parseCookiesRow', expectedArgs: '_without-args_' });
-      nassert.assertFn({ inst: parser, fnName: '_parseBodyRows', expectedArgs: '_without-args_' });
-      nassert.assertFn({ inst: parser, fnName: '_generateModel', expectedArgs: '_without-args_' });
-    });
-  });
+      nassert.assertFn({ inst: parser, fnName: '_parseMessageForRows', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: parser, fnName: '_parseHostRow', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: parser, fnName: '_parseStartRow', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: parser, fnName: '_parseHeaderRows', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: parser, fnName: '_parseCookiesRow', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: parser, fnName: '_parseBodyRows', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: parser, fnName: '_generateModel', expectedArgs: '_without-args_' })
+    })
+  })
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows, when headers does not contain Cookies row', () => {
@@ -68,17 +68,17 @@ describe('parsers / request', () => {
         'header3',
         '',
         'body'
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(plainRequest);
-      parser._parseMessageForRows();
+      let parser = getParserInstance(plainRequest)
+      parser._parseMessageForRows()
 
-      should(parser.startRow).eql('start-line');
-      should(parser.hostRow).eql('host: somehost');
-      should(parser.headerRows).eql(['header1', 'header2', 'header3']);
-      should(parser.cookiesRow).eql(undefined);
-      should(parser.bodyRows).eql('body');
-    });
+      should(parser.startRow).eql('start-line')
+      should(parser.hostRow).eql('host: somehost')
+      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.cookiesRow).eql(undefined)
+      should(parser.bodyRows).eql('body')
+    })
 
     it('should parse message for rows when headers contain Cookies row', () => {
       let plainRequest = [
@@ -90,70 +90,70 @@ describe('parsers / request', () => {
         'cookie: somecookies',
         '',
         'body'
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(plainRequest);
-      parser._parseMessageForRows();
+      let parser = getParserInstance(plainRequest)
+      parser._parseMessageForRows()
 
-      should(parser.startRow).eql('start-line');
-      should(parser.hostRow).eql('host: somehost');
-      should(parser.headerRows).eql(['header1', 'header2', 'header3']);
-      should(parser.cookiesRow).eql('cookie: somecookies');
-      should(parser.bodyRows).eql('body');
-    });
-  });
+      should(parser.startRow).eql('start-line')
+      should(parser.hostRow).eql('host: somehost')
+      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.cookiesRow).eql('cookie: somecookies')
+      should(parser.bodyRows).eql('body')
+    })
+  })
 
   describe('_parseHostRow', () => {
     it('should throw error when hostRow is nil', () => {
-      let parser = getParserInstance();
-      parser.hostRow = undefined;
+      let parser = getParserInstance()
+      parser.hostRow = undefined
 
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'host header is required'
-      });
-    });
+      })
+    })
 
     it('should throw error when host header value is empy', () => {
-      let parser = getParserInstance();
-      parser.hostRow = 'Host:';
+      let parser = getParserInstance()
+      parser.hostRow = 'Host:'
 
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'host header value must be not empty string'
-      });
-    });
+      })
+    })
 
     it('should throw error when host header value is not valid URL', () => {
-      let parser = getParserInstance();
-      parser.hostRow = 'Host: ?!invalid-host';
+      let parser = getParserInstance()
+      parser.hostRow = 'Host: ?!invalid-host'
 
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'Invalid host',
         details: '?!invalid-host'
-      });
-    });
+      })
+    })
 
     it('should set instance.host when host header value is valid URL', () => {
-      let parser = getParserInstance();
-      parser.hostRow = 'Host: www.example.com:2345';
+      let parser = getParserInstance()
+      parser.hostRow = 'Host: www.example.com:2345'
 
-      let expected = 'www.example.com:2345';
-      parser._parseHostRow();
-      should(parser.host).eql(expected);
-    });
-  });
+      let expected = 'www.example.com:2345'
+      parser._parseHostRow()
+      should(parser.host).eql(expected)
+    })
+  })
 
   describe('_parseStartRow', () => {
     function test({ startRow, expected }) {
-      let parser = getParserInstance();
-      parser.startRow = startRow;
-      parser.host = 'example.com';
+      let parser = getParserInstance()
+      parser.startRow = startRow
+      parser.host = 'example.com'
 
-      parser._parseStartRow();
-      should(parser.method).eql(expected.method);
-      should(parser.protocol).eql(expected.protocol);
-      should(parser.protocolVersion).eql(expected.protocolVersion);
-      should(parser.path).eql(expected.path);
-      should(parser.params).eql(expected.params);
+      parser._parseStartRow()
+      should(parser.method).eql(expected.method)
+      should(parser.protocol).eql(expected.protocol)
+      should(parser.protocolVersion).eql(expected.protocolVersion)
+      should(parser.path).eql(expected.path)
+      should(parser.params).eql(expected.params)
     }
 
     function getDefaultExpected(ex) {
@@ -164,131 +164,131 @@ describe('parsers / request', () => {
         path: '/features',
         host: 'example.com',
         queryParams: []
-      };
-      return _.extend(def, ex);
+      }
+      return _.extend(def, ex)
     }
 
     it('should throw error when startRow has invalid format', () => {
-      let parser = getParserInstance();
-      parser.startRow = 'Invalid request startRow';
+      let parser = getParserInstance()
+      parser.startRow = 'Invalid request startRow'
 
       should(parser._parseStartRow.bind(parser)).throw(HttpZError, {
         message: 'Incorrect startRow format, expected: Method request-target HTTP-Version',
         details: 'Invalid request startRow'
-      });
-    });
+      })
+    })
 
     it('should parse valid startRow (GET method)', () => {
-      let startRow = 'GET /features HTTP/1.1';
-      let expected = getDefaultExpected();
+      let startRow = 'GET /features HTTP/1.1'
+      let expected = getDefaultExpected()
 
-      test({ startRow, expected });
-    });
+      test({ startRow, expected })
+    })
 
     it('should parse valid startRow (DELETE method)', () => {
-      let startRow = 'DELETE /features HTTP/1.1';
+      let startRow = 'DELETE /features HTTP/1.1'
       let expected = getDefaultExpected({
         method: 'DELETE'
-      });
+      })
 
-      test({ startRow, expected });
-    });
+      test({ startRow, expected })
+    })
 
     it('should parse valid startRow (path is empty)', () => {
-      let startRow = 'GET / HTTP/1.1';
+      let startRow = 'GET / HTTP/1.1'
       let expected = getDefaultExpected({
         path: '/'
-      });
+      })
 
-      test({ startRow, expected });
-    });
+      test({ startRow, expected })
+    })
 
     it('should parse valid startRow (path with two parameters)', () => {
-      let startRow = 'GET /features?p1=v1&p2=v2 HTTP/1.1';
+      let startRow = 'GET /features?p1=v1&p2=v2 HTTP/1.1'
       let expected = getDefaultExpected({
         queryParams: [
           { name: 'p1', value: 'v1' },
           { name: 'p2', value: 'v2' }
         ]
-      });
+      })
 
-      test({ startRow, expected });
-    });
+      test({ startRow, expected })
+    })
 
     it('should parse valid startRow (HTTP protocol v2.0)', () => {
-      let startRow = 'GET /features HTTP/2.0';
+      let startRow = 'GET /features HTTP/2.0'
       let expected = getDefaultExpected({
         protocolVersion: 'HTTP/2.0'
-      });
+      })
 
-      test({ startRow, expected });
-    });
-  });
+      test({ startRow, expected })
+    })
+  })
 
   describe('_parseCookiesRow', () => {
     it('should throw error when cookiesRow has invalid format', () => {
-      let parser = getParserInstance();
-      parser.cookiesRow = 'Cookie values';
+      let parser = getParserInstance()
+      parser.cookiesRow = 'Cookie values'
 
       should(parser._parseCookiesRow.bind(parser)).throw(HttpZError, {
         message: 'Incorrect cookie row format, expected: Cookie: Name1=Value1;...',
         details: 'Cookie values'
-      });
-    });
+      })
+    })
 
     it('should throw error when cookie values have invalid format', () => {
-      let parser = getParserInstance();
-      parser.cookiesRow = 'Cookie: csrftoken=123abc;=val';
+      let parser = getParserInstance()
+      parser.cookiesRow = 'Cookie: csrftoken=123abc;=val'
 
       should(parser._parseCookiesRow.bind(parser)).throw(HttpZError, {
         message: 'Incorrect cookie pair format, expected: Name1=Value1;...',
         details: 'csrftoken=123abc;=val'
-      });
-    });
+      })
+    })
 
     it('should set instance.cookies to undefined when cookiesRow is undefined', () => {
-      let parser = getParserInstance();
-      parser.cookiesRow = undefined;
+      let parser = getParserInstance()
+      parser.cookiesRow = undefined
 
-      let expected = undefined;
-      parser._parseCookiesRow();
-      should(parser.cookies).eql(expected);
-    });
+      let expected = undefined
+      parser._parseCookiesRow()
+      should(parser.cookies).eql(expected)
+    })
 
     it('should set instance.cookies to [] when cookiesRow does not contain values', () => {
-      let parser = getParserInstance();
-      parser.cookiesRow = 'Cookie:';
+      let parser = getParserInstance()
+      parser.cookiesRow = 'Cookie:'
 
-      let expected = [];
-      parser._parseCookiesRow();
-      should(parser.cookies).eql(expected);
-    });
+      let expected = []
+      parser._parseCookiesRow()
+      should(parser.cookies).eql(expected)
+    })
 
     it('should set instance.cookies when cookiesRow is valid and not empty', () => {
-      let parser = getParserInstance();
-      parser.cookiesRow = 'Cookie: csrftoken=123abc;sessionid=456def;username=';
+      let parser = getParserInstance()
+      parser.cookiesRow = 'Cookie: csrftoken=123abc;sessionid=456def;username='
 
       let expected = [
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', value: '456def' },
         { name: 'username' }
-      ];
-      parser._parseCookiesRow();
-      should(parser.cookies).eql(expected);
-    });
-  });
+      ]
+      parser._parseCookiesRow()
+      should(parser.cookies).eql(expected)
+    })
+  })
 
   describe('_generateModel', () => {
     it('should generate request model using instance fields when some fields are undefined', () => {
-      let parser = getParserInstance();
-      parser.messageSize = 100;
-      parser.headersSize = 80;
-      parser.bodySize = 20;
-      parser.method = 'method';
-      parser.protocol = 'protocol';
-      parser.protocolVersion = 'protocolVersion';
-      parser.path = 'path';
-      parser.host = 'host';
+      let parser = getParserInstance()
+      parser.messageSize = 100
+      parser.headersSize = 80
+      parser.bodySize = 20
+      parser.method = 'method'
+      parser.protocol = 'protocol'
+      parser.protocolVersion = 'protocolVersion'
+      parser.path = 'path'
+      parser.host = 'host'
 
       let expected = {
         method: 'method',
@@ -299,25 +299,25 @@ describe('parsers / request', () => {
         messageSize: 100,
         headersSize: 80,
         bodySize: 20
-      };
-      let actual = parser._generateModel();
-      should(actual).eql(expected);
-    });
+      }
+      let actual = parser._generateModel()
+      should(actual).eql(expected)
+    })
 
     it('should generate request model using instance fields', () => {
-      let parser = getParserInstance();
-      parser.messageSize = 100;
-      parser.headersSize = 80;
-      parser.bodySize = 20;
-      parser.method = 'method';
-      parser.protocol = 'protocol';
-      parser.protocolVersion = 'protocolVersion';
-      parser.path = 'path';
-      parser.host = 'host';
-      parser.queryParams = 'queryParams';
-      parser.headers = 'headers';
-      parser.cookies = 'cookies';
-      parser.body = 'body';
+      let parser = getParserInstance()
+      parser.messageSize = 100
+      parser.headersSize = 80
+      parser.bodySize = 20
+      parser.method = 'method'
+      parser.protocol = 'protocol'
+      parser.protocolVersion = 'protocolVersion'
+      parser.path = 'path'
+      parser.host = 'host'
+      parser.queryParams = 'queryParams'
+      parser.headers = 'headers'
+      parser.cookies = 'cookies'
+      parser.body = 'body'
 
       let expected = {
         method: 'method',
@@ -333,11 +333,11 @@ describe('parsers / request', () => {
         headersSize: 80,
         bodySize: 20
 
-      };
-      let actual = parser._generateModel();
-      should(actual).eql(expected);
-    });
-  });
+      }
+      let actual = parser._generateModel()
+      should(actual).eql(expected)
+    })
+  })
 
   describe('functional tests', () => {
     it('should parse request without headers and body', () => {
@@ -346,7 +346,7 @@ describe('parsers / request', () => {
         'host: www.example.com',
         '',
         ''
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
       let requestModel = {
         method: 'GET',
@@ -362,12 +362,12 @@ describe('parsers / request', () => {
         messageSize: 59,
         headersSize: 21,
         bodySize: 0
-      };
+      }
 
-      let parser = getParserInstance(plainRequest);
-      let actual = parser.parse();
-      should(actual).eql(requestModel);
-    });
+      let parser = getParserInstance(plainRequest)
+      let actual = parser.parse()
+      should(actual).eql(requestModel)
+    })
 
     it('should parse request without body (header names in lower case)', () => {
       let plainRequest = [
@@ -381,7 +381,7 @@ describe('parsers / request', () => {
         'generated-by: "modern-framework 2020"',
         '',
         ''
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
       let requestModel = {
         method: 'GET',
@@ -433,12 +433,12 @@ describe('parsers / request', () => {
         messageSize: 288,
         headersSize: 248,
         bodySize: 0
-      };
+      }
 
-      let parser = getParserInstance(plainRequest);
-      let actual = parser.parse();
-      should(actual).eql(requestModel);
-    });
+      let parser = getParserInstance(plainRequest)
+      let actual = parser.parse()
+      should(actual).eql(requestModel)
+    })
 
     it('should parse request with cookies and without body', () => {
       let plainRequest = [
@@ -451,7 +451,7 @@ describe('parsers / request', () => {
         'Cookie: csrftoken=123abc;sessionid=sd=456def;userid=',
         '',
         ''
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
       let requestModel = {
         method: 'GET',
@@ -496,12 +496,12 @@ describe('parsers / request', () => {
         messageSize: 211,
         headersSize: 173,
         bodySize: 0
-      };
+      }
 
-      let parser = getParserInstance(plainRequest);
-      let actual = parser.parse();
-      should(actual).eql(requestModel);
-    });
+      let parser = getParserInstance(plainRequest)
+      let actual = parser.parse()
+      should(actual).eql(requestModel)
+    })
 
     it('should parse request with body and contentType=text/plain', () => {
       let plainRequest = [
@@ -516,7 +516,7 @@ describe('parsers / request', () => {
         'Content-Length: 301',
         '',
         'Text data'
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
       let requestModel = {
         method: 'POST',
@@ -581,12 +581,12 @@ describe('parsers / request', () => {
         messageSize: 271,
         headersSize: 219,
         bodySize: 9
-      };
+      }
 
-      let parser = getParserInstance(plainRequest);
-      let actual = parser.parse();
-      should(actual).eql(requestModel);
-    });
+      let parser = getParserInstance(plainRequest)
+      let actual = parser.parse()
+      should(actual).eql(requestModel)
+    })
 
     it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
       let plainRequest = [
@@ -601,7 +601,7 @@ describe('parsers / request', () => {
         'Content-Length: 301',
         '',
         'firstName=John&lastName=&age=25'
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
       let requestModel = {
         method: 'POST',
@@ -670,12 +670,12 @@ describe('parsers / request', () => {
         messageSize: 316,
         headersSize: 242,
         bodySize: 31
-      };
+      }
 
-      let parser = getParserInstance(plainRequest);
-      let actual = parser.parse();
-      should(actual).eql(requestModel);
-    });
+      let parser = getParserInstance(plainRequest)
+      let actual = parser.parse()
+      should(actual).eql(requestModel)
+    })
 
     it('should parse request with body and contentType=multipart/form-data', () => {
       let plainRequest = [
@@ -706,7 +706,7 @@ describe('parsers / request', () => {
         'more info',
         '',
         '--111362:53119209--'
-      ].join(HttpZConsts.EOL);
+      ].join(HttpZConsts.EOL)
 
       let requestModel = {
         method: 'POST',
@@ -785,13 +785,13 @@ describe('parsers / request', () => {
         messageSize: 651,
         headersSize: 241,
         bodySize: 367
-      };
+      }
 
-      let parser = getParserInstance(plainRequest);
-      let actual = parser.parse();
-      should(actual).eql(requestModel);
-    });
-  });
+      let parser = getParserInstance(plainRequest)
+      let actual = parser.parse()
+      should(actual).eql(requestModel)
+    })
+  })
 
   it('should parse request with body and contentType=multipart/alternative (inline)', () => {
     let plainRequest = [
@@ -810,7 +810,7 @@ describe('parsers / request', () => {
       '',
       '<base64-data>',
       '--111362-53119209--'
-    ].join(HttpZConsts.EOL);
+    ].join(HttpZConsts.EOL)
 
     let requestModel = {
       method: 'POST',
@@ -881,12 +881,12 @@ describe('parsers / request', () => {
       messageSize: 370,
       headersSize: 243,
       bodySize: 84
-    };
+    }
 
-    let parser = getParserInstance(plainRequest);
-    let actual = parser.parse();
-    should(actual).eql(requestModel);
-  });
+    let parser = getParserInstance(plainRequest)
+    let actual = parser.parse()
+    should(actual).eql(requestModel)
+  })
 
   it('should parse request with body and contentType=multipart/mixed (attachment)', () => {
     let plainRequest = [
@@ -906,7 +906,7 @@ describe('parsers / request', () => {
       '',
       '<binary-data>',
       '--11136253119209--'
-    ].join(HttpZConsts.EOL);
+    ].join(HttpZConsts.EOL)
 
     let requestModel = {
       method: 'POST',
@@ -979,10 +979,10 @@ describe('parsers / request', () => {
       messageSize: 428,
       headersSize: 236,
       bodySize: 149
-    };
+    }
 
-    let parser = getParserInstance(plainRequest);
-    let actual = parser.parse();
-    should(actual).eql(requestModel);
-  });
-});
+    let parser = getParserInstance(plainRequest)
+    let actual = parser.parse()
+    should(actual).eql(requestModel)
+  })
+})
