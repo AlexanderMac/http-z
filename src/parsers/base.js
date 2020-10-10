@@ -3,6 +3,7 @@ const qs = require('querystring');
 const consts = require('../consts');
 const HttpZError = require('../error');
 const utils = require('../utils');
+const formDataParamParser = require('./form-data-param-parser');
 
 class HttpZBaseParser {
   constructor(plainMessage) {
@@ -10,19 +11,12 @@ class HttpZBaseParser {
   }
 
   _parseMessageForRows() {
-    let eol2x = consts.eol + consts.eol;
-    let [headers, body] = utils.splitIntoTwoParts(this.plainMessage, eol2x);
+    let eol2x = consts.eol2x;
+    let [headers, body] = utils.splitByDelimeter(this.plainMessage, eol2x);
     if (_.isNil(headers) || _.isNil(body)) {
-      // special case when the message doesn't contain body
-      let regexp = new RegExp(consts.eol + '+$', 'g');
-      if (regexp.test(this.plainMessage)) {
-        headers = this.plainMessage.replace(regexp, '');
-        body = undefined;
-      } else {
-        throw HttpZError.get(
-          'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
-        );
-      }
+      throw HttpZError.get(
+        'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
+      );
     }
 
     let headerRows = _.split(headers, consts.eol);
@@ -41,7 +35,7 @@ class HttpZBaseParser {
 
   _parseHeaderRows() {
     this.headers = _.map(this.headerRows, hRow => {
-      let [name, values] = utils.splitIntoTwoParts(hRow, ':');
+      let [name, values] = utils.splitByDelimeter(hRow, ':');
       if (!name) {
         throw HttpZError.get('Incorrect header row format, expected: Name: Values', hRow);
       }
@@ -49,10 +43,11 @@ class HttpZBaseParser {
       let valuesWithParams;
       if (_.isNil(values) || values === '') {
         valuesWithParams = [];
-      } else if (_.toLower(name) === 'user-agent') { // use 'user-agent' as is
-        valuesWithParams = [{
-          value: values
-        }];
+      // quoted string must be parsed as a single value (https://tools.ietf.org/html/rfc7230#section-3.2.6)
+      } else if (consts.regexps.quoutedHeaderValue.test(values)) {
+        valuesWithParams = [{ value: _.trim(values, '"') }];
+      } else if (_.toLower(name) === consts.http.headers.userAgent.toLowerCase()) { // use 'user-agent' as is
+        valuesWithParams = [{ value: values }];
       } else {
         valuesWithParams = _.chain(values)
           .split(',')
@@ -82,17 +77,16 @@ class HttpZBaseParser {
     }
 
     this.body = {};
-    let contentType = _.get(this._getContentType(), 'value');
-    if (contentType) {
-      this.body.contentType = contentType;
-    }
-
+    this.body.contentType = this._getContentType();
     switch (this.body.contentType) {
       case consts.http.contentTypes.multipart.formData:
+      case consts.http.contentTypes.multipart.alternative:
+      case consts.http.contentTypes.multipart.mixed:
+      case consts.http.contentTypes.multipart.related:
         this._parseFormDataBody();
         break;
       case consts.http.contentTypes.application.xWwwFormUrlencoded:
-        this._parseXwwwFormUrlencodedBody();
+        this._parseUrlencodedBody();
         break;
       default:
         this._parseTextBody();
@@ -101,30 +95,17 @@ class HttpZBaseParser {
   }
 
   _parseFormDataBody() {
-    this.body.boundary = utils.getBoundary(this._getContentType());
-
+    this.body.boundary = this._getBoundary();
     this.body.params = _.chain(this.bodyRows)
-      .split(`--${this.body.boundary}`)
+      .split(new RegExp(`--${this.body.boundary} *`))
+      // skip first and last items, which contains boundary
       .filter((unused, index, params) => index > 0 && index < params.length - 1)
-      .map(param => {
-        let paramMatch = param.match(consts.regexps.param);
-        if (!paramMatch) {
-          throw HttpZError.get('Incorrect form-data parameter', param);
-        }
-
-        let paramNameMatch = paramMatch.toString().match(consts.regexps.paramName);
-        // eslint-disable-next-line no-unused-vars
-        let [unused, paramName] = utils.splitIntoTwoParts(paramNameMatch.toString(), '=');
-
-        return {
-          name: paramName.replace(consts.regexps.quote, ''),
-          value: param.replace(paramMatch, '').trim(consts.eol)
-        };
-      })
+      .map(paramGroup => formDataParamParser.parse(paramGroup))
       .value();
   }
 
-  _parseXwwwFormUrlencodedBody() {
+  // TODO: validate RFC
+  _parseUrlencodedBody() {
     if (this.bodyRows) {
       let params = qs.parse(this.bodyRows);
       this.body.params = _.map(params, (value, name) => ({ name, value }));
@@ -137,18 +118,42 @@ class HttpZBaseParser {
     this.body.text = this.bodyRows;
   }
 
+  // TODO: is it a valid calculation? What about \r\n
   _calcSizes(headerRows, bodyRows) {
     this.messageSize = this.plainMessage.length;
     this.headersSize = _.join(headerRows, '').length;
     this.bodySize = _.join(bodyRows, '').length;
   }
 
+  _getContentTypeHeader() {
+    return _.chain(this.headers)
+      .find({ name: consts.http.headers.contentType })
+      .get('values[0]')
+      .value();
+  }
+
   _getContentType() {
-    let contentTypeHeader = _.find(this.headers, { name: consts.http.headers.contentType });
+    let contentTypeHeader = this._getContentTypeHeader();
     if (!contentTypeHeader) {
       return;
     }
-    return contentTypeHeader.values[0];
+    if (!contentTypeHeader.value) {
+      return;
+    }
+    return contentTypeHeader.value.toLowerCase();
+  }
+
+  _getBoundary() {
+    let contentTypeHeader = this._getContentTypeHeader();
+    if (!contentTypeHeader || !contentTypeHeader.params) {
+      throw HttpZError.get('multipart/form-data message must have Content-Type header with boundary');
+    }
+
+    let boundary = contentTypeHeader.params.match(consts.regexps.boundary);
+    if (!boundary) {
+      throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentTypeHeader.params);
+    }
+    return _.trim(boundary[0], '"');
   }
 }
 

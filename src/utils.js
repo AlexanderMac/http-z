@@ -38,6 +38,7 @@ exports.generatePath = ({ path, queryParams }) => {
   return path + '?' + qs.stringify(queryParamsObj);
 };
 
+// TODO: rename to pretifyHeaderName
 exports.capitalizeHeaderName = (name) => {
   // accept => Accept, accept-encoding => Accept-Encoding, etc
   return _.chain(name)
@@ -53,4 +54,11 @@ exports.getEmptyStringForUndefined = (val) => {
     return '';
   }
   return val;
+};
+
+// TODO: test it
+exports.extendIfNotUndefined = (obj, fieldName, fieldValue) => {
+  if (!_.isUndefined(fieldValue)) {
+    obj[fieldName] = fieldValue;
+  }
 };

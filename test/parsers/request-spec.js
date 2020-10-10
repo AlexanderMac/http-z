@@ -173,7 +173,7 @@ describe('parsers / request', () => {
       parser.startRow = 'Invalid request startRow';
 
       should(parser._parseStartRow.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect startRow format, expected: METHOD SP request-target SP HTTP-VERSION CRLF',
+        message: 'Incorrect startRow format, expected: Method request-target HTTP-Version',
         details: 'Invalid request startRow'
       });
     });
@@ -246,11 +246,20 @@ describe('parsers / request', () => {
       });
     });
 
-    it('should set instance.cookies to undefined when cookiesRow is empty', () => {
+    it('should set instance.cookies to undefined when cookiesRow is undefined', () => {
       let parser = getParserInstance();
       parser.cookiesRow = undefined;
 
       let expected = undefined;
+      parser._parseCookiesRow();
+      should(parser.cookies).eql(expected);
+    });
+
+    it('should set instance.cookies to [] when cookiesRow does not contain values', () => {
+      let parser = getParserInstance();
+      parser.cookiesRow = 'Cookie:';
+
+      let expected = [];
       parser._parseCookiesRow();
       should(parser.cookies).eql(expected);
     });
@@ -369,6 +378,7 @@ describe('parsers / request', () => {
         'accept-Encoding: gzip,deflate',
         'accept-language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0',
+        'generated-by: "modern-framework 2020"',
         '',
         ''
       ].join(HttpZConsts.eol);
@@ -412,10 +422,16 @@ describe('parsers / request', () => {
             values: [
               { value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0' }
             ]
+          },
+          {
+            name: 'Generated-By',
+            values: [
+              { value: 'modern-framework 2020' }
+            ]
           }
         ],
-        messageSize: 249,
-        headersSize: 211,
+        messageSize: 288,
+        headersSize: 248,
         bodySize: 0
       };
 
@@ -669,23 +685,27 @@ describe('parsers / request', () => {
         'Accept: */*',
         'Accept-Encoding: gzip,deflate',
         'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-        'Content-Type: multipart/form-data; boundary=11136253119209',
+        'Content-Type: multipart/form-data; boundary="111362:53119209"',
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        '--11136253119209',
-        'Content-Disposition: form-data; name="firstName"',
+        '--111362:53119209',
+        'Content-Disposition: form-data; name="user.data[firstName]"',
         '',
         'John',
-        '--11136253119209',
-        'Content-Disposition: form-data; name="lastName"',
+        '--111362:53119209',
+        'Content-Disposition: form-data; name="photo"; filename="photo1.jpg"',
+        'Content-Type: application/octet-stream',
         '',
+        '<binary-data>',
+        '--111362:53119209',
+        'Content-Disposition: form-data; name="bio"',
+        'Content-Type: text/plain',
         '',
-        '--11136253119209',
-        'Content-Disposition: form-data; name="age"',
+        'some info',
+        'more info',
         '',
-        '25',
-        '--11136253119209--'
+        '--111362:53119209--'
       ].join(HttpZConsts.eol);
 
       let requestModel = {
@@ -727,7 +747,7 @@ describe('parsers / request', () => {
           {
             name: 'Content-Type',
             values: [
-              { value: 'multipart/form-data', params: 'boundary=11136253119209' }
+              { value: 'multipart/form-data', params: 'boundary="111362:53119209"' }
             ]
           },
           {
@@ -746,21 +766,223 @@ describe('parsers / request', () => {
         ],
         body: {
           contentType: 'multipart/form-data',
-          boundary: '11136253119209',
+          boundary: '111362:53119209',
           params: [
-            { name: 'firstName', value: 'John' },
-            { name: 'lastName', value: '' },
-            { name: 'age', value: '25' }
+            { name: 'user.data[firstName]', value: 'John' },
+            {
+              contentType: 'application/octet-stream',
+              name: 'photo',
+              fileName: 'photo1.jpg',
+              value: '<binary-data>'
+            },
+            {
+              contentType: 'text/plain',
+              name: 'bio',
+              value: 'some info\r\nmore info\r\n'
+            }
           ]
         },
-        messageSize: 514,
-        headersSize: 238,
-        bodySize: 233
+        messageSize: 651,
+        headersSize: 241,
+        bodySize: 367
       };
 
       let parser = getParserInstance(plainRequest);
       let actual = parser.parse();
       should(actual).eql(requestModel);
     });
+  });
+
+  it('should parse request with body and contentType=multipart/alternative (inline)', () => {
+    let plainRequest = [
+      'POST /features HTTP/1.1',
+      'Host: example.com',
+      'Connection: keep-alive',
+      'Accept: */*',
+      'Accept-Encoding: gzip,deflate',
+      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+      'Content-Type: multipart/alternative; boundary="111362-53119209"',
+      'Content-Encoding: gzip,deflate',
+      'Content-Length: 301',
+      '',
+      '--111362-53119209',
+      'Content-Disposition: inline',
+      '',
+      '<base64-data>',
+      '--111362-53119209--'
+    ].join(HttpZConsts.eol);
+
+    let requestModel = {
+      method: 'POST',
+      protocol: 'HTTP',
+      protocolVersion: 'HTTP/1.1',
+      host: 'example.com',
+      path: '/features',
+      queryParams: [],
+      headers: [
+        {
+          name: 'Connection',
+          values: [
+            { value: 'keep-alive' }
+          ]
+        },
+        {
+          name: 'Accept',
+          values: [
+            { value: '*/*' }
+          ]
+        },
+        {
+          name: 'Accept-Encoding',
+          values: [
+            { value: 'gzip' },
+            { value: 'deflate' }
+          ]
+        },
+        {
+          name: 'Accept-Language',
+          values: [
+            { value: 'ru-RU' },
+            { value: 'ru', params: 'q=0.8' },
+            { value: 'en-US', params: 'q=0.6' },
+            { value: 'en', params: 'q=0.4' }
+          ]
+        },
+        {
+          name: 'Content-Type',
+          values: [
+            { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
+          ]
+        },
+        {
+          name: 'Content-Encoding',
+          values: [
+            { value: 'gzip' },
+            { value: 'deflate' }
+          ]
+        },
+        {
+          name: 'Content-Length',
+          values: [
+            { value: '301' }
+          ]
+        }
+      ],
+      body: {
+        contentType: 'multipart/alternative',
+        boundary: '111362-53119209',
+        params: [
+          {
+            type: 'inline',
+            value: '<base64-data>'
+          }
+        ]
+      },
+      messageSize: 370,
+      headersSize: 243,
+      bodySize: 84
+    };
+
+    let parser = getParserInstance(plainRequest);
+    let actual = parser.parse();
+    should(actual).eql(requestModel);
+  });
+
+  it('should parse request with body and contentType=multipart/mixed (attachment)', () => {
+    let plainRequest = [
+      'POST /features HTTP/1.1',
+      'Host: example.com',
+      'Connection: keep-alive',
+      'Accept: */*',
+      'Accept-Encoding: gzip,deflate',
+      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+      'Content-Type: multipart/mixed; boundary="11136253119209"',
+      'Content-Encoding: gzip,deflate',
+      'Content-Length: 301',
+      '',
+      '--11136253119209',
+      'Content-Disposition: attachment; filename="photo1.jpg"',
+      'Content-Type: application/octet-stream',
+      '',
+      '<binary-data>',
+      '--11136253119209--'
+    ].join(HttpZConsts.eol);
+
+    let requestModel = {
+      method: 'POST',
+      protocol: 'HTTP',
+      protocolVersion: 'HTTP/1.1',
+      host: 'example.com',
+      path: '/features',
+      queryParams: [],
+      headers: [
+        {
+          name: 'Connection',
+          values: [
+            { value: 'keep-alive' }
+          ]
+        },
+        {
+          name: 'Accept',
+          values: [
+            { value: '*/*' }
+          ]
+        },
+        {
+          name: 'Accept-Encoding',
+          values: [
+            { value: 'gzip' },
+            { value: 'deflate' }
+          ]
+        },
+        {
+          name: 'Accept-Language',
+          values: [
+            { value: 'ru-RU' },
+            { value: 'ru', params: 'q=0.8' },
+            { value: 'en-US', params: 'q=0.6' },
+            { value: 'en', params: 'q=0.4' }
+          ]
+        },
+        {
+          name: 'Content-Type',
+          values: [
+            { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
+          ]
+        },
+        {
+          name: 'Content-Encoding',
+          values: [
+            { value: 'gzip' },
+            { value: 'deflate' }
+          ]
+        },
+        {
+          name: 'Content-Length',
+          values: [
+            { value: '301' }
+          ]
+        }
+      ],
+      body: {
+        contentType: 'multipart/mixed',
+        boundary: '11136253119209',
+        params: [
+          {
+            type: 'attachment',
+            contentType: 'application/octet-stream',
+            fileName: 'photo1.jpg',
+            value: '<binary-data>'
+          }
+        ]
+      },
+      messageSize: 428,
+      headersSize: 236,
+      bodySize: 149
+    };
+
+    let parser = getParserInstance(plainRequest);
+    let actual = parser.parse();
+    should(actual).eql(requestModel);
   });
 });

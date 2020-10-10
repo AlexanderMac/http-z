@@ -1,20 +1,25 @@
-const RegExpStrings = {
-  method: '(TRACE|CONNECT|OPTIONS|HEAD|GET|POST|PUT|PATCH|DELETE)',
-  protocolVer: '(HTTP)\\/(1\\.0|1\\.1|2\\.0)',
-  url: '((https?|ftp)://)*(-\\.)?([^\\s/?\\.#-]+\\.?)+(/[^\\s]*)?',
-  path: '\\/\\S*'
-};
-
+// TODO: rename to upper case
 const eol = '\r\n';
+const eol2x = eol + eol;
+const basicLatin = '[\\u0009\\u0020-\\u007E]';
+const paramName = '[A-Za-z0-9_.\\[\\]-]'; // TODO: extend
+const methods = '(CONNECT|OPTIONS|TRACE|GET|HEAD|POST|PUT|PATCH|DELETE)';
+const protocolVer = '(HTTP)\\/(1\\.0|1\\.1|2\\.0)';
 
-const regexps = {
-  requestStartRow: new RegExp(`^${RegExpStrings.method} ${RegExpStrings.path} ${RegExpStrings.protocolVer}$`),
-  responseStartRow: new RegExp(`^${RegExpStrings.protocolVer} \\d{3} [\\u0009\\u0020-\\u007E\\u0080-\\u00FF]*$`),
-  boundary: /boundary=\S+/i,
-  param: /Content-Disposition:\s+form-data;\s+name="\S+"\r\n\r\n/im,
-  paramName: /name="\S+"/im,
-  quote: /"/g
-};
+const regexps = {};
+regexps.quote = /"/g;
+regexps.startNl = new RegExp(`^${eol}`);
+regexps.endNl = new RegExp(`${eol}$`);
+regexps.requestStartRow = new RegExp(`^${methods} \\S* ${protocolVer}$`);
+regexps.responseStartRow = new RegExp(`^${protocolVer} \\d{3} ${basicLatin}*$`);
+// TODO: maybe incorrect, because basicLatin contains quote
+regexps.quoutedHeaderValue = new RegExp(`^"${basicLatin}+"$`);
+regexps.boundary = /(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}/;
+regexps.contentDisposition = new RegExp(`^Content-Disposition: *(form-data|inline|attachment)${basicLatin}*${eol}`, 'i');
+regexps.contentType = new RegExp(`^Content-Type:[\\S ]*${eol}`, 'i');
+regexps.contentDispositionType = /(?<=Content-Disposition:) *(form-data|inline|attachment)/;
+regexps.dispositionName = new RegExp(`(?<=name=)"${paramName}+"`, 'i');
+regexps.dispositionFileName = new RegExp(`(?<=filename=)"${paramName}+"`, 'i');
 
 const http = {};
 
@@ -30,10 +35,10 @@ http.protocolVersions = {
 };
 
 http.methods = {
-  head: 'HEAD',
   connect: 'CONNECT',
   options: 'OPTIONS',
   trace: 'TRACE',
+  head: 'HEAD',
   get: 'GET',
   post: 'POST',
   put: 'PUT',
@@ -41,7 +46,7 @@ http.methods = {
   delete: 'DELETE'
 };
 
-http.methodsWithBody = [
+http.postMethods = [
   http.methods.post,
   http.methods.put,
   http.methods.pathch
@@ -98,11 +103,14 @@ http.contentTypes = {
 
 http.headers = {
   contentType: 'Content-Type',
-  contentLength: 'Content-Length'
+  contentLength: 'Content-Length',
+  userAgent: 'User-Agent',
+  setCookie: 'Set-Cookie'
 };
 
 module.exports = {
   eol,
+  eol2x,
   regexps,
   http
 };

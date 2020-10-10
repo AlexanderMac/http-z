@@ -524,7 +524,7 @@ describe('builders / request', () => {
           {
             name: 'Content-Type',
             values: [
-              { value: 'multipart/form-data', params: 'boundary=11136253119209' }
+              { value: 'multipart/form-data', params: 'boundary="111362:53119209"' }
             ]
           },
           {
@@ -543,11 +543,20 @@ describe('builders / request', () => {
         ],
         body: {
           contentType: 'multipart/form-data',
-          boundary: '11136253119209',
+          boundary: '111362:53119209',
           params: [
-            { name: 'firstName', value: 'John' },
-            { name: 'lastName' },
-            { name: 'age', value: 25 }
+            { name: 'user.data[firstName]', value: 'John' },
+            {
+              contentType: 'application/octet-stream',
+              name: 'photo',
+              fileName: 'photo1.jpg',
+              value: '<binary-data>'
+            },
+            {
+              contentType: 'text/plain',
+              name: 'bio',
+              value: 'some info\r\nmore info\r\n'
+            }
           ]
         }
       };
@@ -559,24 +568,27 @@ describe('builders / request', () => {
         'Accept: */*',
         'Accept-Encoding: gzip, deflate',
         'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Content-Type: multipart/form-data;boundary=11136253119209',
+        'Content-Type: multipart/form-data;boundary="111362:53119209"',
         'Content-Encoding: gzip, deflate',
         'Content-Length: 301',
         '',
-        '--11136253119209',
-        'Content-Disposition: form-data; name="firstName"',
+        '--111362:53119209',
+        'Content-Disposition: form-data; name="user.data[firstName]"',
         '',
         'John',
-        '--11136253119209',
-        'Content-Disposition: form-data; name="lastName"',
+        '--111362:53119209',
+        'Content-Disposition: form-data; name="photo"; filename="photo1.jpg"',
+        'Content-Type: application/octet-stream',
         '',
+        '<binary-data>',
+        '--111362:53119209',
+        'Content-Disposition: form-data; name="bio"',
+        'Content-Type: text/plain',
         '',
-        '--11136253119209',
-        'Content-Disposition: form-data; name="age"',
+        'some info',
+        'more info',
         '',
-        '25',
-        '--11136253119209--',
-        ''
+        '--111362:53119209--'
       ].join(HttpZConsts.eol);
 
       let builder = getBuilderInstance(requestModel);
