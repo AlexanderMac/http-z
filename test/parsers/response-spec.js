@@ -64,7 +64,7 @@ describe('parsers / response', () => {
         'Header3',
         '',
         'Body'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let parser = getParserInstance(plainResponse);
       parser._parseMessageForRows();
@@ -85,7 +85,7 @@ describe('parsers / response', () => {
         'Set-cookie',
         '',
         'Body'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let parser = getParserInstance(plainResponse);
       parser._parseMessageForRows();
@@ -229,7 +229,7 @@ describe('parsers / response', () => {
         'HTTP/1.1 204 No content',
         '',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
@@ -255,7 +255,7 @@ describe('parsers / response', () => {
         'content-encoding: gzip,deflate',
         '',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
@@ -308,7 +308,7 @@ describe('parsers / response', () => {
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
         '',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
@@ -364,7 +364,7 @@ describe('parsers / response', () => {
         'Content-Length: 301',
         '',
         'Text data'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',

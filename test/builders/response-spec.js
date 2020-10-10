@@ -41,15 +41,15 @@ describe('builders / response', () => {
   describe('build', () => {
     it('should call related methods and return response message', () => {
       let builder = getBuilderInstance();
-      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.eol);
-      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.eol);
+      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL);
+      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL);
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows');
 
       let expected = [
         'startRow',
         'headerRows',
         'bodyRows'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
       let actual = builder.build();
       should(actual).eql(expected);
 
@@ -87,7 +87,7 @@ describe('builders / response', () => {
     it('should build startRow when all params are valid', () => {
       let builder = getBuilderInstance();
 
-      let expected = 'HTTP/1.1 200 Ok' + HttpZConsts.eol;
+      let expected = 'HTTP/1.1 200 Ok' + HttpZConsts.EOL;
       let actual = builder._generateStartRow();
       should(actual).eql(expected);
     });
@@ -151,7 +151,7 @@ describe('builders / response', () => {
         'Set-Cookie: csrftoken=123abc',
         'Set-Cookie: sessionid=; Domain=example.com; Path=/',
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
-      ].join(HttpZConsts.eol) + HttpZConsts.eol;
+      ].join(HttpZConsts.EOL) + HttpZConsts.EOL;
       let actual = builder._generateCookieRows();
       should(actual).eql(expected);
     });
@@ -197,7 +197,7 @@ describe('builders / response', () => {
         'Content-Type: text/plain;charset=UTF-8',
         'Content-Encoding: gzip, deflate',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
@@ -253,7 +253,7 @@ describe('builders / response', () => {
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
         'Set-Cookie: date=',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
@@ -313,158 +313,158 @@ describe('builders / response', () => {
         'Content-Type: text/plain;charset=UTF-8',
         '',
         'Text data'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(responseModel);
       let actual = builder.build();
       should(actual).eql(plainResponse);
     });
-  });
 
-  it('should parse response with body and contentType=multipart/alternative (inline)', () => {
-    let responseModel = {
-      protocolVersion: 'HTTP/1.1',
-      statusCode: 200,
-      statusMessage: 'Ok',
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache' }
-          ]
-        },
-        {
-          name: 'Content-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
-        },
-        {
-          name: 'Content-Length',
-          values: [
-            { value: '301' }
-          ]
-        },
-        {
-          name: 'Content-Type',
-          values: [
-            { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
-          ]
-        }
-      ],
-      body: {
-        contentType: 'multipart/alternative',
-        boundary: '111362-53119209',
-        params: [
+    it('should parse response with body and contentType=multipart/alternative (inline)', () => {
+      let responseModel = {
+        protocolVersion: 'HTTP/1.1',
+        statusCode: 200,
+        statusMessage: 'Ok',
+        headers: [
           {
-            type: 'inline',
-            value: '<base64-data>'
-          }
-        ]
-      },
-      messageSize: 370,
-      headersSize: 243,
-      bodySize: 84
-    };
-    let plainResponse = [
-      'HTTP/1.1 200 Ok',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'Content-Encoding: gzip, deflate',
-      'Content-Length: 301',
-      'Content-Type: multipart/alternative;boundary="111362-53119209"',
-      '',
-      '--111362-53119209',
-      'Content-Disposition: inline',
-      '',
-      '<base64-data>',
-      '--111362-53119209--'
-    ].join(HttpZConsts.eol);
-
-    let builder = getBuilderInstance(responseModel);
-    let actual = builder.build();
-    should(actual).eql(plainResponse);
-  });
-
-  it('should parse response with body and contentType=multipart/mixed (attachment)', () => {
-    let responseModel = {
-      protocolVersion: 'HTTP/1.1',
-      statusCode: 200,
-      statusMessage: 'Ok',
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
-        },
-        {
-          name: 'Cache-Control',
-          values: [
-            { value: 'no-cache' }
-          ]
-        },
-        {
-          name: 'Content-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
-        },
-        {
-          name: 'Content-Length',
-          values: [
-            { value: '301' }
-          ]
-        },
-        {
-          name: 'Content-Type',
-          values: [
-            { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
-          ]
-        }
-      ],
-      body: {
-        contentType: 'multipart/mixed',
-        boundary: '11136253119209',
-        params: [
+            name: 'Connection',
+            values: [
+              { value: 'keep-alive' }
+            ]
+          },
           {
-            type: 'attachment',
-            contentType: 'application/octet-stream',
-            fileName: 'photo1.jpg',
-            value: '<binary-data>'
+            name: 'Cache-Control',
+            values: [
+              { value: 'no-cache' }
+            ]
+          },
+          {
+            name: 'Content-Encoding',
+            values: [
+              { value: 'gzip' },
+              { value: 'deflate' }
+            ]
+          },
+          {
+            name: 'Content-Length',
+            values: [
+              { value: '301' }
+            ]
+          },
+          {
+            name: 'Content-Type',
+            values: [
+              { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
+            ]
           }
-        ]
-      },
-      messageSize: 428,
-      headersSize: 236,
-      bodySize: 149
-    };
-    let plainResponse = [
-      'HTTP/1.1 200 Ok',
-      'Connection: keep-alive',
-      'Cache-Control: no-cache',
-      'Content-Encoding: gzip, deflate',
-      'Content-Length: 301',
-      'Content-Type: multipart/mixed;boundary="11136253119209"',
-      '',
-      '--11136253119209',
-      'Content-Disposition: attachment; filename="photo1.jpg"',
-      'Content-Type: application/octet-stream',
-      '',
-      '<binary-data>',
-      '--11136253119209--'
-    ].join(HttpZConsts.eol);
+        ],
+        body: {
+          contentType: 'multipart/alternative',
+          boundary: '111362-53119209',
+          params: [
+            {
+              type: 'inline',
+              value: '<base64-data>'
+            }
+          ]
+        },
+        messageSize: 370,
+        headersSize: 243,
+        bodySize: 84
+      };
+      let plainResponse = [
+        'HTTP/1.1 200 Ok',
+        'Connection: keep-alive',
+        'Cache-Control: no-cache',
+        'Content-Encoding: gzip, deflate',
+        'Content-Length: 301',
+        'Content-Type: multipart/alternative;boundary="111362-53119209"',
+        '',
+        '--111362-53119209',
+        'Content-Disposition: inline',
+        '',
+        '<base64-data>',
+        '--111362-53119209--'
+      ].join(HttpZConsts.EOL);
 
-    let builder = getBuilderInstance(responseModel);
-    let actual = builder.build();
-    should(actual).eql(plainResponse);
+      let builder = getBuilderInstance(responseModel);
+      let actual = builder.build();
+      should(actual).eql(plainResponse);
+    });
+
+    it('should parse response with body and contentType=multipart/mixed (attachment)', () => {
+      let responseModel = {
+        protocolVersion: 'HTTP/1.1',
+        statusCode: 200,
+        statusMessage: 'Ok',
+        headers: [
+          {
+            name: 'Connection',
+            values: [
+              { value: 'keep-alive' }
+            ]
+          },
+          {
+            name: 'Cache-Control',
+            values: [
+              { value: 'no-cache' }
+            ]
+          },
+          {
+            name: 'Content-Encoding',
+            values: [
+              { value: 'gzip' },
+              { value: 'deflate' }
+            ]
+          },
+          {
+            name: 'Content-Length',
+            values: [
+              { value: '301' }
+            ]
+          },
+          {
+            name: 'Content-Type',
+            values: [
+              { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
+            ]
+          }
+        ],
+        body: {
+          contentType: 'multipart/mixed',
+          boundary: '11136253119209',
+          params: [
+            {
+              type: 'attachment',
+              contentType: 'application/octet-stream',
+              fileName: 'photo1.jpg',
+              value: '<binary-data>'
+            }
+          ]
+        },
+        messageSize: 428,
+        headersSize: 236,
+        bodySize: 149
+      };
+      let plainResponse = [
+        'HTTP/1.1 200 Ok',
+        'Connection: keep-alive',
+        'Cache-Control: no-cache',
+        'Content-Encoding: gzip, deflate',
+        'Content-Length: 301',
+        'Content-Type: multipart/mixed;boundary="11136253119209"',
+        '',
+        '--11136253119209',
+        'Content-Disposition: attachment; filename="photo1.jpg"',
+        'Content-Type: application/octet-stream',
+        '',
+        '<binary-data>',
+        '--11136253119209--'
+      ].join(HttpZConsts.EOL);
+
+      let builder = getBuilderInstance(responseModel);
+      let actual = builder.build();
+      should(actual).eql(plainResponse);
+    });
   });
 });

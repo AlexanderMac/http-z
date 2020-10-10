@@ -44,7 +44,7 @@ class FormDataParamParser {
       throw HttpZError.get('Incorrect Content-Disposition', this.paramGroup);
     }
     this.paramGroup = this.paramGroup.replace(contentDisposition[0], '');
-    contentDisposition = _.trimEnd(contentDisposition[0], consts.eol);
+    contentDisposition = _.trimEnd(contentDisposition[0], consts.EOL);
     return contentDisposition;
   }
 
@@ -55,7 +55,7 @@ class FormDataParamParser {
       return _.chain(contentType)
         .toLower()
         .replace(/^content-type: */, '')
-        .trimEnd(consts.eol)
+        .trimEnd(consts.EOL)
         .value();
     }
   }

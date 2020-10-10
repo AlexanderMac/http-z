@@ -11,15 +11,14 @@ class HttpZBaseParser {
   }
 
   _parseMessageForRows() {
-    let eol2x = consts.eol2x;
-    let [headers, body] = utils.splitByDelimeter(this.plainMessage, eol2x);
+    let [headers, body] = utils.splitByDelimeter(this.plainMessage, consts.EOL2X);
     if (_.isNil(headers) || _.isNil(body)) {
       throw HttpZError.get(
         'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
       );
     }
 
-    let headerRows = _.split(headers, consts.eol);
+    let headerRows = _.split(headers, consts.EOL);
     let startRow = headerRows[0];
     headerRows = headerRows.splice(1);
     let bodyRows = body;
@@ -65,7 +64,7 @@ class HttpZBaseParser {
       }
 
       return {
-        name: utils.capitalizeHeaderName(name),
+        name: utils.pretifyHeaderName(name),
         values: valuesWithParams
       };
     });
@@ -97,21 +96,16 @@ class HttpZBaseParser {
   _parseFormDataBody() {
     this.body.boundary = this._getBoundary();
     this.body.params = _.chain(this.bodyRows)
-      .split(new RegExp(`--${this.body.boundary} *`))
+      .split(`--${this.body.boundary}`)
       // skip first and last items, which contains boundary
       .filter((unused, index, params) => index > 0 && index < params.length - 1)
       .map(paramGroup => formDataParamParser.parse(paramGroup))
       .value();
   }
 
-  // TODO: validate RFC
   _parseUrlencodedBody() {
-    if (this.bodyRows) {
-      let params = qs.parse(this.bodyRows);
-      this.body.params = _.map(params, (value, name) => ({ name, value }));
-    } else {
-      this.body.params = [];
-    }
+    let params = qs.parse(this.bodyRows);
+    this.body.params = _.map(params, (value, name) => ({ name, value }));
   }
 
   _parseTextBody() {

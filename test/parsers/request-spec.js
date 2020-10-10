@@ -35,7 +35,7 @@ describe('parsers / request', () => {
 
   describe('parse', () => {
     it('should call related methods and return request model', () => {
-      let parser = getParserInstance('plainRequest', 'eol');
+      let parser = getParserInstance('plainRequest', 'EOL');
       sinon.stub(parser, '_parseMessageForRows');
       sinon.stub(parser, '_parseHostRow');
       sinon.stub(parser, '_parseStartRow');
@@ -68,7 +68,7 @@ describe('parsers / request', () => {
         'header3',
         '',
         'body'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let parser = getParserInstance(plainRequest);
       parser._parseMessageForRows();
@@ -90,7 +90,7 @@ describe('parsers / request', () => {
         'cookie: somecookies',
         '',
         'body'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let parser = getParserInstance(plainRequest);
       parser._parseMessageForRows();
@@ -346,7 +346,7 @@ describe('parsers / request', () => {
         'host: www.example.com',
         '',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let requestModel = {
         method: 'GET',
@@ -381,7 +381,7 @@ describe('parsers / request', () => {
         'generated-by: "modern-framework 2020"',
         '',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let requestModel = {
         method: 'GET',
@@ -451,7 +451,7 @@ describe('parsers / request', () => {
         'Cookie: csrftoken=123abc;sessionid=sd=456def;userid=',
         '',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let requestModel = {
         method: 'GET',
@@ -516,7 +516,7 @@ describe('parsers / request', () => {
         'Content-Length: 301',
         '',
         'Text data'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let requestModel = {
         method: 'POST',
@@ -601,7 +601,7 @@ describe('parsers / request', () => {
         'Content-Length: 301',
         '',
         'firstName=John&lastName=&age=25'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let requestModel = {
         method: 'POST',
@@ -706,7 +706,7 @@ describe('parsers / request', () => {
         'more info',
         '',
         '--111362:53119209--'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let requestModel = {
         method: 'POST',
@@ -810,7 +810,7 @@ describe('parsers / request', () => {
       '',
       '<base64-data>',
       '--111362-53119209--'
-    ].join(HttpZConsts.eol);
+    ].join(HttpZConsts.EOL);
 
     let requestModel = {
       method: 'POST',
@@ -906,7 +906,7 @@ describe('parsers / request', () => {
       '',
       '<binary-data>',
       '--11136253119209--'
-    ].join(HttpZConsts.eol);
+    ].join(HttpZConsts.EOL);
 
     let requestModel = {
       method: 'POST',

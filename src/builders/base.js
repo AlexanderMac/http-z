@@ -18,24 +18,24 @@ class HttpZBaseBuilder {
         validators.validateRequired(header.name, 'header name', `header index: ${index}`);
         validators.validateArray(header.values, 'header.values', `header index: ${index}`);
 
-        let headerName = utils.capitalizeHeaderName(header.name);
+        let headerName = utils.pretifyHeaderName(header.name);
         let headerValues = _.chain(header.values)
           .map(headerVal => {
-            validators.validateRequired(headerVal.value, 'header.values.value', `header index: ${index}`);
-            if (headerVal.params) {
-              return headerVal.value + ';' + headerVal.params;
+            let value = utils.getEmptyStringForUndefined(headerVal.value);
+            if (value && headerVal.params) {
+              return value + ';' + headerVal.params;
             }
-            return headerVal.value;
+            return value;
           })
           .join(', ')
           .value();
 
         return headerName + ': ' + headerValues;
       })
-      .join(consts.eol)
+      .join(consts.EOL)
       .value();
 
-    return headerRowsStr + consts.eol;
+    return headerRowsStr + consts.EOL;
   }
 
   _generateBodyRows() {
@@ -48,11 +48,11 @@ class HttpZBaseBuilder {
       case consts.http.contentTypes.multipart.alternative:
       case consts.http.contentTypes.multipart.mixed:
       case consts.http.contentTypes.multipart.related:
-        return consts.eol + this._generateFormDataBody();
+        return consts.EOL + this._generateFormDataBody();
       case consts.http.contentTypes.application.xWwwFormUrlencoded:
-        return consts.eol + this._generateXwwwFormUrlencodedBody();
+        return consts.EOL + this._generateUrlencodedBody();
       default:
-        return consts.eol + this._generateTextBody();
+        return consts.EOL + this._generateTextBody();
     }
   }
 
@@ -66,7 +66,7 @@ class HttpZBaseBuilder {
         validators.validateNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`);
       }
       let paramGroupStr = '--' + this.body.boundary;
-      paramGroupStr += consts.eol;
+      paramGroupStr += consts.EOL;
       paramGroupStr += `Content-Disposition: ${param.type || 'form-data'}`;
       if (param.name) {
         paramGroupStr += `; name="${param.name}"`;
@@ -74,21 +74,21 @@ class HttpZBaseBuilder {
       if (param.fileName) {
         paramGroupStr += `; filename="${param.fileName}"`;
       }
-      paramGroupStr += consts.eol;
+      paramGroupStr += consts.EOL;
       if (param.contentType) {
         paramGroupStr += `Content-Type: ${param.contentType}`;
-        paramGroupStr += consts.eol;
+        paramGroupStr += consts.EOL;
       }
-      paramGroupStr += consts.eol;
+      paramGroupStr += consts.EOL;
       paramGroupStr += utils.getEmptyStringForUndefined(param.value);
-      paramGroupStr += consts.eol;
+      paramGroupStr += consts.EOL;
       return paramGroupStr;
     }).join('');
 
     return `${paramsStr}--${this.body.boundary}--`;
   }
 
-  _generateXwwwFormUrlencodedBody() {
+  _generateUrlencodedBody() {
     validators.validateArray(this.body.params, 'body.params');
 
     let params = _.reduce(this.body.params, (result, dataParam, index) => {
@@ -101,8 +101,7 @@ class HttpZBaseBuilder {
   }
 
   _generateTextBody() {
-    validators.validateRequired(this.body.text, 'body.text');
-    return this.body.text;
+    return utils.getEmptyStringForUndefined(this.body.text);
   }
 }
 

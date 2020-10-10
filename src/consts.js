@@ -1,25 +1,24 @@
-// TODO: rename to upper case
-const eol = '\r\n';
-const eol2x = eol + eol;
-const basicLatin = '[\\u0009\\u0020-\\u007E]';
-const paramName = '[A-Za-z0-9_.\\[\\]-]'; // TODO: extend
-const methods = '(CONNECT|OPTIONS|TRACE|GET|HEAD|POST|PUT|PATCH|DELETE)';
-const protocolVer = '(HTTP)\\/(1\\.0|1\\.1|2\\.0)';
+const EOL = '\r\n';
+const EOL2X = EOL + EOL;
+const BASIC_LATIN = '[\\u0009\\u0020-\\u007E]';
+const PARAM_NAME = '[A-Za-z0-9_.\\[\\]-]'; // TODO: extend
+const HTTP_METHODS = '(CONNECT|OPTIONS|TRACE|GET|HEAD|POST|PUT|PATCH|DELETE)';
+const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2\\.0)';
 
 const regexps = {};
 regexps.quote = /"/g;
-regexps.startNl = new RegExp(`^${eol}`);
-regexps.endNl = new RegExp(`${eol}$`);
-regexps.requestStartRow = new RegExp(`^${methods} \\S* ${protocolVer}$`);
-regexps.responseStartRow = new RegExp(`^${protocolVer} \\d{3} ${basicLatin}*$`);
+regexps.startNl = new RegExp(`^${EOL}`);
+regexps.endNl = new RegExp(`${EOL}$`);
+regexps.requestStartRow = new RegExp(`^${HTTP_METHODS} \\S* ${HTTP_PROTOCOL_VERSIONS}$`);
+regexps.responseStartRow = new RegExp(`^${HTTP_PROTOCOL_VERSIONS} \\d{3} ${BASIC_LATIN}*$`);
 // TODO: maybe incorrect, because basicLatin contains quote
-regexps.quoutedHeaderValue = new RegExp(`^"${basicLatin}+"$`);
+regexps.quoutedHeaderValue = new RegExp(`^"${BASIC_LATIN}+"$`);
 regexps.boundary = /(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}/;
-regexps.contentDisposition = new RegExp(`^Content-Disposition: *(form-data|inline|attachment)${basicLatin}*${eol}`, 'i');
-regexps.contentType = new RegExp(`^Content-Type:[\\S ]*${eol}`, 'i');
+regexps.contentDisposition = new RegExp(`^Content-Disposition: *(form-data|inline|attachment)${BASIC_LATIN}*${EOL}`, 'i');
+regexps.contentType = new RegExp(`^Content-Type:[\\S ]*${EOL}`, 'i');
 regexps.contentDispositionType = /(?<=Content-Disposition:) *(form-data|inline|attachment)/;
-regexps.dispositionName = new RegExp(`(?<=name=)"${paramName}+"`, 'i');
-regexps.dispositionFileName = new RegExp(`(?<=filename=)"${paramName}+"`, 'i');
+regexps.dispositionName = new RegExp(`(?<=name=)"${PARAM_NAME}+"`, 'i');
+regexps.dispositionFileName = new RegExp(`(?<=filename=)"${PARAM_NAME}+"`, 'i');
 
 const http = {};
 
@@ -109,8 +108,8 @@ http.headers = {
 };
 
 module.exports = {
-  eol,
-  eol2x,
+  EOL,
+  EOL2X,
   regexps,
   http
 };

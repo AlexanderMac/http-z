@@ -15,7 +15,7 @@ describe('parsers / base', () => {
       let plainRequest = [
         '',
         'Body'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
       let parser = getParserInstance(plainRequest);
 
       should(parser._parseMessageForRows.bind(parser)).throw(Error, {
@@ -28,7 +28,7 @@ describe('parsers / base', () => {
         'start-line',
         'host-line',
         'Header1'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
       let parser = getParserInstance(plainRequest);
 
       should(parser._parseMessageForRows.bind(parser)).throw(HttpZError, {
@@ -46,7 +46,7 @@ describe('parsers / base', () => {
         'Cookie',
         '',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
       let parser = getParserInstance(plainRequest);
 
       let actual = parser._parseMessageForRows();
@@ -69,7 +69,7 @@ describe('parsers / base', () => {
         'Cookie',
         '',
         'Body'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
       let parser = getParserInstance(plainRequest);
 
       let actual = parser._parseMessageForRows();
@@ -154,7 +154,7 @@ describe('parsers / base', () => {
       should(parser.body).eql(expected);
 
       nassert.assertFn({ inst: parser, fnName: '_parseFormDataBody', expectedArgs: expectedFnArgs.parseFormDataBody });
-      nassert.assertFn({ inst: parser, fnName: '_parseUrlencodedBody', expectedArgs: expectedFnArgs.parseXwwwFormUrlencodedBody });
+      nassert.assertFn({ inst: parser, fnName: '_parseUrlencodedBody', expectedArgs: expectedFnArgs.parseUrlencodedBody });
       nassert.assertFn({ inst: parser, fnName: '_parseTextBody', expectedArgs: expectedFnArgs.parseTextBody });
     }
 
@@ -184,7 +184,7 @@ describe('parsers / base', () => {
         contentType: 'application/x-www-form-urlencoded',
         params: 'body'
       };
-      let expectedFnArgs = { parseXwwwFormUrlencodedBody: '_without-args_' };
+      let expectedFnArgs = { parseUrlencodedBody: '_without-args_' };
 
       test({ headers, bodyRows, expected, expectedFnArgs });
     });
@@ -232,7 +232,7 @@ describe('parsers / base', () => {
         'Content-Disposition: form-data; name="age"',
         '25',
         '--11136253119209--'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       should(parser._parseFormDataBody.bind(parser)).throw(HttpZError, {
         message: 'Incorrect form-data parameter',
@@ -261,7 +261,7 @@ describe('parsers / base', () => {
         '',
         '',
         '--11136253119209--'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       parser._parseFormDataBody();
 

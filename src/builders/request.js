@@ -44,11 +44,11 @@ class HttpZRequestBuilder extends Base {
         queryParams: this.queryParams
       }) + ' ' +
       this.protocolVersion.toUpperCase() +
-      consts.eol;
+      consts.EOL;
   }
 
   _generateHostRow() {
-    return 'Host: ' + this.host + consts.eol;
+    return 'Host: ' + this.host + consts.EOL;
   }
 
   _generateHeaderRows() {
@@ -72,7 +72,7 @@ class HttpZRequestBuilder extends Base {
       return name + '=' + (value || '');
     });
 
-    return 'Cookie: ' + cookiesStr.join('; ') + consts.eol;
+    return 'Cookie: ' + cookiesStr.join('; ') + consts.EOL;
   }
 }
 

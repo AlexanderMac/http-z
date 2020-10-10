@@ -45,7 +45,7 @@ describe('parsers / index', () => {
       'GET /features HTTP/1.1',
       'host: example.com',
       ''
-    ].join(HttpZConsts.eol);
+    ].join(HttpZConsts.EOL);
     let expected = 'parsed-request';
     let expectedArgs = plainMessage;
 
@@ -67,7 +67,7 @@ describe('parsers / index', () => {
       'HTTP/1.1 200 Ok',
       'host: example.com',
       ''
-    ].join(HttpZConsts.eol);
+    ].join(HttpZConsts.EOL);
     let expected = 'parsed-response';
     let expectedArgs = plainMessage;
 

@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const should = require('should');
 const utils = require('../src/utils');
 
@@ -45,26 +46,62 @@ describe('utils', () => {
   });
 
   describe('parseUrl', () => {
-    function test(url, expected) {
-      let actual = utils.parseUrl(url);
-      should(actual.href).eql(expected.href);
-      should(actual.protocol).eql(expected.protocol);
+    function getDefParsedUrl(ex) {
+      return _.extend({
+        protocol: 'HTTP',
+        host: 'example.com',
+        path: '/',
+        params: []
+      }, ex);
     }
 
-    it('should parse url started with http', () => {
-      test('http://example.com', { href: 'http://example.com/', protocol: 'http:' });
+    function test(path, origin, expected) {
+      let actual = utils.parseUrl(path, origin);
+      should(actual).eql(expected);
+    }
+
+    describe('call with one parameter', () => {
+      it('should parse url started with http', () => {
+        test('http://example.com', undefined, getDefParsedUrl());
+      });
+
+      it('should parse url started with https', () => {
+        test('https://example.com', undefined, getDefParsedUrl({ protocol: 'HTTPS' }));
+      });
+
+      it('should add http for url without protocol and parse it', () => {
+        test('example.com', undefined, getDefParsedUrl({ protocol: 'HTTP' }));
+      });
+
+      it('should parse url with path', () => {
+        test('http://example.com/home', undefined, getDefParsedUrl({ path: '/home' }));
+      });
+
+      it('should parse url with path and params', () => {
+        test('http://example.com/home?p1=v1', undefined, getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }));
+      });
     });
 
-    it('should parse url started with https', () => {
-      test('https://example.com', { href: 'https://example.com/', protocol: 'https:' });
-    });
+    describe('call with two parameters', () => {
+      it('should parse url started with http', () => {
+        test('/', 'http://example.com', getDefParsedUrl());
+      });
 
-    it('should parse url started with ftp', () => {
-      test('ftp://example.com', { href: 'ftp://example.com/', protocol: 'ftp:' });
-    });
+      it('should parse url started with https', () => {
+        test('/', 'https://example.com', getDefParsedUrl({ protocol: 'HTTPS' }));
+      });
 
-    it('should add http for url without protocol and parse it', () => {
-      test('example.com', { href: 'http://example.com/', protocol: 'http:' });
+      it('should add http for url without protocol and parse it', () => {
+        test('/', 'example.com', getDefParsedUrl({ protocol: 'HTTP' }));
+      });
+
+      it('should parse url with path', () => {
+        test('/home', 'http://example.com', getDefParsedUrl({ path: '/home' }));
+      });
+
+      it('should parse url with path and params', () => {
+        test('/home?p1=v1', 'http://example.com', getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }));
+      });
     });
   });
 
@@ -93,9 +130,9 @@ describe('utils', () => {
     });
   });
 
-  describe('capitalizeHeaderName', () => {
+  describe('pretifyHeaderName', () => {
     function test(name, expected) {
-      let actual = utils.capitalizeHeaderName(name);
+      let actual = utils.pretifyHeaderName(name);
       should(actual).eql(expected);
     }
 
@@ -117,6 +154,43 @@ describe('utils', () => {
 
     it('should return capitalized name when it contain three elements', () => {
       test('x-Server-version', 'X-Server-Version');
+    });
+  });
+
+  describe('getEmptyStringForUndefined', () => {
+    function test(val, expected) {
+      let actual = utils.getEmptyStringForUndefined(val);
+      should(actual).eql(expected);
+    }
+
+    it('should return empty string when val is undefined', () => {
+      test(undefined, '');
+    });
+
+    it('should return val when val is not undefined', () => {
+      test('Cookie', 'Cookie');
+    });
+  });
+
+  describe('extendIfNotUndefined', () => {
+    function getDefObject(ex) {
+      return _.extend({
+        name: 'John'
+      }, ex);
+    }
+
+    function test(fieldName, fieldValue, expected) {
+      let obj = getDefObject();
+      utils.extendIfNotUndefined(obj, fieldName, fieldValue);
+      should(obj).eql(expected);
+    }
+
+    it('should not extend object by new field when fieldValue is undefined', () => {
+      test('login', undefined, getDefObject());
+    });
+
+    it('should extend object by new field when fieldValue is not undefined', () => {
+      test('login', 'smith', getDefObject({ login: 'smith' }));
     });
   });
 });

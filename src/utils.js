@@ -18,12 +18,27 @@ exports.splitByDelimeter = (str, delimiter) => {
   return res;
 };
 
-exports.parseUrl = (url) => {
-  const knownProtocols = ['http', 'https', 'ftp'];
-  if (!_.find(knownProtocols, known => _.startsWith(url, known + '://'))) {
-    url = 'http://' + url;
+exports.parseUrl = (path, origin) => {
+  if (!origin) {
+    origin = path;
+    path = null;
   }
-  return new URL(url);
+  const knownProtocols = ['http', 'https'];
+  if (!_.find(knownProtocols, known => _.startsWith(origin, known + '://'))) {
+    origin = 'http://' + origin;
+  }
+
+  let parsedUrl = path ? new URL(path, origin) : new URL(origin);
+  let protocol = parsedUrl.protocol.replace(':', '').toUpperCase();
+  let params = [];
+  parsedUrl.searchParams.forEach((value, name) => params.push({ name, value }));
+
+  return {
+    protocol,
+    host: parsedUrl.host,
+    path: parsedUrl.pathname,
+    params
+  };
 };
 
 exports.generatePath = ({ path, queryParams }) => {
@@ -38,8 +53,7 @@ exports.generatePath = ({ path, queryParams }) => {
   return path + '?' + qs.stringify(queryParamsObj);
 };
 
-// TODO: rename to pretifyHeaderName
-exports.capitalizeHeaderName = (name) => {
+exports.pretifyHeaderName = (name) => {
   // accept => Accept, accept-encoding => Accept-Encoding, etc
   return _.chain(name)
     .split('-')
@@ -48,7 +62,6 @@ exports.capitalizeHeaderName = (name) => {
     .value();
 };
 
-// TODO: test it
 exports.getEmptyStringForUndefined = (val) => {
   if (_.isUndefined(val)) {
     return '';
@@ -56,7 +69,6 @@ exports.getEmptyStringForUndefined = (val) => {
   return val;
 };
 
-// TODO: test it
 exports.extendIfNotUndefined = (obj, fieldName, fieldValue) => {
   if (!_.isUndefined(fieldValue)) {
     obj[fieldName] = fieldValue;

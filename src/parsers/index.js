@@ -9,7 +9,7 @@ module.exports = (plainMessage) => {
     throw HttpZError.get('plainMessage is required');
   }
 
-  let firstRow = _.chain(plainMessage).split(consts.eol).head().value();
+  let firstRow = _.chain(plainMessage).split(consts.EOL).head().value();
   if (consts.regexps.requestStartRow.test(firstRow)) {
     return RequestParser.parse(plainMessage);
   }

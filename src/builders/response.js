@@ -31,7 +31,7 @@ class HttpZResponseBuilder extends Base {
     validators.validateNotEmptyString(this.statusMessage, 'statusMessage');
 
     let protocolVersion = this.protocolVersion.toUpperCase();
-    return `${protocolVersion} ${this.statusCode} ${this.statusMessage}` + consts.eol;
+    return `${protocolVersion} ${this.statusCode} ${this.statusMessage}` + consts.EOL;
   }
 
   _generateCookieRows() {
@@ -39,7 +39,7 @@ class HttpZResponseBuilder extends Base {
       return '';
     }
 
-    validators.validateNotEmptyArray(this.cookies, 'cookies');
+    validators.validateArray(this.cookies, 'cookies');
 
     let cookieRowsStr = _.chain(this.cookies)
       .map(({ name, value, params }, index) => {
@@ -51,10 +51,10 @@ class HttpZResponseBuilder extends Base {
         }
         return `Set-Cookie: ${name}=${value || ''}` + paramsStr;
       })
-      .join(consts.eol)
+      .join(consts.EOL)
       .value();
 
-    return cookieRowsStr + consts.eol;
+    return cookieRowsStr + consts.EOL;
   }
 }
 

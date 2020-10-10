@@ -58,10 +58,10 @@ class HttpZRequestParser extends Base {
     this.protocolVersion = rowElems[2].toUpperCase();
     let path = rowElems[1];
 
-    let url = utils.parseUrl(this.host + path);
-    this.protocol = this._getProtocol(url);
-    this.path = url.pathname;
-    this.queryParams = this._getQueryParams(url);
+    let parsedUrl = utils.parseUrl(path, this.host);
+    this.protocol = parsedUrl.protocol;
+    this.path = parsedUrl.path;
+    this.queryParams = parsedUrl.params;
   }
 
   _parseCookiesRow() {
@@ -120,18 +120,6 @@ class HttpZRequestParser extends Base {
     }
 
     return model;
-  }
-
-  // TODO: test it
-  _getProtocol(url) {
-    return url.protocol.replace(':', '').toUpperCase();
-  }
-
-  // TODO: test it
-  _getQueryParams(url) {
-    let queryParams = [];
-    url.searchParams.forEach((value, name) => queryParams.push({ name, value }));
-    return queryParams;
   }
 }
 

@@ -64,12 +64,12 @@ describe('parse-build-parse', ()=> {
       'Auth-Token: vmbH^=%%mbJkq.lh-8!<}',
       '',
       'firstName=John&p1%20!%40%23%24%25%5E%26*()-%3D_%2B()%7B%7D=v1%20!%40%23%24%25%5E%26*()-%3D_%2B()%7B%7D%5B%5D'
-    ].join(HttpZConsts.eol);
+    ].join(HttpZConsts.EOL);
 
     let builder = getBuilderInstance(requestModel);
     should(builder.build()).eql(plainRequest);
 
-    let parser = getParserInstance(plainRequest, HttpZConsts.eol);
+    let parser = getParserInstance(plainRequest, HttpZConsts.EOL);
     should(parser.parse()).eql(requestModel);
   });
 });

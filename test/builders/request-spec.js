@@ -43,10 +43,10 @@ describe('builders / request', () => {
   describe('build', () => {
     it('should call related methods and return request message', () => {
       let builder = getBuilderInstance();
-      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.eol);
-      sinon.stub(builder, '_generateHostRow').returns('hostRow' + HttpZConsts.eol);
-      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.eol);
-      sinon.stub(builder, '_generateCookiesRow').returns('cookieRow' + HttpZConsts.eol);
+      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL);
+      sinon.stub(builder, '_generateHostRow').returns('hostRow' + HttpZConsts.EOL);
+      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL);
+      sinon.stub(builder, '_generateCookiesRow').returns('cookieRow' + HttpZConsts.EOL);
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows');
 
       let expected = [
@@ -55,7 +55,7 @@ describe('builders / request', () => {
         'headerRows',
         'cookieRow',
         'bodyRows'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
       let actual = builder.build();
       should(actual).eql(expected);
 
@@ -111,7 +111,7 @@ describe('builders / request', () => {
     it('should build startRow when all params are valid', () => {
       let builder = getBuilderInstance();
 
-      let expected = 'GET / HTTP/1.1' + HttpZConsts.eol;
+      let expected = 'GET / HTTP/1.1' + HttpZConsts.EOL;
       let actual = builder._generateStartRow();
       should(actual).eql(expected);
     });
@@ -121,7 +121,7 @@ describe('builders / request', () => {
     it('should build hostRow', () => {
       let builder = getBuilderInstance({ host: 'example.com' });
 
-      let expected = 'Host: example.com' + HttpZConsts.eol;
+      let expected = 'Host: example.com' + HttpZConsts.EOL;
       let actual = builder._generateHostRow();
       should(actual).eql(expected);
     });
@@ -167,7 +167,7 @@ describe('builders / request', () => {
         ]
       });
 
-      let expected = 'Cookie: c1=v1; c2=v2; c3=' + HttpZConsts.eol;
+      let expected = 'Cookie: c1=v1; c2=v2; c3=' + HttpZConsts.EOL;
       let actual = builder._generateCookiesRow();
       should(actual).eql(expected);
     });
@@ -193,7 +193,7 @@ describe('builders / request', () => {
         'Host: example.com',
         '',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -242,7 +242,7 @@ describe('builders / request', () => {
         'Cache-Control: no-cache',
         'Content-Encoding: gzip, deflate',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -312,7 +312,7 @@ describe('builders / request', () => {
         'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
         'Cookie: csrftoken=123abc; sessionid=456def; username=',
         ''
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -393,7 +393,7 @@ describe('builders / request', () => {
         'Content-Length: 301',
         '',
         'Text data'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -478,7 +478,7 @@ describe('builders / request', () => {
         'Content-Length: 301',
         '',
         'firstName=John&lastName=&age=25'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
@@ -589,7 +589,7 @@ describe('builders / request', () => {
         'more info',
         '',
         '--111362:53119209--'
-      ].join(HttpZConsts.eol);
+      ].join(HttpZConsts.EOL);
 
       let builder = getBuilderInstance(requestModel);
       let actual = builder.build();
