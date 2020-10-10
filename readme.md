@@ -6,8 +6,10 @@
 
 ## Features
 
+HTTP request/response message parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230).
+
 * Parse HTTP request/response plain message:
-  - path params
+  - query params
   - headers
   - cookies
   - body, supported contentTypes:
@@ -16,7 +18,7 @@
     - `application/json`,
     - `text/plain`
 * Build HTTP request/response plain message from model:
-  - path params
+  - query params
   - headers
   - cookies
   - body, supported contentTypes:
@@ -35,7 +37,7 @@ $ npm i http-z
 ## Usage
 
 ```js
-const httpZ = require('http-z');
+const httpZ = require('http-z')
 
 let plainMessage = [
   'GET /features?p1=v1 HTTP/1.1',
@@ -45,10 +47,10 @@ let plainMessage = [
   'Accept-Language: en-US;q=0.6, en;q=0.4',
   '',
   ''
-].join('\r\n');
+].join('\r\n')
 
-let messageModel = httpZ.parse(plainMessage);
-console.log(JSON.stringify(messageModel, null, 2));
+let messageModel = httpZ.parse(plainMessage)
+console.log(JSON.stringify(messageModel, null, 2))
 
 /* output:
 { 
@@ -75,8 +77,8 @@ console.log(JSON.stringify(messageModel, null, 2));
 }
 */
 
-plainMessage = httpZ.build(messageModel);
-console.log(plainMessage);
+plainMessage = httpZ.build(messageModel)
+console.log(plainMessage)
 
 /* output:
 GET /features?p1=v1 HTTP/1.1
@@ -99,6 +101,11 @@ Parse HTTP request/response plain message and return model.
 Build HTTP request/response plain message from model.
 
 - `messageModel` is HTTP message model.
+
+## References
+- [RFC 7230: Hypertext Transfer Protocol (HTTP/1.1)](https://tools.ietf.org/html/rfc7230)
+- [RFC 7578: Returning Values from Forms: multipart/form-data](https://tools.ietf.org/html/rfc7578)
+- [RFC 2046: Multipurpose Internet Mail Extensions](https://tools.ietf.org/html/rfc2046)
 
 ## Author
 Alexander Mac
