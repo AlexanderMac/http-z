@@ -3,10 +3,10 @@ export namespace consts {}
 export class HttpZError extends Error {}
 
 declare class HttpZParam {
+  type?: 'inline' | 'attachment';
+  contentType?: string;
   name: string;
-  value: string;
-  // TODO: type
-  // TODO: contentType
+  fileName?: string;
 }
 
 declare class HttpZBody {

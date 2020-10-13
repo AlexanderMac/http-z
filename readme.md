@@ -9,19 +9,21 @@
 HTTP request/response message parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230).
 
 * Parse HTTP request/response plain message:
+  - method, protocol, protocol version / status code, reason
   - query params
   - headers
   - cookies
-  - body, supported contentTypes:
+  - body, the following contentTypes are supported:
     - `multipart/form-data`
     - `application/x-www-form-urlencoded`
     - `application/json`,
     - `text/plain`
 * Build HTTP request/response plain message from model:
+  - method, protocol, protocol version / status code, reason
   - query params
   - headers
   - cookies
-  - body, supported contentTypes:
+  - body, the following contentTypes are supported:
     - `multipart/form-data`
     - `application/x-www-form-urlencoded`
     - `application/json`
@@ -92,12 +94,12 @@ Accept-Language: en-US;q=0.6, en;q=0.4
 ## API
 
 ### parse(plainMessage)
-Parse HTTP request/response plain message and return model.
+Parses HTTP request/response plain message and returns a model.
 
 - `plainMessage` is HTTP plain message.
 
 ### build(messageModel)
-Build HTTP request/response plain message from model.
+Builds HTTP request/response plain message from the model.
 
 - `messageModel` is HTTP message model.
 
