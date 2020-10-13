@@ -1,13 +1,13 @@
 {
   "globals": {
-    "describe"  : true,
-    "it"        : true,
-    "before"    : true,
+    "describe": true,
+    "it": true,
+    "before": true,
     "beforeEach": true,
-    "after"     : true,
-    "afterEach" : true,
-    "inject"    : true,
-    "expect"    : true
+    "after": true,
+    "afterEach": true,
+    "inject": true,
+    "expect": true
   },
   "rules": {
     "max-len": 0,

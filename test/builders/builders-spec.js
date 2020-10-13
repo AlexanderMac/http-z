@@ -17,10 +17,21 @@ describe('builders / index', () => {
     ResponseBuilder.build.restore()
   })
 
-  it('should throw error when messageModel is undefined', () => {
-    should(builder.bind(null)).throw(HttpZError, {
+  it('should throw error when messageModel is nil', () => {
+    const ERR = {
       message: 'messageModel is required'
-    })
+    }
+    should(builder.bind(null, undefined)).throw(HttpZError, ERR)
+    should(builder.bind(null, null)).throw(HttpZError, ERR)
+  })
+
+  it('should throw error when messageModel is not a plain object', () => {
+    const ERR = {
+      message: 'messageModel must be a plain object'
+    }
+    should(builder.bind(null, 123)).throw(HttpZError, ERR)
+    should(builder.bind(null, 'message')).throw(HttpZError, ERR)
+    should(builder.bind(null, ['message'])).throw(HttpZError, ERR)
   })
 
   it('should throw error when model has unknown format', () => {

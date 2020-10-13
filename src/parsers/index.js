@@ -5,8 +5,11 @@ const RequestParser = require('./request')
 const ResponseParser = require('./response')
 
 module.exports = (plainMessage) => {
-  if (!plainMessage) {
+  if (_.isNil(plainMessage)) {
     throw HttpZError.get('plainMessage is required')
+  }
+  if (!_.isString(plainMessage)) {
+    throw HttpZError.get('plainMessage must be a string')
   }
 
   let firstRow = _.chain(plainMessage).split(consts.EOL).head().value()

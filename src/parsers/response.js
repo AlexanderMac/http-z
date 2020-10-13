@@ -48,6 +48,7 @@ class HttpZResponseParser extends Base {
       return
     }
 
+    // eslint-disable-next-line max-statements
     this.cookies = _.map(this.cookieRows, cookiesRow => {
       // eslint-disable-next-line no-unused-vars
       let [unused, values] = utils.splitByDelimeter(cookiesRow, ':')
@@ -55,20 +56,24 @@ class HttpZResponseParser extends Base {
         throw HttpZError.get('Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;...', cookiesRow)
       }
       let params = _.split(values, ';')
+      let paramWithName = _.head(params)
+      let otherParams = _.tail(params)
 
-      let [name, value] = _.chain(params).head().split('=').value()
+      let [name, value] = _.split(paramWithName, '=')
+      name = _.trim(name)
+      value = _.trim(value)
+      if (!name) {
+        throw HttpZError.get('Incorrect set-cookie pair format, expected: Name1=Value1;...', values)
+      }
+
       let cookie = {
-        name: _.trim(name)
+        name
       }
-      if (!cookie.name) {
-        throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values)
-      }
-
       if (value) {
-        cookie.value = _.trim(value)
+        cookie.value = value
       }
-      if (_.slice(params, 1).length > 0) {
-        cookie.params = _.chain(params).slice(1).map(p => _.trim(p)).value()
+      if (otherParams.length > 0) {
+        cookie.params = _.map(otherParams, p => _.trim(p))
       }
 
       return cookie
@@ -80,7 +85,6 @@ class HttpZResponseParser extends Base {
       protocolVersion: this.protocolVersion,
       statusCode: this.statusCode,
       statusMessage: this.statusMessage,
-      messageSize: this.messageSize,
       headersSize: this.headersSize,
       bodySize: this.bodySize
     }

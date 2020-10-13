@@ -39,10 +39,7 @@ class HttpZRequestBuilder extends Base {
 
     return '' +
       this.method.toUpperCase() + ' ' +
-      utils.generatePath({
-        path: this.path,
-        queryParams: this.queryParams
-      }) + ' ' +
+      utils.generatePath(this.path, this.queryParams) + ' ' +
       this.protocolVersion.toUpperCase() +
       consts.EOL
   }
@@ -53,6 +50,7 @@ class HttpZRequestBuilder extends Base {
 
   _generateHeaderRows() {
     validators.validateArray(this.headers, 'headers')
+
     _.remove(this.headers, h => {
       let hName = _.toLower(h.name)
       return hName === 'host' || hName === 'cookie'

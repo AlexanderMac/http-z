@@ -71,7 +71,6 @@ console.log(JSON.stringify(messageModel, null, 2))
       { value: 'en', params: 'q=0.4' } 
     ]}
   ],
-  messageSize: 129,
   headersSize: 98,
   bodySize: 0
 }

@@ -1,10 +1,11 @@
 const _ = require('lodash')
 const should = require('should')
+const HttpZError = require('../src/error')
 const utils = require('../src/utils')
 
 describe('utils', () => {
   describe('splitByDelimeter', () => {
-    const delimiter = ' '
+    const delimiter = ';'
 
     it('should return empty array when str is nil or empty', () => {
       let actual = utils.splitByDelimeter(undefined, delimiter)
@@ -26,21 +27,21 @@ describe('utils', () => {
     })
 
     it('should return empty array with one empty element when str does not contain two parts', () => {
-      let actual = utils.splitByDelimeter('somestring    ', delimiter)
+      let actual = utils.splitByDelimeter('somestring  ;  ', delimiter)
       should(actual).eql(['somestring', ''])
 
-      actual = utils.splitByDelimeter('    somestring', delimiter)
+      actual = utils.splitByDelimeter('  ;  somestring', delimiter)
       should(actual).eql(['', 'somestring'])
     })
 
-    it('should return array of two elems when str contains two parts', () => {
-      let actual = utils.splitByDelimeter('partOne partTwo', delimiter)
+    it('should return array of two elements when str contains two parts', () => {
+      let actual = utils.splitByDelimeter('partOne; partTwo', delimiter)
       should(actual).eql(['partOne', 'partTwo'])
 
-      actual = utils.splitByDelimeter('partOne    partTwo   ', delimiter)
+      actual = utils.splitByDelimeter('partOne  ;  partTwo   ', delimiter)
       should(actual).eql(['partOne', 'partTwo'])
 
-      actual = utils.splitByDelimeter('partOne partTwo partThree', delimiter)
+      actual = utils.splitByDelimeter('partOne; partTwo partThree', delimiter)
       should(actual).eql(['partOne', 'partTwo partThree'])
     })
   })
@@ -69,15 +70,15 @@ describe('utils', () => {
         test('https://example.com', undefined, getDefParsedUrl({ protocol: 'HTTPS' }))
       })
 
-      it('should add http for url without protocol and parse it', () => {
+      it('should add http when url is without protocol', () => {
         test('example.com', undefined, getDefParsedUrl({ protocol: 'HTTP' }))
       })
 
-      it('should parse url with path', () => {
+      it('should parse when url contains path', () => {
         test('http://example.com/home', undefined, getDefParsedUrl({ path: '/home' }))
       })
 
-      it('should parse url with path and params', () => {
+      it('should parse when url contains path and params', () => {
         test('http://example.com/home?p1=v1', undefined, getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }))
       })
     })
@@ -91,42 +92,112 @@ describe('utils', () => {
         test('/', 'https://example.com', getDefParsedUrl({ protocol: 'HTTPS' }))
       })
 
-      it('should add http for url without protocol and parse it', () => {
+      it('should add http when url is without protocol', () => {
         test('/', 'example.com', getDefParsedUrl({ protocol: 'HTTP' }))
       })
 
-      it('should parse url with path', () => {
+      it('should parse when url contains path', () => {
         test('/home', 'http://example.com', getDefParsedUrl({ path: '/home' }))
       })
 
-      it('should parse url with path and params', () => {
+      it('should parse when url contains path and params', () => {
         test('/home?p1=v1', 'http://example.com', getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }))
       })
     })
   })
 
   describe('generatePath', () => {
-    function test(params, expected) {
-      let actual = utils.generatePath(params)
+    function test(path, params, expected) {
+      let actual = utils.generatePath(path, params)
       should(actual).eql(expected)
     }
 
     it('should generate path without params', () => {
-      test({
-        path: '/features'
-      }, '/features')
+      test('/features', null, '/features')
     })
 
     it('should generate path with params', () => {
-      test({
-        path: '/features',
-        queryParams: [
-          { name: 'p1', value: 'v1' },
-          { name: 'p2', value: null },
-          { name: 'p3&[', value: 'some &[] "' },
-          { name: 'p4' }
-        ]
-      }, '/features?p1=v1&p2=&p3%26%5B=some%20%26%5B%5D%20%22&p4=')
+      test('/features', [
+        { name: 'p1', value: 'v1' },
+        { name: 'p2', value: null },
+        { name: 'p3&[', value: 'some &[] "' },
+        { name: 'p4' }
+      ], '/features?p1=v1&p2=&p3%26%5B=some%20%26%5B%5D%20%22&p4=')
+    })
+
+    it('should generate path with params with duplicate names', () => {
+      test('/features', [
+        { name: 'p1', value: 'v1' },
+        { name: 'p2', value: null },
+        { name: 'p3', value: 'x1' },
+        { name: 'p3', value: 'x2' },
+        { name: 'p3', value: 'x3' },
+        { name: 'p4', value: 'y1' },
+        { name: 'p4[]', value: 'y2' }
+      ], '/features?p1=v1&p2=&p3=x1&p3=x2&p3=x3&p4=y1&p4%5B%5D=y2')
+    })
+  })
+
+  describe('convertParamsArrayToObject', () => {
+    function test(params, expected) {
+      let actual = utils.convertParamsArrayToObject(params)
+      should(actual).eql(expected)
+    }
+
+    it('should throw error when params is nil', () => {
+      let expected = HttpZError.get('params is required')
+
+      should(utils.convertParamsArrayToObject.bind(null)).throw(HttpZError, expected)
+    })
+
+    it('should throw error when params is not an array', () => {
+      let params = 'params'
+      let expected = HttpZError.get('params must be an array')
+
+      should(utils.convertParamsArrayToObject.bind(null, params)).throw(HttpZError, expected)
+    })
+
+    it('should throw error when params contains param with empty name', () => {
+      let params = [
+        { name: 'p1', value: 'v1' },
+        { name: 'p2', value: null },
+        { value: 'v3' }
+      ]
+      let expected = HttpZError.get('param name is required', 'param index: 2')
+
+      should(utils.convertParamsArrayToObject.bind(null, params)).throw(HttpZError, expected)
+    })
+
+    it('should return object (params is an array with items with unique names)', () => {
+      test([
+        { name: 'p1', value: 'v1' },
+        { name: 'p2', value: null },
+        { name: 'p3&[', value: 'some &[] "' },
+        { name: 'p4' }
+      ], {
+        p1: 'v1',
+        p2: '',
+        'p3&[': 'some &[] "',
+        p4: ''
+      })
+    })
+
+    it('should return object (params is an array with items with not unique names)', () => {
+      test([
+        { name: 'p1', value: 'v1' },
+        { name: 'p2', value: null },
+        { name: 'p3', value: 'x1' },
+        { name: 'p3', value: 'x2' },
+        { name: 'p3', value: 'x3' },
+        { name: 'p4', value: 'y1' },
+        { name: 'p4[]', value: 'y2' }
+      ], {
+        p1: 'v1',
+        p2: '',
+        p3: ['x1', 'x2', 'x3'],
+        p4: 'y1',
+        'p4[]': 'y2'
+      })
     })
   })
 
@@ -136,23 +207,24 @@ describe('utils', () => {
       should(actual).eql(expected)
     }
 
-    it('should return empty string when name is null', () => {
+    it('should return empty string when name is nil', () => {
+      test(undefined, '')
       test(null, '')
     })
 
-    it('should return name as is when it does not contain elements', () => {
+    it('should return name as is when it does not contain "-" and is already capitalized', () => {
       test('Cookie', 'Cookie')
     })
 
-    it('should return capitalized name when it does not contain elements', () => {
+    it('should return capitalized name when it does not contain "-" and is not capitalized', () => {
       test('cookie', 'Cookie')
     })
 
-    it('should return capitalized name when it contain two elements', () => {
+    it('should return name with two capitalized parts when it contains two "-"', () => {
       test('set-cookie', 'Set-Cookie')
     })
 
-    it('should return capitalized name when it contain three elements', () => {
+    it('should return name with three capitalized parts when it contains three "-"', () => {
       test('x-Server-version', 'X-Server-Version')
     })
   })
@@ -167,7 +239,7 @@ describe('utils', () => {
       test(undefined, '')
     })
 
-    it('should return val when val is not undefined', () => {
+    it('should return string as is when string is not undefined', () => {
       test('Cookie', 'Cookie')
     })
   })

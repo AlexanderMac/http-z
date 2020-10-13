@@ -18,17 +18,13 @@ class HttpZBaseParser {
       )
     }
 
+    this._calcSizes(headers, body)
     let headerRows = _.split(headers, consts.EOL)
-    let startRow = headerRows[0]
-    headerRows = headerRows.splice(1)
-    let bodyRows = body
-
-    this._calcSizes(headerRows, bodyRows)
 
     return {
-      startRow,
-      headerRows,
-      bodyRows
+      startRow: _.head(headerRows),
+      headerRows: _.tail(headerRows),
+      bodyRows: body
     }
   }
 
@@ -76,7 +72,7 @@ class HttpZBaseParser {
     }
 
     this.body = {}
-    this.body.contentType = this._getContentType()
+    this.body.contentType = this._getContentTypeValue()
     switch (this.body.contentType) {
       case consts.http.contentTypes.multipart.formData:
       case consts.http.contentTypes.multipart.alternative:
@@ -112,22 +108,20 @@ class HttpZBaseParser {
     this.body.text = this.bodyRows
   }
 
-  // TODO: is it a valid calculation? What about \r\n
-  _calcSizes(headerRows, bodyRows) {
-    this.messageSize = this.plainMessage.length
-    this.headersSize = _.join(headerRows, '').length
-    this.bodySize = _.join(bodyRows, '').length
+  _calcSizes(headers, body) {
+    this.headersSize = (headers + consts.EOL2X).length
+    this.bodySize = body.length
   }
 
-  _getContentTypeHeader() {
+  _getContentTypeObject() {
     return _.chain(this.headers)
       .find({ name: consts.http.headers.contentType })
       .get('values[0]')
       .value()
   }
 
-  _getContentType() {
-    let contentTypeHeader = this._getContentTypeHeader()
+  _getContentTypeValue() {
+    let contentTypeHeader = this._getContentTypeObject()
     if (!contentTypeHeader) {
       return
     }
@@ -138,9 +132,9 @@ class HttpZBaseParser {
   }
 
   _getBoundary() {
-    let contentTypeHeader = this._getContentTypeHeader()
+    let contentTypeHeader = this._getContentTypeObject()
     if (!contentTypeHeader || !contentTypeHeader.params) {
-      throw HttpZError.get('multipart/form-data message must have Content-Type header with boundary')
+      throw HttpZError.get('Message with multipart/form-data body must have Content-Type header with boundary')
     }
 
     let boundary = contentTypeHeader.params.match(consts.regexps.boundary)

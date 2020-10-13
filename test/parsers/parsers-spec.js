@@ -18,18 +18,21 @@ describe('parsers / index', () => {
     ResponseParser.parse.restore()
   })
 
-  it('should throw error when function called without params', () => {
-    should(parser.bind(null)).throw(HttpZError, {
+  it('should throw error when plainMessage is nil', () => {
+    const ERR = {
       message: 'plainMessage is required'
-    })
+    }
+    should(parser.bind(null, undefined)).throw(HttpZError, ERR)
+    should(parser.bind(null, null)).throw(HttpZError, ERR)
   })
 
-  it('should throw error when plainMessage is nil', () => {
-    let params = [null]
-
-    should(parser.bind(null, ...params)).throw(HttpZError, {
-      message: 'plainMessage is required'
-    })
+  it('should throw error when plainMessage is not a string', () => {
+    const ERR = {
+      message: 'plainMessage must be a string'
+    }
+    should(parser.bind(null, 123)).throw(HttpZError, ERR)
+    should(parser.bind(null, {})).throw(HttpZError, ERR)
+    should(parser.bind(null, [])).throw(HttpZError, ERR)
   })
 
   it('should throw error when plainMessage has unknown format', () => {
@@ -40,7 +43,7 @@ describe('parsers / index', () => {
     })
   })
 
-  function _testCallRequestParser() {
+  it('should call RequestParser.parse when plainMessage is request', () => {
     let plainMessage = [
       'GET /features HTTP/1.1',
       'host: example.com',
@@ -56,13 +59,9 @@ describe('parsers / index', () => {
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedArgs })
     nassert.assertFn({ inst: ResponseParser, fnName: 'parse' })
-  }
-
-  it('should call RequestParser.parse when plainMessage is request', () => {
-    _testCallRequestParser()
   })
 
-  function _testCallResponseParser() {
+  it('should call ResponseParser.parse when plainMessage is response', () => {
     let plainMessage = [
       'HTTP/1.1 200 Ok',
       'host: example.com',
@@ -78,9 +77,5 @@ describe('parsers / index', () => {
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse' })
     nassert.assertFn({ inst: ResponseParser, fnName: 'parse', expectedArgs })
-  }
-
-  it('should call ResponseParser.parse when plainMessage is response', () => {
-    _testCallResponseParser()
   })
 })

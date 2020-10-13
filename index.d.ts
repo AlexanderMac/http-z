@@ -5,6 +5,8 @@ export class HttpZError extends Error {}
 declare class HttpZParam {
   name: string;
   value: string;
+  // TODO: type
+  // TODO: contentType
 }
 
 declare class HttpZBody {
@@ -20,7 +22,6 @@ declare class HttpZRequestModel {
   protocolVersion: string;
   host: string;
   path: string;
-  messageSize: number;
   headersSize: number;
   bodySize: number;
   queryParams?: HttpZParam[];
@@ -33,7 +34,6 @@ declare class HttpZResponseModel {
   protocolVersion: string;
   statusCode: number;
   statusMessage?: string;
-  messageSize: number;
   headersSize: number;
   bodySize: number;
   headers?: HttpZParam[];

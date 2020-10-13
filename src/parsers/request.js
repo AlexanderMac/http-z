@@ -69,8 +69,8 @@ class HttpZRequestParser extends Base {
       return
     }
 
-    let [headerName, values] = utils.splitByDelimeter(this.cookiesRow, ':')
-    if (!headerName) {
+    let [cookieHeaderName, values] = utils.splitByDelimeter(this.cookiesRow, ':')
+    if (!cookieHeaderName) {
       throw HttpZError.get('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow)
     }
     if (!values) {
@@ -102,7 +102,6 @@ class HttpZRequestParser extends Base {
       protocolVersion: this.protocolVersion,
       host: this.host,
       path: this.path,
-      messageSize: this.messageSize,
       headersSize: this.headersSize,
       bodySize: this.bodySize
     }

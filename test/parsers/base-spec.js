@@ -11,7 +11,7 @@ describe('parsers / base', () => {
   }
 
   describe('_parseMessageForRows', () => {
-    it('should throw error when message does not have headers', () => {
+    it('should throw error when message does not have start-line', () => {
       let plainRequest = [
         '',
         'Body'
@@ -23,7 +23,7 @@ describe('parsers / base', () => {
       })
     })
 
-    it('should throw error when message does not have empty line and body', () => {
+    it('should throw error when message does not have empty line between headers and body', () => {
       let plainRequest = [
         'start-line',
         'host-line',
@@ -36,7 +36,7 @@ describe('parsers / base', () => {
       })
     })
 
-    function _testParseMessageWithoutBody() {
+    it('should parse message for rows without body', () => {
       let plainRequest = [
         'start-line',
         'host-line',
@@ -53,13 +53,11 @@ describe('parsers / base', () => {
       should(actual.startRow).eql('start-line')
       should(actual.headerRows).eql(['host-line', 'Header1', 'Header2', 'Header3', 'Cookie'])
       should(actual.bodyRows).eql('')
-    }
-
-    it('should parse message for rows without body', () => {
-      _testParseMessageWithoutBody()
+      should(parser.headersSize).equal(60)
+      should(parser.bodySize).equal(0)
     })
 
-    function _testParseMessageWithBody() {
+    it('should parse message for rows with body', () => {
       let plainRequest = [
         'start-line',
         'host-line',
@@ -76,10 +74,8 @@ describe('parsers / base', () => {
       should(actual.startRow).eql('start-line')
       should(actual.headerRows).eql(['host-line', 'Header1', 'Header2', 'Header3', 'Cookie'])
       should(actual.bodyRows).eql('Body')
-    }
-
-    it('should parse message for rows with body', () => {
-      _testParseMessageWithBody()
+      should(parser.headersSize).equal(60)
+      should(parser.bodySize).equal(4)
     })
   })
 
@@ -159,13 +155,13 @@ describe('parsers / base', () => {
     }
 
     it('should set instance.body to undefined when bodyRows is empty', () => {
-      let bodyRows = undefined
-      let expected = undefined
+      let bodyRows
+      let expected
 
       test({ bodyRows, expected })
     })
 
-    it('should set instance.body when bodyRows are valid and contentType header is multipart/form-data', () => {
+    it('should set instance.body when bodyRows is valid and contentType header is multipart/form-data', () => {
       let headers = [{ name: 'Content-Type', values: [{ value: 'multipart/form-data' }] }]
       let bodyRows = 'body'
       let expected = {
@@ -177,7 +173,7 @@ describe('parsers / base', () => {
       test({ headers, bodyRows, expected, expectedFnArgs })
     })
 
-    it('should set instance.body when bodyRows are valid and contentType header is application/x-www-form-urlencoded', () => {
+    it('should set instance.body when bodyRows is valid and contentType header is application/x-www-form-urlencoded', () => {
       let headers = [{ name: 'Content-Type', values: [{ value: 'application/x-www-form-urlencoded' }] }]
       let bodyRows = 'body'
       let expected = {
@@ -189,7 +185,7 @@ describe('parsers / base', () => {
       test({ headers, bodyRows, expected, expectedFnArgs })
     })
 
-    it('should set instance.body when bodyRows are valid and contentType header is text/plain', () => {
+    it('should set instance.body when bodyRows is valid and contentType header is text/plain', () => {
       let headers = [{ name: 'Content-Type', values: [{ value: 'text/plain' }] }]
       let bodyRows = 'body'
       let expected = {
@@ -201,7 +197,7 @@ describe('parsers / base', () => {
       test({ headers, bodyRows, expected, expectedFnArgs })
     })
 
-    it('should set instance.body when bodyRows are valid and contentType header is missing', () => {
+    it('should set instance.body when bodyRows is valid and contentType header is missing', () => {
       let bodyRows = 'body'
       let expected = {
         contentType: undefined,
@@ -277,7 +273,7 @@ describe('parsers / base', () => {
   })
 
   describe('_parseUrlencodedBody', () => {
-    it('should set instance.body when all params in body are valid', () => {
+    it('should set instance.body', () => {
       let parser = getParserInstance()
       parser.body = {}
       parser.bodyRows = 'firstName=John&lastName=Smith&age='
@@ -296,7 +292,7 @@ describe('parsers / base', () => {
   })
 
   describe('_parseTextBody', () => {
-    it('should set instance.body using bodyRows', () => {
+    it('should set instance.body', () => {
       let parser = getParserInstance()
       parser.body = {}
       parser.bodyRows = 'body'
@@ -311,22 +307,20 @@ describe('parsers / base', () => {
   })
 
   describe('_calcSizes', () => {
-    it('should calc instance.sizes using header and body rows', () => {
-      let parser = getParserInstance('plain message')
+    it('should calc instance.sizes using headers and body', () => {
+      let parser = getParserInstance(`headers${HttpZConsts.EOL2X}body`)
       parser._calcSizes('headers', 'body')
 
       let expected = {
-        messageSize: 13,
-        headersSize: 7,
+        headersSize: 11,
         bodySize: 4
       }
-      should(parser.messageSize).eql(expected.messageSize)
       should(parser.headersSize).eql(expected.headersSize)
       should(parser.bodySize).eql(expected.bodySize)
     })
   })
 
-  describe('_getContentTypeHeader', () => {
+  describe('_getContentTypeObject', () => {
     function getDefaultHeaders() {
       return [
         {
@@ -356,8 +350,8 @@ describe('parsers / base', () => {
       parser.headers = getDefaultHeaders()
       parser.headers.splice(2, 1)
 
-      let expected = undefined
-      let actual = parser._getContentTypeHeader()
+      let expected
+      let actual = parser._getContentTypeObject()
 
       should(actual).eql(expected)
     })
@@ -367,13 +361,13 @@ describe('parsers / base', () => {
       parser.headers = getDefaultHeaders()
 
       let expected = { value: 'application/json' }
-      let actual = parser._getContentTypeHeader()
+      let actual = parser._getContentTypeObject()
 
       should(actual).eql(expected)
     })
   })
 
-  describe('_getContentType', () => {
+  describe('_getContentTypeValue', () => {
     function getDefaultHeaders() {
       return [
         {
@@ -403,18 +397,96 @@ describe('parsers / base', () => {
       parser.headers = getDefaultHeaders()
       parser.headers.splice(2, 1)
 
-      let expected = undefined
-      let actual = parser._getContentType()
+      let expected
+      let actual = parser._getContentTypeValue()
 
       should(actual).eql(expected)
     })
 
-    it('should return contentType value', () => {
+    it('should return undefined when contentType header.value is undefined', () => {
+      let parser = getParserInstance()
+      parser.headers = getDefaultHeaders()
+      parser.headers[2].values = [{}]
+
+      let expected
+      let actual = parser._getContentTypeValue()
+
+      should(actual).eql(expected)
+    })
+
+    it('should return contentType value in lower case', () => {
       let parser = getParserInstance()
       parser.headers = getDefaultHeaders()
 
       let expected = 'application/json'
-      let actual = parser._getContentType()
+      let actual = parser._getContentTypeValue()
+
+      should(actual).eql(expected)
+    })
+  })
+
+  describe('_getBoundary', () => {
+    function getDefaultHeaders() {
+      return [
+        {
+          name: 'Connection',
+          values: [
+            { value: 'keep-alive' }
+          ]
+        },
+        {
+          name: 'Accept-Encoding',
+          values: [
+            { value: 'gzip' },
+            { value: 'deflate' }
+          ]
+        },
+        {
+          name: 'Content-Type',
+          values: [
+            { value: 'multipart/form-data', params: 'boundary="1232:1312312"' }
+          ]
+        }
+      ]
+    }
+
+    it('should throw error when instance.headers does not include contentType header', () => {
+      let parser = getParserInstance()
+      parser.headers = getDefaultHeaders()
+      parser.headers.splice(2, 1)
+
+      should(parser._getBoundary.bind(parser)).throw(HttpZError, {
+        message: 'Message with multipart/form-data body must have Content-Type header with boundary'
+      })
+    })
+
+    it('should throw error when contentType header.params is undefined', () => {
+      let parser = getParserInstance()
+      parser.headers = getDefaultHeaders()
+      parser.headers[2].values[0].params = undefined
+
+      should(parser._getBoundary.bind(parser)).throw(HttpZError, {
+        message: 'Message with multipart/form-data body must have Content-Type header with boundary'
+      })
+    })
+
+    it('should throw error when contentType header.params does not contain boundary', () => {
+      let parser = getParserInstance()
+      parser.headers = getDefaultHeaders()
+      parser.headers[2].values[0].params = 'some params'
+
+      should(parser._getBoundary.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect boundary, expected: boundary=value',
+        details: 'some params'
+      })
+    })
+
+    it('should return boundary without quotes', () => {
+      let parser = getParserInstance()
+      parser.headers = getDefaultHeaders()
+
+      let expected = '1232:1312312'
+      let actual = parser._getBoundary()
 
       should(actual).eql(expected)
     })

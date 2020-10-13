@@ -4,6 +4,7 @@ const utils = require('../utils')
 const HttpZError = require('../error')
 
 class FormDataParamParser {
+  // TODO: test it
   static parse(...params) {
     let instance = new FormDataParamParser(...params)
     return instance.parse()
@@ -13,6 +14,7 @@ class FormDataParamParser {
     this.paramGroup = paramGroup
   }
 
+  // TODO: test it
   parse() {
     this.paramGroup = this.paramGroup
       .replace(consts.regexps.startNl, '')
@@ -38,6 +40,7 @@ class FormDataParamParser {
     return param
   }
 
+  // TODO: test it
   _getContentDisposition() {
     let contentDisposition = this.paramGroup.match(consts.regexps.contentDisposition)
     if (!contentDisposition) {
@@ -48,6 +51,7 @@ class FormDataParamParser {
     return contentDisposition
   }
 
+  // TODO: test it
   _getContentType() {
     let contentType = this.paramGroup.match(consts.regexps.contentType)
     if (contentType) {
@@ -60,6 +64,7 @@ class FormDataParamParser {
     }
   }
 
+  // TODO: test it
   _getDispositionType(contentDisposition) {
     let dispositionType = contentDisposition.match(consts.regexps.contentDispositionType)
     if (!dispositionType) {
@@ -69,6 +74,7 @@ class FormDataParamParser {
     return dispositionType
   }
 
+  // TODO: test it
   _getParamName(contentDisposition) {
     let paramName = contentDisposition.match(consts.regexps.dispositionName)
     if (!paramName) {
@@ -78,6 +84,7 @@ class FormDataParamParser {
     return paramName
   }
 
+  // TODO: test it
   _getFileName(contentDisposition) {
     let fileName = contentDisposition.match(consts.regexps.dispositionFileName)
     if (fileName) {
@@ -85,6 +92,7 @@ class FormDataParamParser {
     }
   }
 
+  // TODO: test it
   _getParamValue() {
     let value
     if (this.paramGroup.match(consts.regexps.startNl)) {

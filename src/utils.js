@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const qs = require('querystring')
+const validators = require('./validators')
 
 exports.splitByDelimeter = (str, delimiter) => {
   if (_.isEmpty(str)) {
@@ -41,20 +42,34 @@ exports.parseUrl = (path, origin) => {
   }
 }
 
-exports.generatePath = ({ path, queryParams }) => {
-  if (_.isEmpty(queryParams)) {
+exports.generatePath = (path, params) => {
+  if (_.isEmpty(params)) {
     return path
   }
+  let paramsObj = exports.convertParamsArrayToObject(params)
 
-  let queryParamsObj = _.reduce(queryParams, (result, param) => {
-    result[param.name] = param.value || ''
+  return path + '?' + qs.stringify(paramsObj)
+}
+
+exports.convertParamsArrayToObject = (params) => {
+  validators.validateArray(params, 'params')
+
+  return _.reduce(params, (result, { name, value }, index) => {
+    validators.validateNotEmptyString(name, 'param name', `param index: ${index}`)
+    if (_.has(result, name)) {
+      if (_.isArray(result[name])) {
+        result[name].push(value)
+      } else {
+        result[name] = [result[name], value]
+      }
+    } else {
+      result[name] = value || ''
+    }
     return result
   }, {})
-  return path + '?' + qs.stringify(queryParamsObj)
 }
 
 exports.pretifyHeaderName = (name) => {
-  // accept => Accept, accept-encoding => Accept-Encoding, etc
   return _.chain(name)
     .split('-')
     .map(_.capitalize)

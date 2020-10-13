@@ -9,7 +9,7 @@ const ResponseBuilder = require('../../src/builders/response')
 describe('builders / response', () => {
   function getBuilderInstance(exResponseModel) {
     let responseModel = _.extend({
-      protocolVersion: 'http/1.1',
+      protocolVersion: 'HTTP/1.1',
       statusCode: 200,
       statusMessage: 'Ok'
     }, exResponseModel)
@@ -43,11 +43,13 @@ describe('builders / response', () => {
       let builder = getBuilderInstance()
       sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
+      sinon.stub(builder, '_generateCookieRows').returns('cookieRows' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
 
       let expected = [
         'startRow',
         'headerRows',
+        'cookieRows',
         'bodyRows'
       ].join(HttpZConsts.EOL)
       let actual = builder.build()
@@ -55,12 +57,13 @@ describe('builders / response', () => {
 
       nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
+      nassert.assertFn({ inst: builder, fnName: '_generateCookieRows', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' })
     })
   })
 
   describe('_generateStartRow', () => {
-    it('should throw error when protocolVersion is not defined', () => {
+    it('should throw error when protocolVersion is undefined', () => {
       let builder = getBuilderInstance({ protocolVersion: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
@@ -68,7 +71,7 @@ describe('builders / response', () => {
       })
     })
 
-    it('should throw error when statusCode is not defined', () => {
+    it('should throw error when statusCode is undefined', () => {
       let builder = getBuilderInstance({ statusCode: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
@@ -76,7 +79,7 @@ describe('builders / response', () => {
       })
     })
 
-    it('should throw error when statusMessage is not defined', () => {
+    it('should throw error when statusMessage is undefined', () => {
       let builder = getBuilderInstance({ statusMessage: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
@@ -102,7 +105,7 @@ describe('builders / response', () => {
       ]
     }
 
-    it('should return empty string when instance.cookies is nil', () => {
+    it('should return empty string when instance.cookies is undefined', () => {
       let builder = getBuilderInstance({ cookies: undefined })
 
       let expected = ''
@@ -158,9 +161,9 @@ describe('builders / response', () => {
   })
 
   describe('functional tests', () => {
-    it('should build response message without body (names in lower case)', () => {
+    it('should build response without body (header names in lower case)', () => {
       let responseModel = {
-        protocolVersion: 'http/1.1',
+        protocolVersion: 'HTTP/1.1',
         statusCode: 201,
         statusMessage: 'Created',
         headers: [
@@ -204,7 +207,7 @@ describe('builders / response', () => {
       should(actual).eql(plainResponse)
     })
 
-    it('should build response message with cookies and without body', () => {
+    it('should build response with cookies, but without body', () => {
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 201,
@@ -260,7 +263,7 @@ describe('builders / response', () => {
       should(actual).eql(plainResponse)
     })
 
-    it('should build response message with body and contentType=text/plain', () => {
+    it('should build response with body of contentType=text/plain', () => {
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
@@ -320,7 +323,7 @@ describe('builders / response', () => {
       should(actual).eql(plainResponse)
     })
 
-    it('should parse response with body and contentType=multipart/alternative (inline)', () => {
+    it('should build response with body of contentType=multipart/alternative (inline)', () => {
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
@@ -368,7 +371,6 @@ describe('builders / response', () => {
             }
           ]
         },
-        messageSize: 370,
         headersSize: 243,
         bodySize: 84
       }
@@ -392,7 +394,7 @@ describe('builders / response', () => {
       should(actual).eql(plainResponse)
     })
 
-    it('should parse response with body and contentType=multipart/mixed (attachment)', () => {
+    it('should build response with body of contentType=multipart/mixed (attachment)', () => {
       let responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
@@ -442,7 +444,6 @@ describe('builders / response', () => {
             }
           ]
         },
-        messageSize: 428,
         headersSize: 236,
         bodySize: 149
       }

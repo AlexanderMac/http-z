@@ -59,7 +59,50 @@ describe('parsers / request', () => {
   })
 
   describe('_parseMessageForRows', () => {
-    it('should parse message for rows, when headers does not contain Cookies row', () => {
+    it('should parse message for rows when message is without Cookie and Body rows', () => {
+      let plainRequest = [
+        'start-line',
+        'host: somehost',
+        'header1',
+        'header2',
+        'header3',
+        '',
+        ''
+      ].join(HttpZConsts.EOL)
+
+      let parser = getParserInstance(plainRequest)
+      parser._parseMessageForRows()
+
+      should(parser.startRow).eql('start-line')
+      should(parser.hostRow).eql('host: somehost')
+      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.cookiesRow).eql(undefined)
+      should(parser.bodyRows).eql('')
+    })
+
+    it('should parse message for rows when message contains Cookies row', () => {
+      let plainRequest = [
+        'start-line',
+        'host: somehost',
+        'header1',
+        'header2',
+        'header3',
+        'cookie: somecookies',
+        '',
+        ''
+      ].join(HttpZConsts.EOL)
+
+      let parser = getParserInstance(plainRequest)
+      parser._parseMessageForRows()
+
+      should(parser.startRow).eql('start-line')
+      should(parser.hostRow).eql('host: somehost')
+      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.cookiesRow).eql('cookie: somecookies')
+      should(parser.bodyRows).eql('')
+    })
+
+    it('should parse message for rows when message contains Body rows', () => {
       let plainRequest = [
         'start-line',
         'host: somehost',
@@ -79,43 +122,42 @@ describe('parsers / request', () => {
       should(parser.cookiesRow).eql(undefined)
       should(parser.bodyRows).eql('body')
     })
-
-    it('should parse message for rows when headers contain Cookies row', () => {
-      let plainRequest = [
-        'start-line',
-        'host: somehost',
-        'header1',
-        'header2',
-        'header3',
-        'cookie: somecookies',
-        '',
-        'body'
-      ].join(HttpZConsts.EOL)
-
-      let parser = getParserInstance(plainRequest)
-      parser._parseMessageForRows()
-
-      should(parser.startRow).eql('start-line')
-      should(parser.hostRow).eql('host: somehost')
-      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
-      should(parser.cookiesRow).eql('cookie: somecookies')
-      should(parser.bodyRows).eql('body')
-    })
   })
 
   describe('_parseHostRow', () => {
     it('should throw error when hostRow is nil', () => {
+      const ERR = {
+        message: 'host header is required'
+      }
       let parser = getParserInstance()
+
       parser.hostRow = undefined
+      should(parser._parseHostRow.bind(parser)).throw(HttpZError, ERR)
+      parser.hostRow = null
+      should(parser._parseHostRow.bind(parser)).throw(HttpZError, ERR)
+    })
+
+    it('should throw error when hostRow is empty string', () => {
+      let parser = getParserInstance()
+      parser.hostRow = ''
 
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
-        message: 'host header is required'
+        message: 'host header must be not empty string'
       })
     })
 
-    it('should throw error when host header value is empy', () => {
+    it('should throw error when host header value is nil', () => {
       let parser = getParserInstance()
-      parser.hostRow = 'Host:'
+      parser.hostRow = 'Host  '
+
+      should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
+        message: 'host header value is required'
+      })
+    })
+
+    it('should throw error when host header value is empty string', () => {
+      let parser = getParserInstance()
+      parser.hostRow = 'Host:  '
 
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'host header value must be not empty string'
@@ -132,11 +174,11 @@ describe('parsers / request', () => {
       })
     })
 
-    it('should set instance.host when host header value is valid URL', () => {
+    it('should set instance.host when host header value is defined and is valid URL', () => {
       let parser = getParserInstance()
       parser.hostRow = 'Host: www.example.com:2345'
-
       let expected = 'www.example.com:2345'
+
       parser._parseHostRow()
       should(parser.host).eql(expected)
     })
@@ -249,8 +291,8 @@ describe('parsers / request', () => {
     it('should set instance.cookies to undefined when cookiesRow is undefined', () => {
       let parser = getParserInstance()
       parser.cookiesRow = undefined
+      let expected
 
-      let expected = undefined
       parser._parseCookiesRow()
       should(parser.cookies).eql(expected)
     })
@@ -258,8 +300,8 @@ describe('parsers / request', () => {
     it('should set instance.cookies to [] when cookiesRow does not contain values', () => {
       let parser = getParserInstance()
       parser.cookiesRow = 'Cookie:'
-
       let expected = []
+
       parser._parseCookiesRow()
       should(parser.cookies).eql(expected)
     })
@@ -267,12 +309,12 @@ describe('parsers / request', () => {
     it('should set instance.cookies when cookiesRow is valid and not empty', () => {
       let parser = getParserInstance()
       parser.cookiesRow = 'Cookie: csrftoken=123abc;sessionid=456def;username='
-
       let expected = [
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', value: '456def' },
         { name: 'username' }
       ]
+
       parser._parseCookiesRow()
       should(parser.cookies).eql(expected)
     })
@@ -281,9 +323,8 @@ describe('parsers / request', () => {
   describe('_generateModel', () => {
     it('should generate request model using instance fields when some fields are undefined', () => {
       let parser = getParserInstance()
-      parser.messageSize = 100
-      parser.headersSize = 80
-      parser.bodySize = 20
+      parser.headersSize = 25
+      parser.bodySize = 0
       parser.method = 'method'
       parser.protocol = 'protocol'
       parser.protocolVersion = 'protocolVersion'
@@ -296,9 +337,8 @@ describe('parsers / request', () => {
         protocolVersion: 'protocolVersion',
         path: 'path',
         host: 'host',
-        messageSize: 100,
-        headersSize: 80,
-        bodySize: 20
+        headersSize: 25,
+        bodySize: 0
       }
       let actual = parser._generateModel()
       should(actual).eql(expected)
@@ -306,9 +346,8 @@ describe('parsers / request', () => {
 
     it('should generate request model using instance fields', () => {
       let parser = getParserInstance()
-      parser.messageSize = 100
-      parser.headersSize = 80
-      parser.bodySize = 20
+      parser.headersSize = 55
+      parser.bodySize = 4
       parser.method = 'method'
       parser.protocol = 'protocol'
       parser.protocolVersion = 'protocolVersion'
@@ -329,10 +368,8 @@ describe('parsers / request', () => {
         headers: 'headers',
         cookies: 'cookies',
         body: 'body',
-        messageSize: 100,
-        headersSize: 80,
-        bodySize: 20
-
+        headersSize: 55,
+        bodySize: 4
       }
       let actual = parser._generateModel()
       should(actual).eql(expected)
@@ -359,8 +396,7 @@ describe('parsers / request', () => {
           { name: 'p2', value: '' }
         ],
         headers: [],
-        messageSize: 59,
-        headersSize: 21,
+        headersSize: 59,
         bodySize: 0
       }
 
@@ -430,8 +466,7 @@ describe('parsers / request', () => {
             ]
           }
         ],
-        messageSize: 288,
-        headersSize: 248,
+        headersSize: 288,
         bodySize: 0
       }
 
@@ -493,8 +528,7 @@ describe('parsers / request', () => {
           { name: 'sessionid', value: 'sd=456def' },
           { name: 'userid' }
         ],
-        messageSize: 211,
-        headersSize: 173,
+        headersSize: 211,
         bodySize: 0
       }
 
@@ -503,7 +537,7 @@ describe('parsers / request', () => {
       should(actual).eql(requestModel)
     })
 
-    it('should parse request with body and contentType=text/plain', () => {
+    it('should parse request with body of contentType=text/plain', () => {
       let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
@@ -578,8 +612,7 @@ describe('parsers / request', () => {
           contentType: 'text/plain',
           text: 'Text data'
         },
-        messageSize: 271,
-        headersSize: 219,
+        headersSize: 262,
         bodySize: 9
       }
 
@@ -588,7 +621,7 @@ describe('parsers / request', () => {
       should(actual).eql(requestModel)
     })
 
-    it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
+    it('should parse request with body of contentType=application/x-www-form-urlencoded', () => {
       let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
@@ -667,8 +700,7 @@ describe('parsers / request', () => {
             { name: 'age', value: '25' }
           ]
         },
-        messageSize: 316,
-        headersSize: 242,
+        headersSize: 285,
         bodySize: 31
       }
 
@@ -677,7 +709,7 @@ describe('parsers / request', () => {
       should(actual).eql(requestModel)
     })
 
-    it('should parse request with body and contentType=multipart/form-data', () => {
+    it('should parse request with body of contentType=multipart/form-data', () => {
       let plainRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
@@ -782,8 +814,7 @@ describe('parsers / request', () => {
             }
           ]
         },
-        messageSize: 651,
-        headersSize: 241,
+        headersSize: 284,
         bodySize: 367
       }
 
@@ -791,198 +822,196 @@ describe('parsers / request', () => {
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
-  })
 
-  it('should parse request with body and contentType=multipart/alternative (inline)', () => {
-    let plainRequest = [
-      'POST /features HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Accept: */*',
-      'Accept-Encoding: gzip,deflate',
-      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-      'Content-Type: multipart/alternative; boundary="111362-53119209"',
-      'Content-Encoding: gzip,deflate',
-      'Content-Length: 301',
-      '',
-      '--111362-53119209',
-      'Content-Disposition: inline',
-      '',
-      '<base64-data>',
-      '--111362-53119209--'
-    ].join(HttpZConsts.EOL)
+    it('should parse request with body of contentType=multipart/alternative (inline)', () => {
+      let plainRequest = [
+        'POST /features HTTP/1.1',
+        'Host: example.com',
+        'Connection: keep-alive',
+        'Accept: */*',
+        'Accept-Encoding: gzip,deflate',
+        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'Content-Type: multipart/alternative; boundary="111362-53119209"',
+        'Content-Encoding: gzip,deflate',
+        'Content-Length: 301',
+        '',
+        '--111362-53119209',
+        'Content-Disposition: inline',
+        '',
+        '<base64-data>',
+        '--111362-53119209--'
+      ].join(HttpZConsts.EOL)
 
-    let requestModel = {
-      method: 'POST',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      queryParams: [],
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*' }
-          ]
-        },
-        {
-          name: 'Accept-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
-        },
-        {
-          name: 'Accept-Language',
-          values: [
-            { value: 'ru-RU' },
-            { value: 'ru', params: 'q=0.8' },
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
-          ]
-        },
-        {
-          name: 'Content-Type',
-          values: [
-            { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
-          ]
-        },
-        {
-          name: 'Content-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
-        },
-        {
-          name: 'Content-Length',
-          values: [
-            { value: '301' }
-          ]
-        }
-      ],
-      body: {
-        contentType: 'multipart/alternative',
-        boundary: '111362-53119209',
-        params: [
+      let requestModel = {
+        method: 'POST',
+        protocol: 'HTTP',
+        protocolVersion: 'HTTP/1.1',
+        host: 'example.com',
+        path: '/features',
+        queryParams: [],
+        headers: [
           {
-            type: 'inline',
-            value: '<base64-data>'
-          }
-        ]
-      },
-      messageSize: 370,
-      headersSize: 243,
-      bodySize: 84
-    }
-
-    let parser = getParserInstance(plainRequest)
-    let actual = parser.parse()
-    should(actual).eql(requestModel)
-  })
-
-  it('should parse request with body and contentType=multipart/mixed (attachment)', () => {
-    let plainRequest = [
-      'POST /features HTTP/1.1',
-      'Host: example.com',
-      'Connection: keep-alive',
-      'Accept: */*',
-      'Accept-Encoding: gzip,deflate',
-      'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
-      'Content-Type: multipart/mixed; boundary="11136253119209"',
-      'Content-Encoding: gzip,deflate',
-      'Content-Length: 301',
-      '',
-      '--11136253119209',
-      'Content-Disposition: attachment; filename="photo1.jpg"',
-      'Content-Type: application/octet-stream',
-      '',
-      '<binary-data>',
-      '--11136253119209--'
-    ].join(HttpZConsts.EOL)
-
-    let requestModel = {
-      method: 'POST',
-      protocol: 'HTTP',
-      protocolVersion: 'HTTP/1.1',
-      host: 'example.com',
-      path: '/features',
-      queryParams: [],
-      headers: [
-        {
-          name: 'Connection',
-          values: [
-            { value: 'keep-alive' }
-          ]
-        },
-        {
-          name: 'Accept',
-          values: [
-            { value: '*/*' }
-          ]
-        },
-        {
-          name: 'Accept-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
-        },
-        {
-          name: 'Accept-Language',
-          values: [
-            { value: 'ru-RU' },
-            { value: 'ru', params: 'q=0.8' },
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
-          ]
-        },
-        {
-          name: 'Content-Type',
-          values: [
-            { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
-          ]
-        },
-        {
-          name: 'Content-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
-        },
-        {
-          name: 'Content-Length',
-          values: [
-            { value: '301' }
-          ]
-        }
-      ],
-      body: {
-        contentType: 'multipart/mixed',
-        boundary: '11136253119209',
-        params: [
+            name: 'Connection',
+            values: [
+              { value: 'keep-alive' }
+            ]
+          },
           {
-            type: 'attachment',
-            contentType: 'application/octet-stream',
-            fileName: 'photo1.jpg',
-            value: '<binary-data>'
+            name: 'Accept',
+            values: [
+              { value: '*/*' }
+            ]
+          },
+          {
+            name: 'Accept-Encoding',
+            values: [
+              { value: 'gzip' },
+              { value: 'deflate' }
+            ]
+          },
+          {
+            name: 'Accept-Language',
+            values: [
+              { value: 'ru-RU' },
+              { value: 'ru', params: 'q=0.8' },
+              { value: 'en-US', params: 'q=0.6' },
+              { value: 'en', params: 'q=0.4' }
+            ]
+          },
+          {
+            name: 'Content-Type',
+            values: [
+              { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
+            ]
+          },
+          {
+            name: 'Content-Encoding',
+            values: [
+              { value: 'gzip' },
+              { value: 'deflate' }
+            ]
+          },
+          {
+            name: 'Content-Length',
+            values: [
+              { value: '301' }
+            ]
           }
-        ]
-      },
-      messageSize: 428,
-      headersSize: 236,
-      bodySize: 149
-    }
+        ],
+        body: {
+          contentType: 'multipart/alternative',
+          boundary: '111362-53119209',
+          params: [
+            {
+              type: 'inline',
+              value: '<base64-data>'
+            }
+          ]
+        },
+        headersSize: 286,
+        bodySize: 84
+      }
 
-    let parser = getParserInstance(plainRequest)
-    let actual = parser.parse()
-    should(actual).eql(requestModel)
+      let parser = getParserInstance(plainRequest)
+      let actual = parser.parse()
+      should(actual).eql(requestModel)
+    })
+
+    it('should parse request with body of contentType=multipart/mixed (attachment)', () => {
+      let plainRequest = [
+        'POST /features HTTP/1.1',
+        'Host: example.com',
+        'Connection: keep-alive',
+        'Accept: */*',
+        'Accept-Encoding: gzip,deflate',
+        'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
+        'Content-Type: multipart/mixed; boundary="11136253119209"',
+        'Content-Encoding: gzip,deflate',
+        'Content-Length: 301',
+        '',
+        '--11136253119209',
+        'Content-Disposition: attachment; filename="photo1.jpg"',
+        'Content-Type: application/octet-stream',
+        '',
+        '<binary-data>',
+        '--11136253119209--'
+      ].join(HttpZConsts.EOL)
+
+      let requestModel = {
+        method: 'POST',
+        protocol: 'HTTP',
+        protocolVersion: 'HTTP/1.1',
+        host: 'example.com',
+        path: '/features',
+        queryParams: [],
+        headers: [
+          {
+            name: 'Connection',
+            values: [
+              { value: 'keep-alive' }
+            ]
+          },
+          {
+            name: 'Accept',
+            values: [
+              { value: '*/*' }
+            ]
+          },
+          {
+            name: 'Accept-Encoding',
+            values: [
+              { value: 'gzip' },
+              { value: 'deflate' }
+            ]
+          },
+          {
+            name: 'Accept-Language',
+            values: [
+              { value: 'ru-RU' },
+              { value: 'ru', params: 'q=0.8' },
+              { value: 'en-US', params: 'q=0.6' },
+              { value: 'en', params: 'q=0.4' }
+            ]
+          },
+          {
+            name: 'Content-Type',
+            values: [
+              { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
+            ]
+          },
+          {
+            name: 'Content-Encoding',
+            values: [
+              { value: 'gzip' },
+              { value: 'deflate' }
+            ]
+          },
+          {
+            name: 'Content-Length',
+            values: [
+              { value: '301' }
+            ]
+          }
+        ],
+        body: {
+          contentType: 'multipart/mixed',
+          boundary: '11136253119209',
+          params: [
+            {
+              type: 'attachment',
+              contentType: 'application/octet-stream',
+              fileName: 'photo1.jpg',
+              value: '<binary-data>'
+            }
+          ]
+        },
+        headersSize: 279,
+        bodySize: 149
+      }
+
+      let parser = getParserInstance(plainRequest)
+      let actual = parser.parse()
+      should(actual).eql(requestModel)
+    })
   })
 })

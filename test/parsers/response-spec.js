@@ -56,44 +56,63 @@ describe('parsers / response', () => {
   })
 
   describe('_parseMessageForRows', () => {
-    it('should parse message for rows, when headers does not contain Set-Cookie rows', () => {
+    it('should parse message for rows when message is without Set-Cookie and Body rows', () => {
       let plainResponse = [
         'start-line',
-        'Header1',
-        'Header2',
-        'Header3',
+        'header1',
+        'header2',
+        'header3',
         '',
-        'Body'
+        ''
       ].join(HttpZConsts.EOL)
 
       let parser = getParserInstance(plainResponse)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
-      should(parser.headerRows).eql(['Header1', 'Header2', 'Header3'])
+      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
       should(parser.cookieRows).eql([])
-      should(parser.bodyRows).eql('Body')
+      should(parser.bodyRows).eql('')
     })
 
-    it('should parse message for rows, when headers contain Set-Cookie rows', () => {
+    it('should parse message for rows when message contains Set-Cookie rows', () => {
       let plainResponse = [
         'start-line',
-        'Header1',
-        'Header2',
-        'Header3',
-        'set-Cookie',
-        'Set-cookie',
+        'header1',
+        'header2',
+        'header3',
+        'set-cookie',
+        'set-cookie',
         '',
-        'Body'
+        ''
       ].join(HttpZConsts.EOL)
 
       let parser = getParserInstance(plainResponse)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
-      should(parser.headerRows).eql(['Header1', 'Header2', 'Header3'])
-      should(parser.cookieRows).eql(['set-Cookie', 'Set-cookie'])
-      should(parser.bodyRows).eql('Body')
+      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.cookieRows).eql(['set-cookie', 'set-cookie'])
+      should(parser.bodyRows).eql('')
+    })
+
+    it('should parse message for rows when message contains Body rows', () => {
+      let plainResponse = [
+        'start-line',
+        'header1',
+        'header2',
+        'header3',
+        '',
+        'body'
+      ].join(HttpZConsts.EOL)
+
+      let parser = getParserInstance(plainResponse)
+      parser._parseMessageForRows()
+
+      should(parser.startRow).eql('start-line')
+      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.cookieRows).eql([])
+      should(parser.bodyRows).eql('body')
     })
   })
 
@@ -108,7 +127,17 @@ describe('parsers / response', () => {
       })
     })
 
-    it('should init instance fields when startRow has valid format', () => {
+    it('should set instance fields when startRow has valid format (reason is empty)', () => {
+      let parser = getParserInstance()
+      parser.startRow = 'HTTP/2 204 '
+
+      parser._parseStartRow()
+      should(parser.protocolVersion).eql('HTTP/2')
+      should(parser.statusCode).eql(204)
+      should(parser.statusMessage).eql('')
+    })
+
+    it('should set instance fields when startRow has valid format (reason is not empty)', () => {
       let parser = getParserInstance()
       parser.startRow = 'HTTP/1.1 201 Created'
 
@@ -145,7 +174,7 @@ describe('parsers / response', () => {
       parser.cookieRows[1] = 'Set-cookie:  =456def;  Domain=example.com;'
 
       should(parser._parseCookieRows.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect cookie pair format, expected: Name1=Value1;...',
+        message: 'Incorrect set-cookie pair format, expected: Name1=Value1;...',
         details: '=456def;  Domain=example.com;'
       })
     })
@@ -153,21 +182,21 @@ describe('parsers / response', () => {
     it('should set instance.cookies to undefined when cookieRows is an empty array', () => {
       let parser = getParserInstance()
       parser.cookieRows = []
+      let expected
 
-      let expected = undefined
       parser._parseCookieRows()
       should(parser.cookies).eql(expected)
     })
 
-    it('should set instance.cookies when cookieRows is not an empty array', () => {
+    it('should set instance.cookies when cookieRows is valid and not an empty array', () => {
       let parser = getParserInstance()
       parser.cookieRows = getDefaultCookies()
-
       let expected = [
         { name: 'csrftoken', value: '123abc' },
         { name: 'sessionid', params: ['Domain=example.com', 'Path=/'] },
         { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
       ]
+
       parser._parseCookieRows()
       should(parser.cookies).eql(expected)
     })
@@ -176,9 +205,8 @@ describe('parsers / response', () => {
   describe('_generateModel', () => {
     it('should generate response model using instance fields when some fields are undefined', () => {
       let parser = getParserInstance()
-      parser.messageSize = 100
-      parser.headersSize = 80
-      parser.bodySize = 20
+      parser.headersSize = 25
+      parser.bodySize = 0
       parser.protocolVersion = 'protocolVersion'
       parser.statusCode = 'statusCode'
       parser.statusMessage = 'statusMessage'
@@ -187,9 +215,8 @@ describe('parsers / response', () => {
         protocolVersion: 'protocolVersion',
         statusCode: 'statusCode',
         statusMessage: 'statusMessage',
-        messageSize: 100,
-        headersSize: 80,
-        bodySize: 20
+        headersSize: 25,
+        bodySize: 0
       }
       let actual = parser._generateModel()
       should(actual).eql(expected)
@@ -197,9 +224,8 @@ describe('parsers / response', () => {
 
     it('should generate response model using instance fields', () => {
       let parser = getParserInstance()
-      parser.messageSize = 100
-      parser.headersSize = 80
-      parser.bodySize = 20
+      parser.headersSize = 55
+      parser.bodySize = 4
       parser.protocolVersion = 'protocolVersion'
       parser.statusCode = 'statusCode'
       parser.statusMessage = 'statusMessage'
@@ -214,9 +240,8 @@ describe('parsers / response', () => {
         headers: 'headers',
         cookies: 'cookies',
         body: 'body',
-        messageSize: 100,
-        headersSize: 80,
-        bodySize: 20
+        headersSize: 55,
+        bodySize: 4
       }
       let actual = parser._generateModel()
       should(actual).eql(expected)
@@ -236,8 +261,7 @@ describe('parsers / response', () => {
         statusCode: 204,
         statusMessage: 'No content',
         headers: [],
-        messageSize: 27,
-        headersSize: 0,
+        headersSize: 27,
         bodySize: 0
       }
 
@@ -286,8 +310,7 @@ describe('parsers / response', () => {
             ]
           }
         ],
-        messageSize: 136,
-        headersSize: 104,
+        headersSize: 136,
         bodySize: 0
       }
 
@@ -296,7 +319,7 @@ describe('parsers / response', () => {
       should(actual).eql(responseModel)
     })
 
-    it('should parse response without cookies and without body', () => {
+    it('should parse response without cookies and body', () => {
       let plainResponse = [
         'HTTP/1.1 201 Created',
         'Connection: ',
@@ -344,8 +367,7 @@ describe('parsers / response', () => {
           { name: 'sessionid', value: '456def', params: ['Domain=example.com', 'Path=/'] },
           { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
         ],
-        messageSize: 309,
-        headersSize: 271,
+        headersSize: 309,
         bodySize: 0
       }
 
@@ -354,7 +376,7 @@ describe('parsers / response', () => {
       should(actual).eql(responseModel)
     })
 
-    it('should parse response with body and contentType=text/plain', () => {
+    it('should parse response with body of contentType=text/plain', () => {
       let plainResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
@@ -407,8 +429,7 @@ describe('parsers / response', () => {
           contentType: 'text/plain',
           text: 'Text data'
         },
-        messageSize: 171,
-        headersSize: 133,
+        headersSize: 162,
         bodySize: 9
       }
 

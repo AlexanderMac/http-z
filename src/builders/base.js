@@ -90,12 +90,7 @@ class HttpZBaseBuilder {
 
   _generateUrlencodedBody() {
     validators.validateArray(this.body.params, 'body.params')
-
-    let params = _.reduce(this.body.params, (result, dataParam, index) => {
-      validators.validateNotEmptyString(dataParam.name, 'body.params[index].name', `dataParam index: ${index}`)
-      result[dataParam.name] = utils.getEmptyStringForUndefined(dataParam.value)
-      return result
-    }, {})
+    let params = utils.convertParamsArrayToObject(this.body.params)
 
     return qs.stringify(params)
   }

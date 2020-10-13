@@ -3,7 +3,7 @@ const EOL2X = EOL + EOL
 const BASIC_LATIN = '[\\u0009\\u0020-\\u007E]'
 const PARAM_NAME = '[A-Za-z0-9_.\\[\\]-]' // TODO: extend
 const HTTP_METHODS = '(CONNECT|OPTIONS|TRACE|GET|HEAD|POST|PUT|PATCH|DELETE)'
-const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2\\.0)'
+const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2(\\.0){0,1})'
 
 const regexps = {}
 regexps.quote = /"/g

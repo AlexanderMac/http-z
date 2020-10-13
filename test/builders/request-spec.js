@@ -4,6 +4,7 @@ const should = require('should')
 const nassert = require('n-assert')
 const HttpZConsts = require('../../src/consts')
 const HttpZError = require('../../src/error')
+const BaseBuilder = require('../../src/builders/base')
 const RequestBuilder = require('../../src/builders/request')
 
 describe('builders / request', () => {
@@ -68,7 +69,7 @@ describe('builders / request', () => {
   })
 
   describe('_generateStartRow', () => {
-    it('should throw error when method is not defined', () => {
+    it('should throw error when method is undefined', () => {
       let builder = getBuilderInstance({ method: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
@@ -76,7 +77,7 @@ describe('builders / request', () => {
       })
     })
 
-    it('should throw error when protocol is not defined', () => {
+    it('should throw error when protocol is undefined', () => {
       let builder = getBuilderInstance({ protocol: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
@@ -84,7 +85,7 @@ describe('builders / request', () => {
       })
     })
 
-    it('should throw error when protocolVersion is not defined', () => {
+    it('should throw error when protocolVersion is undefined', () => {
       let builder = getBuilderInstance({ protocolVersion: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
@@ -92,7 +93,7 @@ describe('builders / request', () => {
       })
     })
 
-    it('should throw error when host is not defined', () => {
+    it('should throw error when host is undefined', () => {
       let builder = getBuilderInstance({ host: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
@@ -100,7 +101,7 @@ describe('builders / request', () => {
       })
     })
 
-    it('should throw error when path is not defined', () => {
+    it('should throw error when path is undefined', () => {
       let builder = getBuilderInstance({ path: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
@@ -127,8 +128,77 @@ describe('builders / request', () => {
     })
   })
 
+  describe('_generateHeaderRows', () => {
+    beforeEach(() => {
+      sinon.stub(BaseBuilder.prototype, '_generateHeaderRows')
+    })
+
+    afterEach(() => {
+      BaseBuilder.prototype._generateHeaderRows.restore()
+    })
+
+    it('should throw error when instance.headers is not array', () => {
+      let builder = new RequestBuilder({ headers: 'incorrect headers' })
+
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, {
+        message: 'headers must be an array'
+      })
+
+      nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows' })
+    })
+
+    it('should remove host and cookie headers and call parent method', () => {
+      let builder = new RequestBuilder({
+        headers: [
+          {
+            name: 'host',
+            values: 'some host'
+          },
+          {
+            name: 'cookie',
+            values: 'some cookie1'
+          },
+          {
+            name: 'connection',
+            values: []
+          },
+          {
+            name: 'accept',
+            values: [
+              { value: '*/*' }
+            ]
+          },
+          {
+            name: 'cookie',
+            values: 'some cookie2'
+          }
+        ]
+      })
+      let expected = 'ok'
+      let expectedHeaders = [
+        {
+          name: 'connection',
+          values: []
+        },
+        {
+          name: 'accept',
+          values: [
+            { value: '*/*' }
+          ]
+        }
+      ]
+
+      BaseBuilder.prototype._generateHeaderRows.returns('ok')
+
+      let actual = builder._generateHeaderRows()
+      should(actual).eql(expected)
+      should(builder.headers).eql(expectedHeaders)
+      nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
+    })
+  })
+
   describe('_generateCookiesRow', () => {
-    it('should return empty string when instance.cookies is nil', () => {
+    it('should return empty string when instance.cookies is undefined', () => {
       let builder = getBuilderInstance({ cookies: undefined })
 
       let expected = ''
@@ -137,7 +207,7 @@ describe('builders / request', () => {
     })
 
     it('should throw error when instance.cookies is not array', () => {
-      let builder = getBuilderInstance({ cookies: 'wrong cookies' })
+      let builder = getBuilderInstance({ cookies: 'incorrect cookies' })
 
       should(builder._generateCookiesRow.bind(builder)).throw(HttpZError, {
         message: 'cookies must be an array'
@@ -158,7 +228,7 @@ describe('builders / request', () => {
       })
     })
 
-    it('should build cookies row when instance.cookies are valid', () => {
+    it('should build cookies row when all params are valid', () => {
       let builder = getBuilderInstance({
         cookies: [
           { name: 'c1', value: 'v1' },
@@ -200,7 +270,7 @@ describe('builders / request', () => {
       should(actual).eql(plainRequest)
     })
 
-    it('should build request message without body (names in lower case)', () => {
+    it('should build request without body (header names in lower case)', () => {
       let requestModel = {
         method: 'get',
         protocol: 'http',
@@ -249,7 +319,7 @@ describe('builders / request', () => {
       should(actual).eql(plainRequest)
     })
 
-    it('should parse request with cookies and without body', () => {
+    it('should parse request with cookies, but without body', () => {
       let requestModel = {
         method: 'GET',
         protocol: 'HTTP',
@@ -319,7 +389,7 @@ describe('builders / request', () => {
       should(actual).eql(plainRequest)
     })
 
-    it('should parse request with body and contentType=text/plain', () => {
+    it('should build request with body of contentType=text/plain', () => {
       let requestModel = {
         method: 'POST',
         protocol: 'HTTP',
@@ -400,7 +470,7 @@ describe('builders / request', () => {
       should(actual).eql(plainRequest)
     })
 
-    it('should parse request with body and contentType=application/x-www-form-urlencoded', () => {
+    it('should build request with body of contentType=application/x-www-form-urlencoded', () => {
       let requestModel = {
         method: 'POST',
         protocol: 'HTTP',
@@ -485,7 +555,7 @@ describe('builders / request', () => {
       should(actual).eql(plainRequest)
     })
 
-    it('should parse request with body and contentType=multipart/form-data', () => {
+    it('should build request with body of contentType=multipart/form-data', () => {
       let requestModel = {
         method: 'POST',
         protocol: 'HTTP',
