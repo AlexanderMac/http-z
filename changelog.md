@@ -1,3 +1,11 @@
+# <sub>v3.0.0</sub>
+#### _Oct. 14, 2020_
+  * Refactor codebase according to RFC 7230.
+  * Add full support for multipart/* body (except encoding stuff).
+  * Use `\r\n` as line separator instead of `\n`.
+  * Add optional parameters to message body model: `type`, `contentType`, `fileName`.
+  * Remove `messageSize` from message model.
+
 # <sub>v2.2.1</sub>
 #### _Aug. 17, 2020_
   * Add support for new HTTP methods.
