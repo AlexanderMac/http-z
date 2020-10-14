@@ -55,6 +55,7 @@ describe('builders / request', () => {
         'hostRow',
         'headerRows',
         'cookieRow',
+        '',
         'bodyRows'
       ].join(HttpZConsts.EOL)
       let actual = builder.build()
@@ -311,6 +312,7 @@ describe('builders / request', () => {
         'Accept: */*',
         'Cache-Control: no-cache',
         'Content-Encoding: gzip, deflate',
+        '',
         ''
       ].join(HttpZConsts.EOL)
 
@@ -381,6 +383,7 @@ describe('builders / request', () => {
         'Accept-Encoding: gzip, deflate',
         'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
         'Cookie: csrftoken=123abc; sessionid=456def; username=',
+        '',
         ''
       ].join(HttpZConsts.EOL)
 

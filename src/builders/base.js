@@ -13,6 +13,10 @@ class HttpZBaseBuilder {
   _generateHeaderRows() {
     validators.validateArray(this.headers, 'headers')
 
+    if (_.isEmpty(this.headers)) {
+      return ''
+    }
+
     let headerRowsStr = _.chain(this.headers)
       .map((header, index) => {
         validators.validateRequired(header.name, 'header name', `header index: ${index}`)
@@ -48,11 +52,11 @@ class HttpZBaseBuilder {
       case consts.http.contentTypes.multipart.alternative:
       case consts.http.contentTypes.multipart.mixed:
       case consts.http.contentTypes.multipart.related:
-        return consts.EOL + this._generateFormDataBody()
+        return this._generateFormDataBody()
       case consts.http.contentTypes.application.xWwwFormUrlencoded:
-        return consts.EOL + this._generateUrlencodedBody()
+        return this._generateUrlencodedBody()
       default:
-        return consts.EOL + this._generateTextBody()
+        return this._generateTextBody()
     }
   }
 

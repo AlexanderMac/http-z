@@ -27,6 +27,7 @@ class HttpZRequestBuilder extends Base {
       this._generateHostRow() +
       this._generateHeaderRows() +
       this._generateCookiesRow() +
+      consts.EOL +
       this._generateBodyRows()
   }
 
@@ -55,6 +56,7 @@ class HttpZRequestBuilder extends Base {
       let hName = _.toLower(h.name)
       return hName === 'host' || hName === 'cookie'
     })
+
     return super._generateHeaderRows()
   }
 

@@ -83,9 +83,9 @@ describe('builders / base', () => {
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
-    it('should return <eol> when instance.headers is an empty array', () => {
+    it('should return empty line when instance.headers is an empty array', () => {
       let headers = []
-      let expected = HttpZConsts.EOL
+      let expected = ''
 
       let builder = getBuilderInstance({ headers })
       let actual = builder._generateHeaderRows()
@@ -138,7 +138,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'multipart/form-data'
       }
-      let expected = HttpZConsts.EOL + 'FormDataBody'
+      let expected = 'FormDataBody'
       let expectedFnArgs = { genFormDataBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
@@ -148,7 +148,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'multipart/alternative'
       }
-      let expected = HttpZConsts.EOL + 'FormDataBody'
+      let expected = 'FormDataBody'
       let expectedFnArgs = { genFormDataBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
@@ -158,7 +158,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'multipart/mixed'
       }
-      let expected = HttpZConsts.EOL + 'FormDataBody'
+      let expected = 'FormDataBody'
       let expectedFnArgs = { genFormDataBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
@@ -168,7 +168,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'multipart/related'
       }
-      let expected = HttpZConsts.EOL + 'FormDataBody'
+      let expected = 'FormDataBody'
       let expectedFnArgs = { genFormDataBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
@@ -178,7 +178,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'application/x-www-form-urlencoded'
       }
-      let expected = HttpZConsts.EOL + 'UrlencodedBody'
+      let expected = 'UrlencodedBody'
       let expectedFnArgs = { genUrlencodedBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
@@ -188,7 +188,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'text/plain'
       }
-      let expected = HttpZConsts.EOL + 'TextBody'
+      let expected = 'TextBody'
       let expectedFnArgs = { genTextBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
@@ -198,7 +198,7 @@ describe('builders / base', () => {
       let body = {
         contentType: 'unknown'
       }
-      let expected = HttpZConsts.EOL + 'TextBody'
+      let expected = 'TextBody'
       let expectedFnArgs = { genTextBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })

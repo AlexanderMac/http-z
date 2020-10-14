@@ -50,6 +50,7 @@ describe('builders / response', () => {
         'startRow',
         'headerRows',
         'cookieRows',
+        '',
         'bodyRows'
       ].join(HttpZConsts.EOL)
       let actual = builder.build()
@@ -199,6 +200,7 @@ describe('builders / response', () => {
         'Cache-Control: no-cache',
         'Content-Type: text/plain;charset=UTF-8',
         'Content-Encoding: gzip, deflate',
+        '',
         ''
       ].join(HttpZConsts.EOL)
 
@@ -255,6 +257,7 @@ describe('builders / response', () => {
         'Set-Cookie: sessionid=456def; Domain=example.com; Path=/',
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
         'Set-Cookie: date=',
+        '',
         ''
       ].join(HttpZConsts.EOL)
 

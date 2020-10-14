@@ -22,6 +22,7 @@ class HttpZResponseBuilder extends Base {
       this._generateStartRow() +
       this._generateHeaderRows() +
       this._generateCookieRows() +
+      consts.EOL +
       this._generateBodyRows()
   }
 
