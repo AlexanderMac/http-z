@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const qs = require('querystring')
+const qs = require('qs')
 const validators = require('./validators')
 
 exports.splitByDelimeter = (str, delimiter) => {
@@ -48,7 +48,7 @@ exports.generatePath = (path, params) => {
   }
   let paramsObj = exports.convertParamsArrayToObject(params)
 
-  return path + '?' + qs.stringify(paramsObj)
+  return path + '?' + qs.stringify(paramsObj, { indices: false })
 }
 
 exports.convertParamsArrayToObject = (params) => {

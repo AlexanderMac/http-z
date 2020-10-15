@@ -36,7 +36,8 @@
   },
   "homepage": "https://github.com/AlexanderMac/http-z#readme",
   "dependencies": {
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "qs": "^6.9.4"
   },
   "devDependencies": {
     "eslint": "^7.10.0",

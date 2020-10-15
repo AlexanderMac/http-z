@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const qs = require('querystring')
+const qs = require('qs')
 const consts = require('../consts')
 const HttpZError = require('../error')
 const utils = require('../utils')

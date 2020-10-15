@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const qs = require('querystring')
+const qs = require('qs')
 const consts = require('../consts')
 const utils = require('../utils')
 const validators = require('../validators')
@@ -96,7 +96,7 @@ class HttpZBaseBuilder {
     validators.validateArray(this.body.params, 'body.params')
     let params = utils.convertParamsArrayToObject(this.body.params)
 
-    return qs.stringify(params)
+    return qs.stringify(params, { indices: false })
   }
 
   _generateTextBody() {
