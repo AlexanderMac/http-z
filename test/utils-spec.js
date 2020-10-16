@@ -106,6 +106,21 @@ describe('utils', () => {
     })
   })
 
+  describe('generateUrl', () => {
+    function test(protocol, host, path, params, expected) {
+      let actual = utils.generateUrl(protocol, host, path, params)
+      should(actual).eql(expected)
+    }
+
+    it('should generate url without host', () => {
+      test(null, null, '/features', null, '/features')
+    })
+
+    it('should generate url with host', () => {
+      test('http', 'example.com', '/features', null, 'http://example.com/features')
+    })
+  })
+
   describe('generatePath', () => {
     function test(path, params, expected) {
       let actual = utils.generatePath(path, params)

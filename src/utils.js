@@ -42,6 +42,18 @@ exports.parseUrl = (path, origin) => {
   }
 }
 
+// eslint-disable-next-line max-params
+exports.generateUrl = (protocol, host, path, params) => {
+  let result = ''
+  if (host) {
+    result += protocol.toLowerCase() + '://' + host
+  }
+  let pathWithParams = exports.generatePath(path, params)
+  result += pathWithParams
+
+  return result
+}
+
 exports.generatePath = (path, params) => {
   if (_.isEmpty(params)) {
     return path
