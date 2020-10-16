@@ -1,8 +1,35 @@
-export namespace consts {}
+export class consts {
+  EOL: string;
+  EOL2X: string;
+  regexps: any;
+  http: {
+    protocols: any;
+    protocolVersions: any;
+    methods: any;
+    postMethods: any;
+    contentTypes: any;
+    headers: any;
+  };
+}
+
+declare namespace utils {
+  function splitByDelimeter(str: string, delimiter: string): any;
+  function parseUrl(path?: string, origin?: string): any; 
+  function generatePath(path: string, params: HttpZParam[]): any;
+  function convertParamsArrayToObject(params: HttpZParam[]): any;
+  function pretifyHeaderName(name: string): string;
+  function getEmptyStringForUndefined(val?: string): string;
+  function extendIfNotUndefined(obj: any, fieldName: string, fieldValue?: any): any;
+}
 
 export class HttpZError extends Error {}
 
 declare class HttpZParam {
+  name: string;
+  fileName?: string;
+}
+
+declare class HttpZBodyParam {
   type?: 'inline' | 'attachment';
   contentType?: string;
   name: string;
@@ -12,7 +39,7 @@ declare class HttpZParam {
 declare class HttpZBody {
   contentType: string;
   boundary: string;
-  params: HttpZParam[];
+  params: HttpZParam[] | HttpZBodyParam[];
   text: string;
 }
 

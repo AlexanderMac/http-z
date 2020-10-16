@@ -1,4 +1,7 @@
-exports.consts = require('./src/consts')
-exports.HttpZError = require('./src/error')
-exports.parse = require('./src/parsers')
-exports.build = require('./src/builders')
+module.exports = {
+  consts: require('./src/consts'),
+  HttpZError: require('./src/error'),
+  utils: require('./src/utils'),
+  parse: require('./src/parsers'),
+  build: require('./src/builders')
+}
