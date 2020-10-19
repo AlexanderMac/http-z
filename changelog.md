@@ -1,3 +1,7 @@
+# <sub>v3.0.1</sub>
+#### _Oct. 19, 2020_
+  * Fix typo: `pathch` => `patch`.
+
 # <sub>v3.0.0</sub>
 #### _Oct. 14, 2020_
   * Refactor codebase according to RFC 7230.

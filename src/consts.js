@@ -41,14 +41,14 @@ http.methods = {
   get: 'GET',
   post: 'POST',
   put: 'PUT',
-  pathch: 'PATCH',
+  patch: 'PATCH',
   delete: 'DELETE'
 }
 
 http.postMethods = [
   http.methods.post,
   http.methods.put,
-  http.methods.pathch
+  http.methods.patch
 ]
 
 http.contentTypes = {
