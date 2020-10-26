@@ -31,15 +31,16 @@ describe('parsers / index', () => {
       message: 'plainMessage must be a string'
     }
     should(parser.bind(null, 123)).throw(HttpZError, ERR)
+    should(parser.bind(null, true)).throw(HttpZError, ERR)
     should(parser.bind(null, {})).throw(HttpZError, ERR)
     should(parser.bind(null, [])).throw(HttpZError, ERR)
   })
 
-  it('should throw error when plainMessage has unknown format', () => {
+  it('should throw error when plainMessage has incorrect format', () => {
     let params = ['invalid']
 
     should(parser.bind(null, ...params)).throw(HttpZError, {
-      message: 'Unknown plainMessage format'
+      message: 'plainMessage has incorrect format'
     })
   })
 

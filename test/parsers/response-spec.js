@@ -19,7 +19,7 @@ describe('parsers / response', () => {
       ResponseParser.prototype.parse.restore()
     })
 
-    it('should create an instance of ResponseParser and call instance.parse', () => {
+    it('should create instance of ResponseParser and call instance.parse', () => {
       let params = 'plain'
       let expected = 'ok'
 
@@ -249,7 +249,7 @@ describe('parsers / response', () => {
   })
 
   describe('functional tests', () => {
-    it('should parse request without headers and body', () => {
+    it('should parse response without headers and body', () => {
       let plainResponse = [
         'HTTP/1.1 204 No content',
         '',

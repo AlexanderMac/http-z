@@ -16,5 +16,5 @@ module.exports = (messageModel) => {
   if (messageModel.statusCode) {
     return ResponseBuilder.build(messageModel)
   }
-  throw HttpZError.get('Unknown messageModel format')
+  throw HttpZError.get('messageModel has incorrect format')
 }

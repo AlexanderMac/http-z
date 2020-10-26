@@ -42,14 +42,14 @@ describe('builders / base', () => {
       ]
     }
 
-    it('should throw error when instance.headers', () => {
+    it('should throw error when instance.headers is undefined', () => {
       let expected = HttpZError.get('headers is required')
 
       let builder = getBuilderInstance({ })
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
-    it('should throw error when instance.headers is not an array', () => {
+    it('should throw error when instance.headers is not array', () => {
       let expected = HttpZError.get('headers must be an array')
 
       let builder = getBuilderInstance({ headers: 'headers' })
@@ -83,7 +83,7 @@ describe('builders / base', () => {
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
-    it('should return empty line when instance.headers is an empty array', () => {
+    it('should return empty string when instance.headers is empty array', () => {
       let headers = []
       let expected = ''
 
@@ -92,7 +92,7 @@ describe('builders / base', () => {
       should(actual).eql(expected)
     })
 
-    it('should return headerRows when all params are valid', () => {
+    it('should return headerRows when instance.headers is valid', () => {
       let headers = getDefaultHeaders()
       let expected = [
         'Connection: ',
@@ -134,7 +134,7 @@ describe('builders / base', () => {
       test({ body, expected })
     })
 
-    it('should return FormDataBody when instance.body is not empty and contentType is multipart/form-data', () => {
+    it('should return FormDataBody when instance.body is not nil and contentType is multipart/form-data', () => {
       let body = {
         contentType: 'multipart/form-data'
       }
@@ -144,7 +144,7 @@ describe('builders / base', () => {
       test({ body, expected, expectedFnArgs })
     })
 
-    it('should return FormDataBody when instance.body is not empty and contentType is multipart/alternative', () => {
+    it('should return FormDataBody when instance.body is not nil and contentType is multipart/alternative', () => {
       let body = {
         contentType: 'multipart/alternative'
       }
@@ -154,7 +154,7 @@ describe('builders / base', () => {
       test({ body, expected, expectedFnArgs })
     })
 
-    it('should return FormDataBody when instance.body is not empty and contentType is multipart/mixed', () => {
+    it('should return FormDataBody when instance.body is not nil and contentType is multipart/mixed', () => {
       let body = {
         contentType: 'multipart/mixed'
       }
@@ -164,7 +164,7 @@ describe('builders / base', () => {
       test({ body, expected, expectedFnArgs })
     })
 
-    it('should return FormDataBody when instance.body is not empty and contentType is multipart/related', () => {
+    it('should return FormDataBody when instance.body is not nil and contentType is multipart/related', () => {
       let body = {
         contentType: 'multipart/related'
       }
@@ -174,7 +174,7 @@ describe('builders / base', () => {
       test({ body, expected, expectedFnArgs })
     })
 
-    it('should return UrlencodedBody when instance.body is not empty and contentType is application/x-www-form-urlencoded', () => {
+    it('should return UrlencodedBody when instance.body is not nil and contentType is application/x-www-form-urlencoded', () => {
       let body = {
         contentType: 'application/x-www-form-urlencoded'
       }
@@ -184,7 +184,7 @@ describe('builders / base', () => {
       test({ body, expected, expectedFnArgs })
     })
 
-    it('should return TextBody when instance.body is not empty and contentType is text/plain', () => {
+    it('should return TextBody when instance.body is not nil and contentType is text/plain', () => {
       let body = {
         contentType: 'text/plain'
       }
@@ -194,7 +194,7 @@ describe('builders / base', () => {
       test({ body, expected, expectedFnArgs })
     })
 
-    it('should return TextBody when instance.body is not empty and contentType is unknown', () => {
+    it('should return TextBody when instance.body is not nil and contentType is unknown', () => {
       let body = {
         contentType: 'unknown'
       }
@@ -244,19 +244,19 @@ describe('builders / base', () => {
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
     })
 
-    it('should throw error when instance.body.boundary is empty string', () => {
+    it('should throw error when instance.body.boundary is not a string', () => {
       let body = getDefaultBody()
-      body.boundary = ''
-      let expected = HttpZError.get('body.boundary must be not empty string')
+      body.boundary = 12345
+      let expected = HttpZError.get('body.boundary must be a string')
 
       let builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
     })
 
-    it('should throw error when instance.body.boundary is not a string', () => {
+    it('should throw error when instance.body.boundary is empty string', () => {
       let body = getDefaultBody()
-      body.boundary = 12345
-      let expected = HttpZError.get('body.boundary must be a string')
+      body.boundary = ''
+      let expected = HttpZError.get('body.boundary must be not empty string')
 
       let builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
@@ -280,7 +280,17 @@ describe('builders / base', () => {
       should(builder._generateFormDataBody.bind(builder)).not.throw(HttpZError)
     })
 
-    it('should return BodyRows when all params are valid', () => {
+    it('should return empty string when instance.body.params is empty array', () => {
+      let body = getDefaultBody()
+      body.params = []
+      let expected = ''
+
+      let builder = getBuilderInstance({ body })
+      let actual = builder._generateFormDataBody()
+      should(actual).eql(expected)
+    })
+
+    it('should return BodyRows with params when instance.body.params is not empty array', () => {
       let body = getDefaultBody()
       let expected = [
         '--11136253119209',
@@ -305,19 +315,14 @@ describe('builders / base', () => {
   })
 
   describe('_generateUrlencodedBody', () => {
-    function getDefaultBody() {
+    function getDefaultBody(params) {
       return {
-        params: [
-          { name: 'firstName', value: 'John' },
-          { name: 'lastName', value: 'Smith' },
-          { name: 'age', value: '' }
-        ]
+        params
       }
     }
 
-    it('should throw error when instance.body.params is nil', () => {
+    it('should throw error when instance.body.params is undefined', () => {
       let body = getDefaultBody()
-      body.params = undefined
       let expected = HttpZError.get('body.params is required')
 
       let builder = getBuilderInstance({ body })
@@ -325,17 +330,54 @@ describe('builders / base', () => {
     })
 
     it('should throw error when instance.body.params is not array', () => {
-      let body = getDefaultBody()
-      body.params = 'params'
+      let body = getDefaultBody('params')
       let expected = HttpZError.get('body.params must be an array')
 
       let builder = getBuilderInstance({ body })
       should(builder._generateUrlencodedBody.bind(builder)).throw(HttpZError, expected)
     })
 
-    it('should return BodyRows when all params are valid', () => {
-      let body = getDefaultBody()
-      let expected = 'firstName=John&lastName=Smith&age='
+    it('should return empty string when instance.body.params is empty', () => {
+      let body = getDefaultBody([])
+      let expected = ''
+
+      let builder = getBuilderInstance({ body })
+      let actual = builder._generateUrlencodedBody()
+      should(actual).eql(expected)
+    })
+
+    it('should return BodyRows when instance.body.params has two simple parameters', () => {
+      let body = getDefaultBody([
+        { name: 'p1', value: 'v1' },
+        { name: 'p2>', value: 'v2;' }
+      ])
+      let expected = 'p1=v1&p2%3E=v2%3B'
+
+      let builder = getBuilderInstance({ body })
+      let actual = builder._generateUrlencodedBody()
+      should(actual).eql(expected)
+    })
+
+    it('should return BodyRows when instance.body.params has object parameters', () => {
+      let body = getDefaultBody([
+        { name: 'p1[x]', value: 'v1' },
+        { name: 'p1[y]', value: 'v2' },
+        { name: 'p2>', value: 'v2;' }
+      ])
+      let expected = 'p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v2%3B'
+
+      let builder = getBuilderInstance({ body })
+      let actual = builder._generateUrlencodedBody()
+      should(actual).eql(expected)
+    })
+
+    it('should return BodyRows when instance.body.params has array parameters', () => {
+      let body = getDefaultBody([
+        { name: 'p1[]', value: 'v1' },
+        { name: 'p1[]', value: 'v2' },
+        { name: 'p2>', value: 'v2;' }
+      ])
+      let expected = 'p1%5B%5D=v1&p1%5B%5D=v2&p2%3E=v2%3B'
 
       let builder = getBuilderInstance({ body })
       let actual = builder._generateUrlencodedBody()
@@ -350,8 +392,9 @@ describe('builders / base', () => {
       }
     }
 
-    it('should return empty string when instance.body is undefined', () => {
-      let body = {}
+    it('should return empty string when instance.body.text is empty', () => {
+      let body = getDefaultBody()
+      body.text = ''
       let expected = ''
 
       let builder = getBuilderInstance({ body })
@@ -359,7 +402,7 @@ describe('builders / base', () => {
       should(actual).eql(expected)
     })
 
-    it('should return BodyRows when all params are valid', () => {
+    it('should return BodyRows when instance.body.text is not empty', () => {
       let body = getDefaultBody()
       let expected = 'text data'
 

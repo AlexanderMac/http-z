@@ -1,5 +1,4 @@
 const _ = require('lodash')
-const qs = require('qs')
 const consts = require('../consts')
 const utils = require('../utils')
 const validators = require('../validators')
@@ -64,6 +63,10 @@ class HttpZBaseBuilder {
     validators.validateArray(this.body.params, 'body.params')
     validators.validateNotEmptyString(this.body.boundary, 'body.boundary')
 
+    if (_.isEmpty(this.body.params)) {
+      return ''
+    }
+
     // eslint-disable-next-line max-statements
     let paramsStr = _.map(this.body.params, (param, index) => {
       if (!param.type) {
@@ -94,9 +97,9 @@ class HttpZBaseBuilder {
 
   _generateUrlencodedBody() {
     validators.validateArray(this.body.params, 'body.params')
-    let params = utils.convertParamsArrayToObject(this.body.params)
+    let paramPairs = utils.convertParamsArrayToPairs(this.body.params)
 
-    return qs.stringify(params, { indices: false })
+    return new URLSearchParams(paramPairs).toString()
   }
 
   _generateTextBody() {

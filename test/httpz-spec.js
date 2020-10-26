@@ -6,15 +6,15 @@ describe('httpz', ()=> {
     should(httpZ.consts).is.Object()
   })
 
-  it('should httpz.HttpZError be an function', () => {
+  it('should httpz.HttpZError be a function', () => {
     should(httpZ.HttpZError).is.Function()
   })
 
-  it('should httpz.parse be an function', () => {
+  it('should httpz.parse be a function', () => {
     should(httpZ.parse).is.Function()
   })
 
-  it('should httpz.build be an function', () => {
+  it('should httpz.build be a function', () => {
     should(httpZ.build).is.Function()
   })
 })

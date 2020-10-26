@@ -1,5 +1,4 @@
 const _ = require('lodash')
-const qs = require('qs')
 const consts = require('../consts')
 const HttpZError = require('../error')
 const utils = require('../utils')
@@ -100,8 +99,11 @@ class HttpZBaseParser {
   }
 
   _parseUrlencodedBody() {
-    let params = qs.parse(this.bodyRows)
-    this.body.params = _.map(params, (value, name) => ({ name, value }))
+    let params = new URLSearchParams(this.bodyRows)
+    this.body.params = []
+    params.forEach((value, name) => {
+      this.body.params.push({ name, value })
+    })
   }
 
   _parseTextBody() {

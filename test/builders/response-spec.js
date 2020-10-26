@@ -25,7 +25,7 @@ describe('builders / response', () => {
       ResponseBuilder.prototype.build.restore()
     })
 
-    it('should create an instance of ResponseBuilder and call instance.build', () => {
+    it('should create instance of ResponseBuilder and call instance.build', () => {
       let model = {}
       let expected = 'ok'
 
@@ -106,14 +106,6 @@ describe('builders / response', () => {
       ]
     }
 
-    it('should return empty string when instance.cookies is undefined', () => {
-      let builder = getBuilderInstance({ cookies: undefined })
-
-      let expected = ''
-      let actual = builder._generateCookieRows()
-      should(actual).eql(expected)
-    })
-
     it('should throw error when instance.cookies is not array', () => {
       let builder = getBuilderInstance({ cookies: 'wrong cookies' })
 
@@ -144,6 +136,22 @@ describe('builders / response', () => {
         message: 'cookie params must be an array',
         details: 'cookie index: 1'
       })
+    })
+
+    it('should return empty string when instance.cookies is undefined', () => {
+      let builder = getBuilderInstance({ cookies: undefined })
+
+      let expected = ''
+      let actual = builder._generateCookieRows()
+      should(actual).eql(expected)
+    })
+
+    it('should return empty string when instance.cookies is empty array', () => {
+      let builder = getBuilderInstance({ cookies: [] })
+
+      let expected = ''
+      let actual = builder._generateCookieRows()
+      should(actual).eql(expected)
     })
 
     it('should build cookie rows when instance.cookies are valid', () => {
@@ -319,151 +327,6 @@ describe('builders / response', () => {
         'Content-Type: text/plain;charset=UTF-8',
         '',
         'Text data'
-      ].join(HttpZConsts.EOL)
-
-      let builder = getBuilderInstance(responseModel)
-      let actual = builder.build()
-      should(actual).eql(plainResponse)
-    })
-
-    it('should build response with body of contentType=multipart/alternative (inline)', () => {
-      let responseModel = {
-        protocolVersion: 'HTTP/1.1',
-        statusCode: 200,
-        statusMessage: 'Ok',
-        headers: [
-          {
-            name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
-          },
-          {
-            name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
-          },
-          {
-            name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
-          },
-          {
-            name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
-          },
-          {
-            name: 'Content-Type',
-            values: [
-              { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
-            ]
-          }
-        ],
-        body: {
-          contentType: 'multipart/alternative',
-          boundary: '111362-53119209',
-          params: [
-            {
-              type: 'inline',
-              value: '<base64-data>'
-            }
-          ]
-        },
-        headersSize: 243,
-        bodySize: 84
-      }
-      let plainResponse = [
-        'HTTP/1.1 200 Ok',
-        'Connection: keep-alive',
-        'Cache-Control: no-cache',
-        'Content-Encoding: gzip, deflate',
-        'Content-Length: 301',
-        'Content-Type: multipart/alternative;boundary="111362-53119209"',
-        '',
-        '--111362-53119209',
-        'Content-Disposition: inline',
-        '',
-        '<base64-data>',
-        '--111362-53119209--'
-      ].join(HttpZConsts.EOL)
-
-      let builder = getBuilderInstance(responseModel)
-      let actual = builder.build()
-      should(actual).eql(plainResponse)
-    })
-
-    it('should build response with body of contentType=multipart/mixed (attachment)', () => {
-      let responseModel = {
-        protocolVersion: 'HTTP/1.1',
-        statusCode: 200,
-        statusMessage: 'Ok',
-        headers: [
-          {
-            name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
-          },
-          {
-            name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
-          },
-          {
-            name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
-          },
-          {
-            name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
-          },
-          {
-            name: 'Content-Type',
-            values: [
-              { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
-            ]
-          }
-        ],
-        body: {
-          contentType: 'multipart/mixed',
-          boundary: '11136253119209',
-          params: [
-            {
-              type: 'attachment',
-              contentType: 'application/octet-stream',
-              fileName: 'photo1.jpg',
-              value: '<binary-data>'
-            }
-          ]
-        },
-        headersSize: 236,
-        bodySize: 149
-      }
-      let plainResponse = [
-        'HTTP/1.1 200 Ok',
-        'Connection: keep-alive',
-        'Cache-Control: no-cache',
-        'Content-Encoding: gzip, deflate',
-        'Content-Length: 301',
-        'Content-Type: multipart/mixed;boundary="11136253119209"',
-        '',
-        '--11136253119209',
-        'Content-Disposition: attachment; filename="photo1.jpg"',
-        'Content-Type: application/octet-stream',
-        '',
-        '<binary-data>',
-        '--11136253119209--'
       ].join(HttpZConsts.EOL)
 
       let builder = getBuilderInstance(responseModel)

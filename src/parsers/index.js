@@ -19,5 +19,5 @@ module.exports = (plainMessage) => {
   if (consts.regexps.responseStartRow.test(firstRow)) {
     return ResponseParser.parse(plainMessage)
   }
-  throw HttpZError.get('Unknown plainMessage format')
+  throw HttpZError.get('plainMessage has incorrect format')
 }

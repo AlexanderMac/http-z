@@ -17,7 +17,7 @@ declare namespace utils {
   function parseUrl(path?: string, origin?: string): any;
   function generateUrl(protocol: string, host: string, path: string, params: HttpZParam[]): string;
   function generatePath(path: string, params: HttpZParam[]): string;
-  function convertParamsArrayToObject(params: HttpZParam[]): any;
+  function convertParamsArrayToPairs(params: HttpZParam[]): any[];
   function pretifyHeaderName(name: string): string;
   function getEmptyStringForUndefined(val?: string): string;
   function extendIfNotUndefined(obj: any, fieldName: string, fieldValue?: any): any;

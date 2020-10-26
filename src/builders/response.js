@@ -42,6 +42,10 @@ class HttpZResponseBuilder extends Base {
 
     validators.validateArray(this.cookies, 'cookies')
 
+    if (_.isEmpty(this.cookies)) {
+      return ''
+    }
+
     let cookieRowsStr = _.chain(this.cookies)
       .map(({ name, value, params }, index) => {
         validators.validateNotEmptyString(name, 'cookie name', `cookie index: ${index}`)
