@@ -1,3 +1,7 @@
+# <sub>v3.1.2</sub>
+#### _Dec. 2, 2020_
+  * Replace prefix `plain` to `raw`.
+
 # <sub>v3.1.1</sub>
 #### _Dec. 2, 2020_
   * Skip `set-cookie` headers in response builder, use `cookies` object from model.
