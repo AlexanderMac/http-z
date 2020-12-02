@@ -269,7 +269,7 @@ describe('builders / response', () => {
         ]
       }
 
-      let plainResponse = [
+      let rawResponse = [
         'HTTP/1.1 201 Created',
         'Connection: ',
         'Cache-Control: no-cache',
@@ -281,7 +281,7 @@ describe('builders / response', () => {
 
       let builder = getBuilderInstance(responseModel)
       let actual = builder.build()
-      should(actual).eql(plainResponse)
+      should(actual).eql(rawResponse)
     })
 
     it('should build response with cookies, but without body', () => {
@@ -322,7 +322,7 @@ describe('builders / response', () => {
         ]
       }
 
-      let plainResponse = [
+      let rawResponse = [
         'HTTP/1.1 201 Created',
         'Connection: ',
         'Cache-Control: no-cache',
@@ -338,7 +338,7 @@ describe('builders / response', () => {
 
       let builder = getBuilderInstance(responseModel)
       let actual = builder.build()
-      should(actual).eql(plainResponse)
+      should(actual).eql(rawResponse)
     })
 
     it('should build response with body of contentType=text/plain', () => {
@@ -385,7 +385,7 @@ describe('builders / response', () => {
         }
       }
 
-      let plainResponse = [
+      let rawResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -398,7 +398,7 @@ describe('builders / response', () => {
 
       let builder = getBuilderInstance(responseModel)
       let actual = builder.build()
-      should(actual).eql(plainResponse)
+      should(actual).eql(rawResponse)
     })
   })
 })

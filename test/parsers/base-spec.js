@@ -12,11 +12,11 @@ describe('parsers / base', () => {
 
   describe('_parseMessageForRows', () => {
     it('should throw error when message does not have start-line', () => {
-      let plainRequest = [
+      let rawRequest = [
         '',
         'Body'
       ].join(HttpZConsts.EOL)
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
 
       should(parser._parseMessageForRows.bind(parser)).throw(Error, {
         message: 'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
@@ -24,12 +24,12 @@ describe('parsers / base', () => {
     })
 
     it('should throw error when message does not have empty line between headers and body', () => {
-      let plainRequest = [
+      let rawRequest = [
         'start-line',
         'host-line',
         'Header1'
       ].join(HttpZConsts.EOL)
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
 
       should(parser._parseMessageForRows.bind(parser)).throw(HttpZError, {
         message: 'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
@@ -37,7 +37,7 @@ describe('parsers / base', () => {
     })
 
     it('should parse message for rows without body', () => {
-      let plainRequest = [
+      let rawRequest = [
         'start-line',
         'host-line',
         'Header1',
@@ -47,7 +47,7 @@ describe('parsers / base', () => {
         '',
         ''
       ].join(HttpZConsts.EOL)
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
 
       let actual = parser._parseMessageForRows()
       should(actual.startRow).eql('start-line')
@@ -58,7 +58,7 @@ describe('parsers / base', () => {
     })
 
     it('should parse message for rows with body', () => {
-      let plainRequest = [
+      let rawRequest = [
         'start-line',
         'host-line',
         'Header1',
@@ -68,7 +68,7 @@ describe('parsers / base', () => {
         '',
         'Body'
       ].join(HttpZConsts.EOL)
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
 
       let actual = parser._parseMessageForRows()
       should(actual.startRow).eql('start-line')

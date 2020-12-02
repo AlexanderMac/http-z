@@ -69,6 +69,6 @@ declare class HttpZResponseModel {
   body: HttpZBody;
 }
 
-export function parse(plainMessage: string): HttpZRequestModel | HttpZResponseModel;
+export function parse(rawMessage: string): HttpZRequestModel | HttpZResponseModel;
 
 export function build(messageModel: HttpZRequestModel | HttpZResponseModel): string;

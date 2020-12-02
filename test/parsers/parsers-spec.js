@@ -18,17 +18,17 @@ describe('parsers / index', () => {
     ResponseParser.parse.restore()
   })
 
-  it('should throw error when plainMessage is nil', () => {
+  it('should throw error when rawMessage is nil', () => {
     const ERR = {
-      message: 'plainMessage is required'
+      message: 'rawMessage is required'
     }
     should(parser.bind(null, undefined)).throw(HttpZError, ERR)
     should(parser.bind(null, null)).throw(HttpZError, ERR)
   })
 
-  it('should throw error when plainMessage is not a string', () => {
+  it('should throw error when rawMessage is not a string', () => {
     const ERR = {
-      message: 'plainMessage must be a string'
+      message: 'rawMessage must be a string'
     }
     should(parser.bind(null, 123)).throw(HttpZError, ERR)
     should(parser.bind(null, true)).throw(HttpZError, ERR)
@@ -36,44 +36,44 @@ describe('parsers / index', () => {
     should(parser.bind(null, [])).throw(HttpZError, ERR)
   })
 
-  it('should throw error when plainMessage has incorrect format', () => {
+  it('should throw error when rawMessage has incorrect format', () => {
     let params = ['invalid']
 
     should(parser.bind(null, ...params)).throw(HttpZError, {
-      message: 'plainMessage has incorrect format'
+      message: 'rawMessage has incorrect format'
     })
   })
 
-  it('should call RequestParser.parse when plainMessage is request', () => {
-    let plainMessage = [
+  it('should call RequestParser.parse when rawMessage is request', () => {
+    let rawMessage = [
       'GET /features HTTP/1.1',
       'host: example.com',
       ''
     ].join(HttpZConsts.EOL)
     let expected = 'parsed-request'
-    let expectedArgs = plainMessage
+    let expectedArgs = rawMessage
 
     RequestParser.parse.returns('parsed-request')
 
-    let actual = parser(plainMessage)
+    let actual = parser(rawMessage)
     should(actual).eql(expected)
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedArgs })
     nassert.assertFn({ inst: ResponseParser, fnName: 'parse' })
   })
 
-  it('should call ResponseParser.parse when plainMessage is response', () => {
-    let plainMessage = [
+  it('should call ResponseParser.parse when rawMessage is response', () => {
+    let rawMessage = [
       'HTTP/1.1 200 Ok',
       'host: example.com',
       ''
     ].join(HttpZConsts.EOL)
     let expected = 'parsed-response'
-    let expectedArgs = plainMessage
+    let expectedArgs = rawMessage
 
     ResponseParser.parse.returns('parsed-response')
 
-    let actual = parser(plainMessage)
+    let actual = parser(rawMessage)
     should(actual).eql(expected)
 
     nassert.assertFn({ inst: RequestParser, fnName: 'parse' })

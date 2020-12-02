@@ -301,7 +301,7 @@ describe('builders / request', () => {
         headers: []
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'GET /features?p1=v1%3B&p2= HTTP/1.1',
         'Host: example.com',
         '',
@@ -310,7 +310,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request without body (header names in lower case)', () => {
@@ -347,7 +347,7 @@ describe('builders / request', () => {
         ]
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: ',
@@ -360,7 +360,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request with cookies, but without body', () => {
@@ -418,7 +418,7 @@ describe('builders / request', () => {
         ]
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: ',
@@ -432,7 +432,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request with body of contentType=text/plain', () => {
@@ -497,7 +497,7 @@ describe('builders / request', () => {
         }
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -513,7 +513,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request with body of contentType=application/x-www-form-urlencoded', () => {
@@ -582,7 +582,7 @@ describe('builders / request', () => {
         }
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -598,7 +598,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request with body of contentType=multipart/form-data', () => {
@@ -677,7 +677,7 @@ describe('builders / request', () => {
         }
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -709,7 +709,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
 
@@ -766,7 +766,7 @@ describe('builders / request', () => {
         headersSize: 243,
         bodySize: 84
       }
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -784,7 +784,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request with body of contentType=multipart/mixed (attachment)', () => {
@@ -842,7 +842,7 @@ describe('builders / request', () => {
         headersSize: 236,
         bodySize: 149
       }
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -861,7 +861,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
   })
 })

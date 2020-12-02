@@ -20,7 +20,7 @@ describe('parsers / response', () => {
     })
 
     it('should create instance of ResponseParser and call instance.parse', () => {
-      let params = 'plain'
+      let params = 'raw'
       let expected = 'ok'
 
       ResponseParser.prototype.parse.returns('ok')
@@ -34,7 +34,7 @@ describe('parsers / response', () => {
 
   describe('parse', () => {
     it('should call related methods and return response model', () => {
-      let parser = getParserInstance('plainResponse')
+      let parser = getParserInstance('rawResponse')
       sinon.stub(parser, '_parseMessageForRows')
       sinon.stub(parser, '_parseStartRow')
       sinon.stub(parser, '_parseHeaderRows')
@@ -57,7 +57,7 @@ describe('parsers / response', () => {
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows when message is without Set-Cookie and Body rows', () => {
-      let plainResponse = [
+      let rawResponse = [
         'start-line',
         'header1',
         'header2',
@@ -66,7 +66,7 @@ describe('parsers / response', () => {
         ''
       ].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(plainResponse)
+      let parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -76,7 +76,7 @@ describe('parsers / response', () => {
     })
 
     it('should parse message for rows when message contains Set-Cookie rows', () => {
-      let plainResponse = [
+      let rawResponse = [
         'start-line',
         'header1',
         'header2',
@@ -87,7 +87,7 @@ describe('parsers / response', () => {
         ''
       ].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(plainResponse)
+      let parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -97,7 +97,7 @@ describe('parsers / response', () => {
     })
 
     it('should parse message for rows when message contains Body rows', () => {
-      let plainResponse = [
+      let rawResponse = [
         'start-line',
         'header1',
         'header2',
@@ -106,7 +106,7 @@ describe('parsers / response', () => {
         'body'
       ].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(plainResponse)
+      let parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -250,7 +250,7 @@ describe('parsers / response', () => {
 
   describe('functional tests', () => {
     it('should parse response without headers and body', () => {
-      let plainResponse = [
+      let rawResponse = [
         'HTTP/1.1 204 No content',
         '',
         ''
@@ -265,13 +265,13 @@ describe('parsers / response', () => {
         bodySize: 0
       }
 
-      let parser = getParserInstance(plainResponse)
+      let parser = getParserInstance(rawResponse)
       let actual = parser.parse()
       should(actual).eql(responseModel)
     })
 
     it('should parse response without body (header names in lower case)', () => {
-      let plainResponse = [
+      let rawResponse = [
         'HTTP/1.1 201 Created',
         'connection: ',
         'cache-Control: no-cache',
@@ -314,13 +314,13 @@ describe('parsers / response', () => {
         bodySize: 0
       }
 
-      let parser = getParserInstance(plainResponse)
+      let parser = getParserInstance(rawResponse)
       let actual = parser.parse()
       should(actual).eql(responseModel)
     })
 
     it('should parse response without cookies and body', () => {
-      let plainResponse = [
+      let rawResponse = [
         'HTTP/1.1 201 Created',
         'Connection: ',
         'Cache-Control: no-cache',
@@ -371,13 +371,13 @@ describe('parsers / response', () => {
         bodySize: 0
       }
 
-      let parser = getParserInstance(plainResponse)
+      let parser = getParserInstance(rawResponse)
       let actual = parser.parse()
       should(actual).eql(responseModel)
     })
 
     it('should parse response with body of contentType=text/plain', () => {
-      let plainResponse = [
+      let rawResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -433,7 +433,7 @@ describe('parsers / response', () => {
         bodySize: 9
       }
 
-      let parser = getParserInstance(plainResponse)
+      let parser = getParserInstance(rawResponse)
       let actual = parser.parse()
       should(actual).eql(responseModel)
     })

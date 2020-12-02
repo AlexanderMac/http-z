@@ -21,7 +21,7 @@ describe('parsers / request', () => {
     })
 
     it('should create instance of RequestParser and call instance.parse', () => {
-      let params = 'plain'
+      let params = 'raw'
       let expected = 'ok'
 
       RequestParser.prototype.parse.returns('ok')
@@ -35,7 +35,7 @@ describe('parsers / request', () => {
 
   describe('parse', () => {
     it('should call related methods and return request model', () => {
-      let parser = getParserInstance('plainRequest', 'EOL')
+      let parser = getParserInstance('rawRequest', 'EOL')
       sinon.stub(parser, '_parseMessageForRows')
       sinon.stub(parser, '_parseHostRow')
       sinon.stub(parser, '_parseStartRow')
@@ -60,7 +60,7 @@ describe('parsers / request', () => {
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows when message is without Cookie and Body rows', () => {
-      let plainRequest = [
+      let rawRequest = [
         'start-line',
         'host: somehost',
         'header1',
@@ -70,7 +70,7 @@ describe('parsers / request', () => {
         ''
       ].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -81,7 +81,7 @@ describe('parsers / request', () => {
     })
 
     it('should parse message for rows when message contains Cookies row', () => {
-      let plainRequest = [
+      let rawRequest = [
         'start-line',
         'host: somehost',
         'header1',
@@ -92,7 +92,7 @@ describe('parsers / request', () => {
         ''
       ].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -103,7 +103,7 @@ describe('parsers / request', () => {
     })
 
     it('should parse message for rows when message contains Body rows', () => {
-      let plainRequest = [
+      let rawRequest = [
         'start-line',
         'host: somehost',
         'header1',
@@ -113,7 +113,7 @@ describe('parsers / request', () => {
         'body'
       ].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -404,7 +404,7 @@ describe('parsers / request', () => {
 
   describe('functional tests', () => {
     it('should parse request without headers and body', () => {
-      let plainRequest = [
+      let rawRequest = [
         'GET /features?p1=v1%3B&p2= HTTP/1.1',
         'host: www.example.com',
         '',
@@ -426,13 +426,13 @@ describe('parsers / request', () => {
         bodySize: 0
       }
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
 
     it('should parse request without body (header names in lower case)', () => {
-      let plainRequest = [
+      let rawRequest = [
         'GET /features HTTP/1.1',
         'host: example.com',
         'connection: ',
@@ -496,13 +496,13 @@ describe('parsers / request', () => {
         bodySize: 0
       }
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
 
     it('should parse request with cookies and without body', () => {
-      let plainRequest = [
+      let rawRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: ',
@@ -558,13 +558,13 @@ describe('parsers / request', () => {
         bodySize: 0
       }
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
 
     it('should parse request with body of contentType=text/plain', () => {
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -642,13 +642,13 @@ describe('parsers / request', () => {
         bodySize: 9
       }
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
 
     it('should parse request with body of contentType=application/x-www-form-urlencoded', () => {
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -730,13 +730,13 @@ describe('parsers / request', () => {
         bodySize: 34
       }
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
 
     it('should parse request with body of contentType=multipart/form-data', () => {
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -844,13 +844,13 @@ describe('parsers / request', () => {
         bodySize: 367
       }
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
 
     it('should parse request with body of contentType=multipart/alternative (inline)', () => {
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -938,13 +938,13 @@ describe('parsers / request', () => {
         bodySize: 84
       }
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
 
     it('should parse request with body of contentType=multipart/mixed (attachment)', () => {
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -1035,7 +1035,7 @@ describe('parsers / request', () => {
         bodySize: 149
       }
 
-      let parser = getParserInstance(plainRequest)
+      let parser = getParserInstance(rawRequest)
       let actual = parser.parse()
       should(actual).eql(requestModel)
     })
