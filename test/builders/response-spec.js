@@ -4,6 +4,7 @@ const should = require('should')
 const nassert = require('n-assert')
 const HttpZConsts = require('../../src/consts')
 const HttpZError = require('../../src/error')
+const BaseBuilder = require('../../src/builders/base')
 const ResponseBuilder = require('../../src/builders/response')
 
 describe('builders / response', () => {
@@ -94,6 +95,72 @@ describe('builders / response', () => {
       let expected = 'HTTP/1.1 200 Ok' + HttpZConsts.EOL
       let actual = builder._generateStartRow()
       should(actual).eql(expected)
+    })
+  })
+
+  describe('_generateHeaderRows', () => {
+    beforeEach(() => {
+      sinon.stub(BaseBuilder.prototype, '_generateHeaderRows')
+    })
+
+    afterEach(() => {
+      BaseBuilder.prototype._generateHeaderRows.restore()
+    })
+
+    it('should throw error when instance.headers is not array', () => {
+      let builder = new ResponseBuilder({ headers: 'incorrect headers' })
+
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, {
+        message: 'headers must be an array'
+      })
+
+      nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows' })
+    })
+
+    it('should remove set-cookie headers and call parent method', () => {
+      let builder = new ResponseBuilder({
+        headers: [
+          {
+            name: 'set-cookie',
+            values: 'some cookie1'
+          },
+          {
+            name: 'connection',
+            values: []
+          },
+          {
+            name: 'accept',
+            values: [
+              { value: '*/*' }
+            ]
+          },
+          {
+            name: 'set-cookie',
+            values: 'some cookie2'
+          }
+        ]
+      })
+      let expected = 'ok'
+      let expectedHeaders = [
+        {
+          name: 'connection',
+          values: []
+        },
+        {
+          name: 'accept',
+          values: [
+            { value: '*/*' }
+          ]
+        }
+      ]
+
+      BaseBuilder.prototype._generateHeaderRows.returns('ok')
+
+      let actual = builder._generateHeaderRows()
+      should(actual).eql(expected)
+      should(builder.headers).eql(expectedHeaders)
+
+      nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
     })
   })
 
