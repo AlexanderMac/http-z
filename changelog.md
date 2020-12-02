@@ -1,3 +1,7 @@
+# <sub>v3.1.1</sub>
+#### _Dec. 2, 2020_
+  * Skip `set-cookie` headers in response builder, use `cookies` object from model.
+
 # <sub>v3.1.0</sub>
 #### _Oct. 27, 2020_
   * Remove `qs` module, use the native `URLSearchParams`.
