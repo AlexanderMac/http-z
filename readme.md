@@ -6,7 +6,7 @@
 
 ## Features
 
-HTTP request/response message parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230).
+HTTP request/response message parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230). Works in Node.js and in the browser.
 
 * Parse HTTP request/response raw message:
   - method, protocol, protocol version / status code, reason
