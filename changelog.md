@@ -1,3 +1,7 @@
+# <sub>v3.2.0</sub>
+#### _Dec. 3, 2020_
+  * Integrate rollup and create client bundle (add browser support).
+
 # <sub>v3.1.2</sub>
 #### _Dec. 2, 2020_
   * Replace prefix `plain` to `raw`.
