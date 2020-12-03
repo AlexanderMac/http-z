@@ -9,8 +9,7 @@ module.exports = {
     name: 'httpZ',
     format: 'umd',
     globals: {
-      'lodash': '_',
-      'qs': 'qs'
+      'lodash': '_'
     }
   },
   plugins: [
@@ -18,7 +17,6 @@ module.exports = {
     commonjs()
   ],
   external: [
-    'lodash',
-    'qs'
+    'lodash'
   ]
 }
