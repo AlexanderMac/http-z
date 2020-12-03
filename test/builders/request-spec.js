@@ -28,7 +28,7 @@ describe('builders / request', () => {
       RequestBuilder.prototype.build.restore()
     })
 
-    it('should create an instance of RequestBuilder and call instance.build', () => {
+    it('should create instance of RequestBuilder and call instance.build', () => {
       let model = {}
       let expected = 'ok'
 
@@ -110,10 +110,51 @@ describe('builders / request', () => {
       })
     })
 
-    it('should build startRow when all params are valid', () => {
+    it('should build startRow when query params is empty', () => {
       let builder = getBuilderInstance()
 
       let expected = 'GET / HTTP/1.1' + HttpZConsts.EOL
+      let actual = builder._generateStartRow()
+      should(actual).eql(expected)
+    })
+
+    it('should build startRow when query params has two simple parameters', () => {
+      let builder = getBuilderInstance({
+        queryParams: [
+          { name: 'p1', value: 'v1' },
+          { name: 'p2>', value: 'v2;' }
+        ]
+      })
+
+      let expected = 'GET /?p1=v1&p2%3E=v2%3B HTTP/1.1' + HttpZConsts.EOL
+      let actual = builder._generateStartRow()
+      should(actual).eql(expected)
+    })
+
+    it('should build startRow when query params contains object parameters', () => {
+      let builder = getBuilderInstance({
+        queryParams: [
+          { name: 'p1[x]', value: 'v1' },
+          { name: 'p1[y]', value: 'v2' },
+          { name: 'p2>', value: 'v3;' }
+        ]
+      })
+
+      let expected = 'GET /?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v3%3B HTTP/1.1' + HttpZConsts.EOL
+      let actual = builder._generateStartRow()
+      should(actual).eql(expected)
+    })
+
+    it('should build startRow when query params contains array parameters', () => {
+      let builder = getBuilderInstance({
+        queryParams: [
+          { name: 'p1[x]', value: 'v1' },
+          { name: 'p1[y]', value: 'v2' },
+          { name: 'p2>', value: 'v3;' }
+        ]
+      })
+
+      let expected = 'GET /?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v3%3B HTTP/1.1' + HttpZConsts.EOL
       let actual = builder._generateStartRow()
       should(actual).eql(expected)
     })
@@ -194,6 +235,7 @@ describe('builders / request', () => {
       let actual = builder._generateHeaderRows()
       should(actual).eql(expected)
       should(builder.headers).eql(expectedHeaders)
+
       nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
     })
   })
@@ -253,14 +295,14 @@ describe('builders / request', () => {
         host: 'example.com',
         path: '/features',
         queryParams: [
-          { name: 'p1', value: 'v1' },
+          { name: 'p1', value: 'v1;' },
           { name: 'p2' }
         ],
         headers: []
       }
 
-      let plainRequest = [
-        'GET /features?p1=v1&p2= HTTP/1.1',
+      let rawRequest = [
+        'GET /features?p1=v1%3B&p2= HTTP/1.1',
         'Host: example.com',
         '',
         ''
@@ -268,7 +310,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request without body (header names in lower case)', () => {
@@ -305,7 +347,7 @@ describe('builders / request', () => {
         ]
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: ',
@@ -318,10 +360,10 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
-    it('should parse request with cookies, but without body', () => {
+    it('should build request with cookies, but without body', () => {
       let requestModel = {
         method: 'GET',
         protocol: 'HTTP',
@@ -361,6 +403,7 @@ describe('builders / request', () => {
               { value: 'en', params: 'q=0.4' }
             ]
           },
+          // it will be replaced
           {
             name: 'Cookie',
             values: [
@@ -370,26 +413,26 @@ describe('builders / request', () => {
         ],
         cookies: [
           { name: 'csrftoken', value: '123abc' },
-          { name: 'sessionid', value: '456def' },
+          { name: 'sessionid', value: '456def%3B' },
           { name: 'username' }
         ]
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'GET /features HTTP/1.1',
         'Host: example.com',
         'Connection: ',
         'Accept: */*',
         'Accept-Encoding: gzip, deflate',
         'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
-        'Cookie: csrftoken=123abc; sessionid=456def; username=',
+        'Cookie: csrftoken=123abc; sessionid=456def%3B; username=',
         '',
         ''
       ].join(HttpZConsts.EOL)
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request with body of contentType=text/plain', () => {
@@ -454,7 +497,7 @@ describe('builders / request', () => {
         }
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -470,7 +513,7 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request with body of contentType=application/x-www-form-urlencoded', () => {
@@ -534,12 +577,12 @@ describe('builders / request', () => {
           params: [
             { name: 'firstName', value: 'John' },
             { name: 'lastName' },
-            { name: 'age', value: 25 }
+            { name: 'age', value: '25;' }
           ]
         }
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -550,12 +593,12 @@ describe('builders / request', () => {
         'Content-Encoding: gzip, deflate',
         'Content-Length: 301',
         '',
-        'firstName=John&lastName=&age=25'
+        'firstName=John&lastName=&age=25%3B'
       ].join(HttpZConsts.EOL)
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
     })
 
     it('should build request with body of contentType=multipart/form-data', () => {
@@ -634,7 +677,7 @@ describe('builders / request', () => {
         }
       }
 
-      let plainRequest = [
+      let rawRequest = [
         'POST /features HTTP/1.1',
         'Host: example.com',
         'Connection: keep-alive',
@@ -666,7 +709,159 @@ describe('builders / request', () => {
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
-      should(actual).eql(plainRequest)
+      should(actual).eql(rawRequest)
+    })
+
+
+    it('should build request with body of contentType=multipart/alternative (inline)', () => {
+      let requestModel = {
+        method: 'POST',
+        protocol: 'HTTP',
+        protocolVersion: 'HTTP/1.1',
+        host: 'example.com',
+        path: '/features',
+        headers: [
+          {
+            name: 'Connection',
+            values: [
+              { value: 'keep-alive' }
+            ]
+          },
+          {
+            name: 'Cache-Control',
+            values: [
+              { value: 'no-cache' }
+            ]
+          },
+          {
+            name: 'Content-Encoding',
+            values: [
+              { value: 'gzip' },
+              { value: 'deflate' }
+            ]
+          },
+          {
+            name: 'Content-Length',
+            values: [
+              { value: '301' }
+            ]
+          },
+          {
+            name: 'Content-Type',
+            values: [
+              { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
+            ]
+          }
+        ],
+        body: {
+          contentType: 'multipart/alternative',
+          boundary: '111362-53119209',
+          params: [
+            {
+              type: 'inline',
+              value: '<base64-data>'
+            }
+          ]
+        },
+        headersSize: 243,
+        bodySize: 84
+      }
+      let rawRequest = [
+        'POST /features HTTP/1.1',
+        'Host: example.com',
+        'Connection: keep-alive',
+        'Cache-Control: no-cache',
+        'Content-Encoding: gzip, deflate',
+        'Content-Length: 301',
+        'Content-Type: multipart/alternative;boundary="111362-53119209"',
+        '',
+        '--111362-53119209',
+        'Content-Disposition: inline',
+        '',
+        '<base64-data>',
+        '--111362-53119209--'
+      ].join(HttpZConsts.EOL)
+
+      let builder = getBuilderInstance(requestModel)
+      let actual = builder.build()
+      should(actual).eql(rawRequest)
+    })
+
+    it('should build request with body of contentType=multipart/mixed (attachment)', () => {
+      let requestModel = {
+        method: 'POST',
+        protocol: 'HTTP',
+        protocolVersion: 'HTTP/1.1',
+        host: 'example.com',
+        path: '/features',
+        headers: [
+          {
+            name: 'Connection',
+            values: [
+              { value: 'keep-alive' }
+            ]
+          },
+          {
+            name: 'Cache-Control',
+            values: [
+              { value: 'no-cache' }
+            ]
+          },
+          {
+            name: 'Content-Encoding',
+            values: [
+              { value: 'gzip' },
+              { value: 'deflate' }
+            ]
+          },
+          {
+            name: 'Content-Length',
+            values: [
+              { value: '301' }
+            ]
+          },
+          {
+            name: 'Content-Type',
+            values: [
+              { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
+            ]
+          }
+        ],
+        body: {
+          contentType: 'multipart/mixed',
+          boundary: '11136253119209',
+          params: [
+            {
+              type: 'attachment',
+              contentType: 'application/octet-stream',
+              fileName: 'photo1.jpg',
+              value: '<binary-data>'
+            }
+          ]
+        },
+        headersSize: 236,
+        bodySize: 149
+      }
+      let rawRequest = [
+        'POST /features HTTP/1.1',
+        'Host: example.com',
+        'Connection: keep-alive',
+        'Cache-Control: no-cache',
+        'Content-Encoding: gzip, deflate',
+        'Content-Length: 301',
+        'Content-Type: multipart/mixed;boundary="11136253119209"',
+        '',
+        '--11136253119209',
+        'Content-Disposition: attachment; filename="photo1.jpg"',
+        'Content-Type: application/octet-stream',
+        '',
+        '<binary-data>',
+        '--11136253119209--'
+      ].join(HttpZConsts.EOL)
+
+      let builder = getBuilderInstance(requestModel)
+      let actual = builder.build()
+      should(actual).eql(rawRequest)
     })
   })
 })

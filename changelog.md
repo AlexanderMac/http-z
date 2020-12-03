@@ -1,3 +1,19 @@
+# <sub>v3.1.2</sub>
+#### _Dec. 2, 2020_
+  * Replace prefix `plain` to `raw`.
+
+# <sub>v3.1.1</sub>
+#### _Dec. 2, 2020_
+  * Skip `set-cookie` headers in response builder, use `cookies` object from model.
+
+# <sub>v3.1.0</sub>
+#### _Oct. 27, 2020_
+  * Remove `qs` module, use the native `URLSearchParams`.
+
+# <sub>v3.0.1</sub>
+#### _Oct. 19, 2020_
+  * Fix typo: `pathch` => `patch`.
+
 # <sub>v3.0.0</sub>
 #### _Oct. 14, 2020_
   * Refactor codebase according to RFC 7230.

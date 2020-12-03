@@ -1,5 +1,4 @@
 const _ = require('lodash')
-const qs = require('qs')
 const validators = require('./validators')
 
 exports.splitByDelimeter = (str, delimiter) => {
@@ -58,27 +57,18 @@ exports.generatePath = (path, params) => {
   if (_.isEmpty(params)) {
     return path
   }
-  let paramsObj = exports.convertParamsArrayToObject(params)
+  let paramPairs = exports.convertParamsArrayToPairs(params)
 
-  return path + '?' + qs.stringify(paramsObj, { indices: false })
+  return path + '?' + new URLSearchParams(paramPairs).toString()
 }
 
-exports.convertParamsArrayToObject = (params) => {
+exports.convertParamsArrayToPairs = (params) => {
   validators.validateArray(params, 'params')
 
-  return _.reduce(params, (result, { name, value }, index) => {
-    validators.validateNotEmptyString(name, 'param name', `param index: ${index}`)
-    if (_.has(result, name)) {
-      if (_.isArray(result[name])) {
-        result[name].push(value)
-      } else {
-        result[name] = [result[name], value]
-      }
-    } else {
-      result[name] = value || ''
-    }
-    return result
-  }, {})
+  return _.map(params, ({ name, value }) => [
+    name,
+    exports.getEmptyStringForUndefined(value)]
+  )
 }
 
 exports.pretifyHeaderName = (name) => {

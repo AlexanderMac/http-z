@@ -1,17 +1,16 @@
 const _ = require('lodash')
-const qs = require('qs')
 const consts = require('../consts')
 const HttpZError = require('../error')
 const utils = require('../utils')
 const formDataParamParser = require('./form-data-param-parser')
 
 class HttpZBaseParser {
-  constructor(plainMessage) {
-    this.plainMessage = plainMessage
+  constructor(rawMessage) {
+    this.rawMessage = rawMessage
   }
 
   _parseMessageForRows() {
-    let [headers, body] = utils.splitByDelimeter(this.plainMessage, consts.EOL2X)
+    let [headers, body] = utils.splitByDelimeter(this.rawMessage, consts.EOL2X)
     if (_.isNil(headers) || _.isNil(body)) {
       throw HttpZError.get(
         'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
@@ -100,8 +99,11 @@ class HttpZBaseParser {
   }
 
   _parseUrlencodedBody() {
-    let params = qs.parse(this.bodyRows)
-    this.body.params = _.map(params, (value, name) => ({ name, value }))
+    let params = new URLSearchParams(this.bodyRows)
+    this.body.params = []
+    params.forEach((value, name) => {
+      this.body.params.push({ name, value })
+    })
   }
 
   _parseTextBody() {

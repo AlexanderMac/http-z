@@ -35,12 +35,27 @@ class HttpZResponseBuilder extends Base {
     return `${protocolVersion} ${this.statusCode} ${this.statusMessage}` + consts.EOL
   }
 
+  _generateHeaderRows() {
+    validators.validateArray(this.headers, 'headers')
+
+    _.remove(this.headers, h => {
+      let hName = _.toLower(h.name)
+      return hName === 'set-cookie'
+    })
+
+    return super._generateHeaderRows()
+  }
+
   _generateCookieRows() {
     if (!this.cookies) {
       return ''
     }
 
     validators.validateArray(this.cookies, 'cookies')
+
+    if (_.isEmpty(this.cookies)) {
+      return ''
+    }
 
     let cookieRowsStr = _.chain(this.cookies)
       .map(({ name, value, params }, index) => {

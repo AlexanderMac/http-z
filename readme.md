@@ -8,7 +8,7 @@
 
 HTTP request/response message parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230).
 
-* Parse HTTP request/response plain message:
+* Parse HTTP request/response raw message:
   - method, protocol, protocol version / status code, reason
   - query params
   - headers
@@ -18,7 +18,7 @@ HTTP request/response message parser/builder according to the rules defined in [
     - `application/x-www-form-urlencoded`
     - `application/json`,
     - `text/plain`
-* Build HTTP request/response plain message from model:
+* Build HTTP request/response raw message from model:
   - method, protocol, protocol version / status code, reason
   - query params
   - headers
@@ -41,7 +41,7 @@ $ npm i http-z
 ```js
 const httpZ = require('http-z')
 
-let plainMessage = [
+let rawMessage = [
   'GET /features?p1=v1 HTTP/1.1',
   'Host: example.com',
   'Accept: */*',
@@ -51,7 +51,7 @@ let plainMessage = [
   ''
 ].join('\r\n')
 
-let messageModel = httpZ.parse(plainMessage)
+let messageModel = httpZ.parse(rawMessage)
 console.log(JSON.stringify(messageModel, null, 2))
 
 /* output:
@@ -78,8 +78,8 @@ console.log(JSON.stringify(messageModel, null, 2))
 }
 */
 
-plainMessage = httpZ.build(messageModel)
-console.log(plainMessage)
+rawMessage = httpZ.build(messageModel)
+console.log(rawMessage)
 
 /* output:
 GET /features?p1=v1 HTTP/1.1
@@ -93,13 +93,13 @@ Accept-Language: en-US;q=0.6, en;q=0.4
 
 ## API
 
-### parse(plainMessage)
-Parses HTTP request/response plain message and returns a model.
+### parse(rawMessage)
+Parses HTTP request/response raw message and returns a model.
 
-- `plainMessage` is HTTP plain message.
+- `rawMessage` is HTTP raw message.
 
 ### build(messageModel)
-Builds HTTP request/response plain message from the model.
+Builds HTTP request/response raw message from the model.
 
 - `messageModel` is HTTP message model.
 

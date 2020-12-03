@@ -70,15 +70,15 @@ describe('utils', () => {
         test('https://example.com', undefined, getDefParsedUrl({ protocol: 'HTTPS' }))
       })
 
-      it('should add http when url is without protocol', () => {
+      it('should add `http` when url is without protocol', () => {
         test('example.com', undefined, getDefParsedUrl({ protocol: 'HTTP' }))
       })
 
-      it('should parse when url contains path', () => {
+      it('should parse url with path', () => {
         test('http://example.com/home', undefined, getDefParsedUrl({ path: '/home' }))
       })
 
-      it('should parse when url contains path and params', () => {
+      it('should parse url with path and params', () => {
         test('http://example.com/home?p1=v1', undefined, getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }))
       })
     })
@@ -92,15 +92,15 @@ describe('utils', () => {
         test('/', 'https://example.com', getDefParsedUrl({ protocol: 'HTTPS' }))
       })
 
-      it('should add http when url is without protocol', () => {
+      it('should add `http` when url is without protocol', () => {
         test('/', 'example.com', getDefParsedUrl({ protocol: 'HTTP' }))
       })
 
-      it('should parse when url contains path', () => {
+      it('should parse url with path', () => {
         test('/home', 'http://example.com', getDefParsedUrl({ path: '/home' }))
       })
 
-      it('should parse when url contains path and params', () => {
+      it('should parse url with path and params', () => {
         test('/home?p1=v1', 'http://example.com', getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }))
       })
     })
@@ -131,88 +131,62 @@ describe('utils', () => {
       test('/features', null, '/features')
     })
 
-    it('should generate path with params', () => {
+    it('should generate path with two simple parameters', () => {
       test('/features', [
         { name: 'p1', value: 'v1' },
-        { name: 'p2', value: null },
-        { name: 'p3&[', value: 'some &[] "' },
-        { name: 'p4' }
-      ], '/features?p1=v1&p2=&p3%26%5B=some%20%26%5B%5D%20%22&p4=')
+        { name: 'p2>', value: 'v2;' }
+      ], '/features?p1=v1&p2%3E=v2%3B')
     })
 
-    it('should generate path with params with duplicate names', () => {
+    it('should generate path with object parameters', () => {
       test('/features', [
-        { name: 'p1', value: 'v1' },
-        { name: 'p2', value: null },
-        { name: 'p3', value: 'x1' },
-        { name: 'p3', value: 'x2' },
-        { name: 'p3', value: 'x3' },
-        { name: 'p4', value: 'y1' },
-        { name: 'p4[]', value: 'y2' }
-      ], '/features?p1=v1&p2=&p3=x1&p3=x2&p3=x3&p4=y1&p4%5B%5D=y2')
+        { name: 'p1[x]', value: 'v1' },
+        { name: 'p1[y]', value: 'v2' },
+        { name: 'p2>', value: 'v2;' }
+      ], '/features?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v2%3B')
+    })
+
+    it('should generate path with array parameters', () => {
+      test('/features', [
+        { name: 'p1[]', value: 'v1' },
+        { name: 'p1[]', value: 'v2' },
+        { name: 'p2>', value: 'v2;' }
+      ], '/features?p1%5B%5D=v1&p1%5B%5D=v2&p2%3E=v2%3B')
     })
   })
 
-  describe('convertParamsArrayToObject', () => {
+  describe('convertParamsArrayToPairs', () => {
     function test(params, expected) {
-      let actual = utils.convertParamsArrayToObject(params)
+      let actual = utils.convertParamsArrayToPairs(params)
       should(actual).eql(expected)
     }
 
     it('should throw error when params is nil', () => {
       let expected = HttpZError.get('params is required')
 
-      should(utils.convertParamsArrayToObject.bind(null)).throw(HttpZError, expected)
+      should(utils.convertParamsArrayToPairs.bind(null)).throw(HttpZError, expected)
     })
 
-    it('should throw error when params is not an array', () => {
+    it('should throw error when params is not array', () => {
       let params = 'params'
       let expected = HttpZError.get('params must be an array')
 
-      should(utils.convertParamsArrayToObject.bind(null, params)).throw(HttpZError, expected)
+      should(utils.convertParamsArrayToPairs.bind(null, params)).throw(HttpZError, expected)
     })
 
-    it('should throw error when params contains param with empty name', () => {
-      let params = [
-        { name: 'p1', value: 'v1' },
-        { name: 'p2', value: null },
-        { value: 'v3' }
-      ]
-      let expected = HttpZError.get('param name is required', 'param index: 2')
-
-      should(utils.convertParamsArrayToObject.bind(null, params)).throw(HttpZError, expected)
-    })
-
-    it('should return object (params is an array with items with unique names)', () => {
-      test([
-        { name: 'p1', value: 'v1' },
-        { name: 'p2', value: null },
-        { name: 'p3&[', value: 'some &[] "' },
-        { name: 'p4' }
-      ], {
-        p1: 'v1',
-        p2: '',
-        'p3&[': 'some &[] "',
-        p4: ''
-      })
-    })
-
-    it('should return object (params is an array with items with not unique names)', () => {
-      test([
-        { name: 'p1', value: 'v1' },
-        { name: 'p2', value: null },
-        { name: 'p3', value: 'x1' },
-        { name: 'p3', value: 'x2' },
-        { name: 'p3', value: 'x3' },
-        { name: 'p4', value: 'y1' },
-        { name: 'p4[]', value: 'y2' }
-      ], {
-        p1: 'v1',
-        p2: '',
-        p3: ['x1', 'x2', 'x3'],
-        p4: 'y1',
-        'p4[]': 'y2'
-      })
+    it('should return param pairs', () => {
+      test(
+        [
+          { name: 'p1', value: 'v1' },
+          { name: 'p2', value: null },
+          { name: 'p3' }
+        ],
+        [
+          ['p1', 'v1'],
+          ['p2', null],
+          ['p3', '']
+        ]
+      )
     })
   })
 

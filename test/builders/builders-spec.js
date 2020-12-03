@@ -30,17 +30,18 @@ describe('builders / index', () => {
       message: 'messageModel must be a plain object'
     }
     should(builder.bind(null, 123)).throw(HttpZError, ERR)
+    should(builder.bind(null, true)).throw(HttpZError, ERR)
     should(builder.bind(null, 'message')).throw(HttpZError, ERR)
     should(builder.bind(null, ['message'])).throw(HttpZError, ERR)
   })
 
-  it('should throw error when model has unknown format', () => {
+  it('should throw error when model has incorrect format', () => {
     let messageModel = {
       data: 'some data'
     }
 
     should(builder.bind(null, messageModel)).throw(HttpZError, {
-      message: 'Unknown messageModel format'
+      message: 'messageModel has incorrect format'
     })
   })
 
@@ -57,6 +58,7 @@ describe('builders / index', () => {
     should(actual).eql(expected)
 
     nassert.assertFn({ inst: RequestBuilder, fnName: 'build', expectedArgs })
+    nassert.assertFn({ inst: ResponseBuilder, fnName: 'build' })
   })
 
   it('should call ResponseBuilder.build when messageModel is response', () => {
@@ -71,6 +73,7 @@ describe('builders / index', () => {
     let actual = builder(messageModel)
     should(actual).eql(expected)
 
+    nassert.assertFn({ inst: RequestBuilder, fnName: 'build' })
     nassert.assertFn({ inst: ResponseBuilder, fnName: 'build', expectedArgs })
   })
 })

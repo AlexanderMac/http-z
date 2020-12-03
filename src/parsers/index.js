@@ -4,20 +4,20 @@ const HttpZError = require('../error')
 const RequestParser = require('./request')
 const ResponseParser = require('./response')
 
-module.exports = (plainMessage) => {
-  if (_.isNil(plainMessage)) {
-    throw HttpZError.get('plainMessage is required')
+module.exports = (rawMessage) => {
+  if (_.isNil(rawMessage)) {
+    throw HttpZError.get('rawMessage is required')
   }
-  if (!_.isString(plainMessage)) {
-    throw HttpZError.get('plainMessage must be a string')
+  if (!_.isString(rawMessage)) {
+    throw HttpZError.get('rawMessage must be a string')
   }
 
-  let firstRow = _.chain(plainMessage).split(consts.EOL).head().value()
+  let firstRow = _.chain(rawMessage).split(consts.EOL).head().value()
   if (consts.regexps.requestStartRow.test(firstRow)) {
-    return RequestParser.parse(plainMessage)
+    return RequestParser.parse(rawMessage)
   }
   if (consts.regexps.responseStartRow.test(firstRow)) {
-    return ResponseParser.parse(plainMessage)
+    return ResponseParser.parse(rawMessage)
   }
-  throw HttpZError.get('Unknown plainMessage format')
+  throw HttpZError.get('rawMessage has incorrect format')
 }
