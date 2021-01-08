@@ -27,7 +27,15 @@ export class HttpZError extends Error {}
 
 declare class HttpZParam {
   name: string;
-  fileName?: string;
+  value?: string;
+}
+
+declare class HttpZHeader {
+  name: string;
+  values: [{
+    value?: string;
+    params: string;
+  }];
 }
 
 declare class HttpZBodyParam {
@@ -53,7 +61,7 @@ declare class HttpZRequestModel {
   headersSize: number;
   bodySize: number;
   queryParams?: HttpZParam[];
-  headers?: HttpZParam[];
+  headers?: HttpZHeader[];
   cookies?: HttpZParam[];
   body: HttpZBody;
 }
@@ -64,7 +72,7 @@ declare class HttpZResponseModel {
   statusMessage?: string;
   headersSize: number;
   bodySize: number;
-  headers?: HttpZParam[];
+  headers?: HttpZHeader[];
   cookies?: HttpZParam[];
   body: HttpZBody;
 }

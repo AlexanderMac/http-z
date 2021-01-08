@@ -1,3 +1,7 @@
+# <sub>v3.2.1</sub>
+#### _Jan. 8, 2021_
+  * Fix types defenitions.
+
 # <sub>v3.2.0</sub>
 #### _Dec. 3, 2020_
   * Integrate rollup and create client bundle (add browser support).
