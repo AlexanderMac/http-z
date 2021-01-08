@@ -43,8 +43,8 @@
     "lodash": "^4.17.20"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^15.1.0",
-    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
     "eslint": "^7.10.0",
     "mocha": "^8.1.3",
     "n-assert": "^5.0.2",
