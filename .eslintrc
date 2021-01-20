@@ -1,13 +1,12 @@
 {
   "env": {
     "node": true,
-    "es6": true
+    "es2021": true
   },
   "parserOptions": {
-    "ecmaVersion": 2020,
     "sourceType": "module",
     "ecmaFeatures": {
-      "impliedStrict": false
+      "impliedStrict": true
     }
   },
   "extends": "eslint:recommended",
@@ -54,7 +53,7 @@
     "prefer-rest-params": "error",
     "prefer-spread": "error",
     "require-await": "warn",
-    "semi": ["error", "never"],
+    "semi": ["warn", "never"],
     "space-infix-ops": "error",
     "space-unary-ops": "error",
     "strict": "error",
