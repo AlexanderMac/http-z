@@ -32,10 +32,7 @@ declare class HttpZParam {
 
 declare class HttpZHeader {
   name: string;
-  values: [{
-    value?: string;
-    params: string;
-  }];
+  value?: string;
 }
 
 declare class HttpZBodyParam {

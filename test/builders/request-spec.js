@@ -194,25 +194,23 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'host',
-            values: 'some host'
+            value: 'some host'
           },
           {
             name: 'cookie',
-            values: 'some cookie1'
+            value: 'some cookie1'
           },
           {
             name: 'connection',
-            values: []
+            value: ''
           },
           {
             name: 'accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'cookie',
-            values: 'some cookie2'
+            value: 'some cookie2'
           }
         ]
       })
@@ -220,13 +218,11 @@ describe('builders / request', () => {
       let expectedHeaders = [
         {
           name: 'connection',
-          values: []
+          value: ''
         },
         {
           name: 'accept',
-          values: [
-            { value: '*/*' }
-          ]
+          value: '*/*'
         }
       ]
 
@@ -323,26 +319,19 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'connection',
-            values: []
+            value: ''
           },
           {
             name: 'accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'content-encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           }
         ]
       }
@@ -373,42 +362,28 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'Host',
-            values: [
-              { value: 'www.example.com' }
-            ]
+            value: 'www.example.com'
           },
           {
             name: 'Connection',
-            values: []
+            value: ''
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4'
           },
           // it will be replaced
           {
             name: 'Cookie',
-            values: [
-              { value: 'firstName=John; lastName=Smith' }
-            ]
+            value: 'firstName=John; lastName=Smith'
           }
         ],
         cookies: [
@@ -445,50 +420,31 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
+            value: 'text/plain;charset=UTF-8'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {
@@ -526,50 +482,31 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'application/x-www-form-urlencoded', params: 'charset=UTF-8' }
-            ]
+            value: 'application/x-www-form-urlencoded;charset=UTF-8'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {
@@ -611,50 +548,31 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'multipart/form-data', params: 'boundary="111362:53119209"' }
-            ]
+            value: 'multipart/form-data;boundary="111362:53119209"'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {
@@ -723,34 +641,23 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
-            ]
+            value: 'multipart/alternative;boundary="111362-53119209"'
           }
         ],
         body: {
@@ -797,34 +704,23 @@ describe('builders / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
-            ]
+            value: 'multipart/mixed;boundary="11136253119209"'
           }
         ],
         body: {

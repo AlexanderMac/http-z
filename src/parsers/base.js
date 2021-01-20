@@ -29,38 +29,21 @@ class HttpZBaseParser {
 
   _parseHeaderRows() {
     this.headers = _.map(this.headerRows, hRow => {
-      let [name, values] = utils.splitByDelimeter(hRow, ':')
+      let [name, value] = utils.splitByDelimeter(hRow, ':')
       if (!name) {
-        throw HttpZError.get('Incorrect header row format, expected: Name: Values', hRow)
+        throw HttpZError.get('Incorrect header row format, expected: Name: Value', hRow)
       }
 
-      let valuesWithParams
-      if (_.isNil(values) || values === '') {
-        valuesWithParams = []
       // quoted string must be parsed as a single value (https://tools.ietf.org/html/rfc7230#section-3.2.6)
-      } else if (consts.regexps.quoutedHeaderValue.test(values)) {
-        valuesWithParams = [{ value: _.trim(values, '"') }]
-      } else if (_.toLower(name) === consts.http.headers.userAgent.toLowerCase()) { // use 'user-agent' as is
-        valuesWithParams = [{ value: values }]
-      } else {
-        valuesWithParams = _.chain(values)
-          .split(',')
-          .map(value => {
-            let valueAndParams = _.split(value, ';')
-            let res = {
-              value: _.trim(valueAndParams[0])
-            }
-            if (valueAndParams.length > 1) {
-              res.params = _.trim(valueAndParams[1])
-            }
-            return res
-          })
-          .value()
+      if (_.isNil(value)) {
+        value = ''
+      } else if (consts.regexps.quoutedHeaderValue.test(value)) {
+        value = _.trim(value, '"')
       }
 
       return {
         name: utils.pretifyHeaderName(name),
-        values: valuesWithParams
+        value
       }
     })
   }
@@ -71,7 +54,10 @@ class HttpZBaseParser {
     }
 
     this.body = {}
-    this.body.contentType = this._getContentTypeValue()
+    let contentTypeHeader = this._getContentTypeValue()
+    if (contentTypeHeader) {
+      this.body.contentType = contentTypeHeader.split(';')[0]
+    }
     switch (this.body.contentType) {
       case consts.http.contentTypes.multipart.formData:
       case consts.http.contentTypes.multipart.alternative:
@@ -115,15 +101,8 @@ class HttpZBaseParser {
     this.bodySize = body.length
   }
 
-  _getContentTypeObject() {
-    return _.chain(this.headers)
-      .find({ name: consts.http.headers.contentType })
-      .get('values[0]')
-      .value()
-  }
-
   _getContentTypeValue() {
-    let contentTypeHeader = this._getContentTypeObject()
+    let contentTypeHeader = _.find(this.headers, { name: consts.http.headers.contentType })
     if (!contentTypeHeader) {
       return
     }
@@ -134,14 +113,19 @@ class HttpZBaseParser {
   }
 
   _getBoundary() {
-    let contentTypeHeader = this._getContentTypeObject()
-    if (!contentTypeHeader || !contentTypeHeader.params) {
+    let contentTypeValue = this._getContentTypeValue()
+    if (!contentTypeValue) {
       throw HttpZError.get('Message with multipart/form-data body must have Content-Type header with boundary')
     }
 
-    let boundary = contentTypeHeader.params.match(consts.regexps.boundary)
+    let params = contentTypeValue.split(';')[1]
+    if (!params) {
+      throw HttpZError.get('Message with multipart/form-data body must have Content-Type header with boundary')
+    }
+
+    let boundary = params.match(consts.regexps.boundary)
     if (!boundary) {
-      throw HttpZError.get('Incorrect boundary, expected: boundary=value', contentTypeHeader.params)
+      throw HttpZError.get('Incorrect boundary, expected: boundary=value', params)
     }
     return _.trim(boundary[0], '"')
   }

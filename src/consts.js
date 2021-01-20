@@ -11,8 +11,8 @@ regexps.startNl = new RegExp(`^${EOL}`)
 regexps.endNl = new RegExp(`${EOL}$`)
 regexps.requestStartRow = new RegExp(`^${HTTP_METHODS} \\S* ${HTTP_PROTOCOL_VERSIONS}$`)
 regexps.responseStartRow = new RegExp(`^${HTTP_PROTOCOL_VERSIONS} \\d{3} ${BASIC_LATIN}*$`)
-// TODO: maybe incorrect, because basicLatin contains quote
-regexps.quoutedHeaderValue = new RegExp(`^"${BASIC_LATIN}+"$`)
+// eslint-disable-next-line no-control-regex
+regexps.quoutedHeaderValue = new RegExp('^"[\\u0009\\u0020\\u0021\\u0023-\\u007E]+"$')
 regexps.boundary = /(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}/
 regexps.contentDisposition = new RegExp(`^Content-Disposition: *(form-data|inline|attachment)${BASIC_LATIN}*${EOL}`, 'i')
 regexps.contentType = new RegExp(`^Content-Type:[\\S ]*${EOL}`, 'i')

@@ -441,6 +441,8 @@ describe('parsers / request', () => {
         'accept-language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
         'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0',
         'generated-by: "modern-framework 2020"',
+        'Sec-ch-ua: "Google Chrome";v="87", " Not;A Brand";v="99", "Chromium";v="87"',
+        'Authorization: AWS4-HMAC-SHA256 Credential=CRED/20210118/eu-west-1/s3/aws4_request, SignedHeaders=host;x-amz-acl;x-amz-user-agent, Signature=fb1e6017a1d',
         '',
         ''
       ].join(HttpZConsts.EOL)
@@ -455,44 +457,38 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: []
+            value: ''
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
           },
           {
             name: 'User-Agent',
-            values: [
-              { value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0' }
-            ]
+            value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0'
           },
           {
             name: 'Generated-By',
-            values: [
-              { value: 'modern-framework 2020' }
-            ]
+            value: 'modern-framework 2020'
+          },
+          {
+            name: 'Sec-Ch-Ua',
+            value: '"Google Chrome";v="87", " Not;A Brand";v="99", "Chromium";v="87"'
+          },
+          {
+            name: 'Authorization',
+            value: 'AWS4-HMAC-SHA256 Credential=CRED/20210118/eu-west-1/s3/aws4_request, SignedHeaders=host;x-amz-acl;x-amz-user-agent, Signature=fb1e6017a1d'
           }
         ],
-        headersSize: 288,
+        headersSize: 519,
         bodySize: 0
       }
 
@@ -524,29 +520,19 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: []
+            value: ''
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
           }
         ],
         cookies: [
@@ -588,50 +574,31 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
+            value: 'text/plain; charset=UTF-8'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {
@@ -672,50 +639,31 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'application/x-www-form-urlencoded', params: 'charset=UTF-8' }
-            ]
+            value: 'application/x-www-form-urlencoded; charset=UTF-8'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {
@@ -776,50 +724,31 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'multipart/form-data', params: 'boundary="111362:53119209"' }
-            ]
+            value: 'multipart/form-data; boundary="111362:53119209"'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {
@@ -878,50 +807,31 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'multipart/alternative', params: 'boundary="111362-53119209"' }
-            ]
+            value: 'multipart/alternative; boundary="111362-53119209"'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {
@@ -973,50 +883,31 @@ describe('parsers / request', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'Accept-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Accept-Language',
-            values: [
-              { value: 'ru-RU' },
-              { value: 'ru', params: 'q=0.8' },
-              { value: 'en-US', params: 'q=0.6' },
-              { value: 'en', params: 'q=0.4' }
-            ]
+            value: 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'multipart/mixed', params: 'boundary="11136253119209"' }
-            ]
+            value: 'multipart/mixed; boundary="11136253119209"'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {

@@ -122,21 +122,19 @@ describe('builders / response', () => {
         headers: [
           {
             name: 'set-cookie',
-            values: 'some cookie1'
+            value: 'some cookie1'
           },
           {
             name: 'connection',
-            values: []
+            value: ''
           },
           {
             name: 'accept',
-            values: [
-              { value: '*/*' }
-            ]
+            value: '*/*'
           },
           {
             name: 'set-cookie',
-            values: 'some cookie2'
+            value: 'some cookie2'
           }
         ]
       })
@@ -144,13 +142,11 @@ describe('builders / response', () => {
       let expectedHeaders = [
         {
           name: 'connection',
-          values: []
+          value: ''
         },
         {
           name: 'accept',
-          values: [
-            { value: '*/*' }
-          ]
+          value: '*/*'
         }
       ]
 
@@ -245,26 +241,19 @@ describe('builders / response', () => {
         headers: [
           {
             name: 'connection',
-            values: []
+            value: ''
           },
           {
             name: 'cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'Content-type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
+            value: 'text/plain;charset=UTF-8'
           },
           {
             name: 'content-encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           }
         ]
       }
@@ -292,26 +281,19 @@ describe('builders / response', () => {
         headers: [
           {
             name: 'Connection',
-            values: []
+            value: ''
           },
           {
             name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
+            value: 'text/plain;charset=UTF-8'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           }
         ],
         cookies: [
@@ -349,34 +331,23 @@ describe('builders / response', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip, deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
+            value: 'text/plain;charset=UTF-8'
           }
         ],
         body: {

@@ -19,21 +19,12 @@ class HttpZBaseBuilder {
     let headerRowsStr = _.chain(this.headers)
       .map((header, index) => {
         validators.validateRequired(header.name, 'header name', `header index: ${index}`)
-        validators.validateArray(header.values, 'header.values', `header index: ${index}`)
+        validators.validateString(header.value, 'header.value', `header index: ${index}`)
 
         let headerName = utils.pretifyHeaderName(header.name)
-        let headerValues = _.chain(header.values)
-          .map(headerVal => {
-            let value = utils.getEmptyStringForUndefined(headerVal.value)
-            if (value && headerVal.params) {
-              return value + ';' + headerVal.params
-            }
-            return value
-          })
-          .join(', ')
-          .value()
+        let headerValue = header.value
 
-        return headerName + ': ' + headerValues
+        return headerName + ': ' + headerValue
       })
       .join(consts.EOL)
       .value()

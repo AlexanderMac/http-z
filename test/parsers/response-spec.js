@@ -288,26 +288,19 @@ describe('parsers / response', () => {
         headers: [
           {
             name: 'Connection',
-            values: []
+            value: ''
           },
           {
             name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
+            value: 'text/plain; charset=UTF-8'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           }
         ],
         headersSize: 136,
@@ -340,26 +333,19 @@ describe('parsers / response', () => {
         headers: [
           {
             name: 'Connection',
-            values: []
+            value: ''
           },
           {
             name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
+            value: 'text/plain; charset=UTF-8'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           }
         ],
         cookies: [
@@ -395,34 +381,23 @@ describe('parsers / response', () => {
         headers: [
           {
             name: 'Connection',
-            values: [
-              { value: 'keep-alive' }
-            ]
+            value: 'keep-alive'
           },
           {
             name: 'Cache-Control',
-            values: [
-              { value: 'no-cache' }
-            ]
+            value: 'no-cache'
           },
           {
             name: 'Content-Type',
-            values: [
-              { value: 'text/plain', params: 'charset=UTF-8' }
-            ]
+            value: 'text/plain; charset=UTF-8'
           },
           {
             name: 'Content-Encoding',
-            values: [
-              { value: 'gzip' },
-              { value: 'deflate' }
-            ]
+            value: 'gzip,deflate'
           },
           {
             name: 'Content-Length',
-            values: [
-              { value: '301' }
-            ]
+            value: '301'
           }
         ],
         body: {

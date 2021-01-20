@@ -16,28 +16,19 @@ describe('builders / base', () => {
       return [
         {
           name: 'Connection',
-          values: []
+          value: ''
         },
         {
           name: 'Accept',
-          values: [
-            { value: '*/*' },
-            { value: 'text/plain' }
-          ]
+          value: '*/*, text/plain'
         },
         {
           name: 'Accept-Encoding',
-          values: [
-            { value: 'gzip' },
-            { value: 'deflate' }
-          ]
+          value: 'gzip, deflate'
         },
         {
           name: 'Accept-Language',
-          values: [
-            { value: 'en-US', params: 'q=0.6' },
-            { value: 'en', params: 'q=0.4' }
-          ]
+          value: 'en-US;q=0.6, en;q=0.4'
         }
       ]
     }
@@ -65,19 +56,19 @@ describe('builders / base', () => {
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
-    it('should throw error when instance.headers contains header without values', () => {
+    it('should throw error when instance.headers contains header without value', () => {
       let headers = getDefaultHeaders()
-      headers[2].values = undefined
-      let expected = HttpZError.get('header.values is required', 'header index: 2')
+      headers[2].value = undefined
+      let expected = HttpZError.get('header.value is required', 'header index: 2')
 
       let builder = getBuilderInstance({ headers })
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
-    it('should throw error when instance.headers contains header with values that is not array', () => {
+    it('should throw error when instance.headers contains header with value that is not a string', () => {
       let headers = getDefaultHeaders()
-      headers[2].values = 'values'
-      let expected = HttpZError.get('header.values must be an array', 'header index: 2')
+      headers[2].value = 25
+      let expected = HttpZError.get('header.value must be a string', 'header index: 2')
 
       let builder = getBuilderInstance({ headers })
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
