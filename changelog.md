@@ -1,3 +1,7 @@
+# <sub>v4.0.0</sub>
+#### _Jan. 20, 2021_
+  * Store header value as is (don't parse for values and params). Now header is an object with two string fields: `name` and `value`.
+
 # <sub>v3.2.1</sub>
 #### _Jan. 8, 2021_
   * Fix types defenitions.

@@ -21,8 +21,8 @@
   regexps.endNl = new RegExp(`${EOL}$`);
   regexps.requestStartRow = new RegExp(`^${HTTP_METHODS} \\S* ${HTTP_PROTOCOL_VERSIONS}$`);
   regexps.responseStartRow = new RegExp(`^${HTTP_PROTOCOL_VERSIONS} \\d{3} ${BASIC_LATIN}*$`);
-  // TODO: maybe incorrect, because basicLatin contains quote
-  regexps.quoutedHeaderValue = new RegExp(`^"${BASIC_LATIN}+"$`);
+  // eslint-disable-next-line no-control-regex
+  regexps.quoutedHeaderValue = new RegExp('^"[\\u0009\\u0020\\u0021\\u0023-\\u007E]+"$');
   regexps.boundary = /(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}/;
   regexps.contentDisposition = new RegExp(`^Content-Disposition: *(form-data|inline|attachment)${BASIC_LATIN}*${EOL}`, 'i');
   regexps.contentType = new RegExp(`^Content-Type:[\\S ]*${EOL}`, 'i');
@@ -408,38 +408,21 @@
 
     _parseHeaderRows() {
       this.headers = ___default['default'].map(this.headerRows, hRow => {
-        let [name, values] = utils.splitByDelimeter(hRow, ':');
+        let [name, value] = utils.splitByDelimeter(hRow, ':');
         if (!name) {
-          throw error.get('Incorrect header row format, expected: Name: Values', hRow)
+          throw error.get('Incorrect header row format, expected: Name: Value', hRow)
         }
 
-        let valuesWithParams;
-        if (___default['default'].isNil(values) || values === '') {
-          valuesWithParams = [];
         // quoted string must be parsed as a single value (https://tools.ietf.org/html/rfc7230#section-3.2.6)
-        } else if (consts.regexps.quoutedHeaderValue.test(values)) {
-          valuesWithParams = [{ value: ___default['default'].trim(values, '"') }];
-        } else if (___default['default'].toLower(name) === consts.http.headers.userAgent.toLowerCase()) { // use 'user-agent' as is
-          valuesWithParams = [{ value: values }];
-        } else {
-          valuesWithParams = ___default['default'].chain(values)
-            .split(',')
-            .map(value => {
-              let valueAndParams = ___default['default'].split(value, ';');
-              let res = {
-                value: ___default['default'].trim(valueAndParams[0])
-              };
-              if (valueAndParams.length > 1) {
-                res.params = ___default['default'].trim(valueAndParams[1]);
-              }
-              return res
-            })
-            .value();
+        if (___default['default'].isNil(value)) {
+          value = '';
+        } else if (consts.regexps.quoutedHeaderValue.test(value)) {
+          value = ___default['default'].trim(value, '"');
         }
 
         return {
           name: utils.pretifyHeaderName(name),
-          values: valuesWithParams
+          value
         }
       });
     }
@@ -450,7 +433,10 @@
       }
 
       this.body = {};
-      this.body.contentType = this._getContentTypeValue();
+      let contentTypeHeader = this._getContentTypeValue();
+      if (contentTypeHeader) {
+        this.body.contentType = contentTypeHeader.split(';')[0];
+      }
       switch (this.body.contentType) {
         case consts.http.contentTypes.multipart.formData:
         case consts.http.contentTypes.multipart.alternative:
@@ -494,15 +480,8 @@
       this.bodySize = body.length;
     }
 
-    _getContentTypeObject() {
-      return ___default['default'].chain(this.headers)
-        .find({ name: consts.http.headers.contentType })
-        .get('values[0]')
-        .value()
-    }
-
     _getContentTypeValue() {
-      let contentTypeHeader = this._getContentTypeObject();
+      let contentTypeHeader = ___default['default'].find(this.headers, { name: consts.http.headers.contentType });
       if (!contentTypeHeader) {
         return
       }
@@ -513,14 +492,19 @@
     }
 
     _getBoundary() {
-      let contentTypeHeader = this._getContentTypeObject();
-      if (!contentTypeHeader || !contentTypeHeader.params) {
+      let contentTypeValue = this._getContentTypeValue();
+      if (!contentTypeValue) {
         throw error.get('Message with multipart/form-data body must have Content-Type header with boundary')
       }
 
-      let boundary = contentTypeHeader.params.match(consts.regexps.boundary);
+      let params = contentTypeValue.split(';')[1];
+      if (!params) {
+        throw error.get('Message with multipart/form-data body must have Content-Type header with boundary')
+      }
+
+      let boundary = params.match(consts.regexps.boundary);
       if (!boundary) {
-        throw error.get('Incorrect boundary, expected: boundary=value', contentTypeHeader.params)
+        throw error.get('Incorrect boundary, expected: boundary=value', params)
       }
       return ___default['default'].trim(boundary[0], '"')
     }
@@ -781,21 +765,12 @@
       let headerRowsStr = ___default['default'].chain(this.headers)
         .map((header, index) => {
           validators.validateRequired(header.name, 'header name', `header index: ${index}`);
-          validators.validateArray(header.values, 'header.values', `header index: ${index}`);
+          validators.validateString(header.value, 'header.value', `header index: ${index}`);
 
           let headerName = utils.pretifyHeaderName(header.name);
-          let headerValues = ___default['default'].chain(header.values)
-            .map(headerVal => {
-              let value = utils.getEmptyStringForUndefined(headerVal.value);
-              if (value && headerVal.params) {
-                return value + ';' + headerVal.params
-              }
-              return value
-            })
-            .join(', ')
-            .value();
+          let headerValue = header.value;
 
-          return headerName + ': ' + headerValues
+          return headerName + ': ' + headerValue
         })
         .join(consts.EOL)
         .value();
