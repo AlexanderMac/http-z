@@ -18,7 +18,7 @@ class HttpZBaseBuilder {
 
     let headerRowsStr = _.chain(this.headers)
       .map((header, index) => {
-        validators.validateRequired(header.name, 'header name', `header index: ${index}`)
+        validators.validateNotEmptyString(header.name, 'header name', `header index: ${index}`)
         validators.validateString(header.value, 'header.value', `header index: ${index}`)
 
         let headerName = utils.pretifyHeaderName(header.name)

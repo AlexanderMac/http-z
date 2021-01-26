@@ -56,6 +56,15 @@ describe('builders / base', () => {
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
+    it('should throw error when instance.headers contains header with empty name', () => {
+      let headers = getDefaultHeaders()
+      headers[1].name = undefined
+      let expected = HttpZError.get('header name is required', 'header index: 1')
+
+      let builder = getBuilderInstance({ headers })
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
+    })
+
     it('should throw error when instance.headers contains header without value', () => {
       let headers = getDefaultHeaders()
       headers[2].value = undefined
