@@ -779,7 +779,7 @@
     }
 
     _generateBodyRows() {
-      if (!this.body) {
+      if (___default['default'].isEmpty(this.body)) {
         return ''
       }
 
@@ -903,7 +903,7 @@
     }
 
     _generateCookiesRow() {
-      if (!this.cookies) {
+      if (___default['default'].isEmpty(this.cookies)) {
         return ''
       }
 
@@ -964,7 +964,7 @@
     }
 
     _generateCookieRows() {
-      if (!this.cookies) {
+      if (___default['default'].isEmpty(this.cookies)) {
         return ''
       }
 

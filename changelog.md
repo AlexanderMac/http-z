@@ -1,3 +1,7 @@
+# <sub>v4.0.2</sub>
+#### _Jan. 27, 2021_
+  * Don't process empty arrays (with zero elements) in builder.
+
 # <sub>v4.0.1</sub>
 #### _Jan. 26, 2021_
   * Validate that header name is not empty in builder.

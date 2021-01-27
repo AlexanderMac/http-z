@@ -1,6 +1,6 @@
 {
   "name": "http-z",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Parse and build HTTP message",
   "engines": {
     "node": ">=10"
