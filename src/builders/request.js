@@ -61,7 +61,7 @@ class HttpZRequestBuilder extends Base {
   }
 
   _generateCookiesRow() {
-    if (!this.cookies) {
+    if (_.isEmpty(this.cookies)) {
       return ''
     }
 

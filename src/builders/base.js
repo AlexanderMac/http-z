@@ -33,7 +33,7 @@ class HttpZBaseBuilder {
   }
 
   _generateBodyRows() {
-    if (!this.body) {
+    if (_.isEmpty(this.body)) {
       return ''
     }
 
