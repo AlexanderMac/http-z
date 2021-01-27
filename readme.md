@@ -1,6 +1,6 @@
 # http-z
 
-![Build Status](https://github.com/AlexanderMac/http-z/workflows/CI/badge.svg)
+[![Build Status](https://github.com/AlexanderMac/http-z/workflows/CI/badge.svg)](https://github.com/AlexanderMac/http-z/actions?query=workflow%3ACI)
 [![Code Coverage](https://codecov.io/gh/AlexanderMac/http-z/branch/master/graph/badge.svg)](https://codecov.io/gh/AlexanderMac/http-z)
 [![npm version](https://badge.fury.io/js/http-z.svg)](https://badge.fury.io/js/http-z)
 
