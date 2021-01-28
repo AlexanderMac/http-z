@@ -42,7 +42,7 @@ class HttpZRequestParser extends Base {
     if (_.isError(res)) {
       throw HttpZError.get('Invalid host', value)
     }
-    this.host = res.host
+    this.host = decodeURIComponent(res.host)
   }
 
   _parseStartRow() {
@@ -60,7 +60,7 @@ class HttpZRequestParser extends Base {
 
     let parsedUrl = utils.parseUrl(path, this.host)
     this.protocol = parsedUrl.protocol
-    this.path = parsedUrl.path
+    this.path = decodeURIComponent(parsedUrl.path)
     this.queryParams = parsedUrl.params
   }
 

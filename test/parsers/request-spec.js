@@ -182,6 +182,15 @@ describe('parsers / request', () => {
       parser._parseHostRow()
       should(parser.host).eql(expected)
     })
+
+    it('should set instance.host when host header value contains url-encoded elements', () => {
+      let parser = getParserInstance()
+      parser.hostRow = 'Host: www.example.%7Bparam%7D.com:2345'
+      let expected = 'www.example.{param}.com:2345'
+
+      parser._parseHostRow()
+      should(parser.host).eql(expected)
+    })
   })
 
   describe('_parseStartRow', () => {
@@ -249,6 +258,15 @@ describe('parsers / request', () => {
       let startRow = 'GET / HTTP/1.1'
       let expected = getDefaultExpected({
         path: '/'
+      })
+
+      test({ startRow, expected })
+    })
+
+    it('should parse valid startRow (path contains url-encoded elements)', () => {
+      let startRow = 'GET /%7Bparam%7D HTTP/1.1'
+      let expected = getDefaultExpected({
+        path: '/{param}'
       })
 
       test({ startRow, expected })
