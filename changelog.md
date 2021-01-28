@@ -1,3 +1,7 @@
+# <sub>v4.0.3</sub>
+#### _Jan. 28, 2021_
+  * Url-decode url.host and url.path in parse action.
+
 # <sub>v4.0.2</sub>
 #### _Jan. 27, 2021_
   * Don't process empty arrays (with zero elements) in builder.
