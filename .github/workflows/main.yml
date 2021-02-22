@@ -21,10 +21,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: |
-          npm install
-          npm run lint
-          npm test
-          npm install -g codecov
-          nyc --reporter=lcov npm test && codecov
+      - run: npm install
+      - run: npm run lint
+      - run: npm test
+      - run: npm install -g codecov
+      - run: npm run coverage-gh
       - uses: codecov/codecov-action@v1
