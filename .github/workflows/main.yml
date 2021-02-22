@@ -25,7 +25,6 @@ jobs:
           npm install
           npm run lint
           npm test
-          npm run coverage
+          npm install -g codecov
+          npm run coverage && codecov
       - uses: codecov/codecov-action@v1
-        with:
-          directory: .nyc_output
