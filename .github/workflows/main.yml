@@ -26,5 +26,5 @@ jobs:
           npm run lint
           npm test
           npm install -g codecov
-          npm run coverage && codecov
+          nyc --reporter=lcov npm test && codecov
       - uses: codecov/codecov-action@v1
