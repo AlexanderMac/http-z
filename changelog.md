@@ -1,3 +1,7 @@
+# <sub>v4.0.4</sub>
+#### _Feb. 26, 2021_
+  * Update dependencies.
+
 # <sub>v4.0.3</sub>
 #### _Jan. 28, 2021_
   * Url-decode url.host and url.path in parse action.
