@@ -1,3 +1,7 @@
+# <sub>v5.0.0</sub>
+#### _May. 21, 2021_
+  * Drop support for Node v10.
+
 # <sub>v4.0.4</sub>
 #### _Feb. 26, 2021_
   * Update dependencies.
@@ -96,10 +100,6 @@
 
 # <sub>v0.12.0.</sub>
 #### _Jan. 15, 2020_
-  * Drop support for Node v8.
-
-# <sub>v0.11.2.</sub>
-#### _Jan. 7, 2020_
   * Drop support for Node v8.
 
 # <sub>v0.11.1.</sub>
