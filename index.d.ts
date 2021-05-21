@@ -15,7 +15,7 @@ export class consts {
 declare namespace utils {
   function splitByDelimeter(str: string, delimiter: string): any;
   function parseUrl(path?: string, origin?: string): any;
-  function generateUrl(protocol: string, host: string, path: string, params: HttpZParam[]): string;
+  function generateUrl(protocol: string, host: string, port?: number, path: string, params: HttpZParam[]): string;
   function generatePath(path: string, params: HttpZParam[]): string;
   function convertParamsArrayToPairs(params: HttpZParam[]): any[];
   function pretifyHeaderName(name: string): string;
