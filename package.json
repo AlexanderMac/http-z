@@ -45,14 +45,14 @@
     "lodash": "^4.17.20"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.1",
-    "eslint": "^7.10.0",
-    "mocha": "^8.1.3",
-    "n-assert": "^5.0.2",
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "eslint": "^7.26.0",
+    "mocha": "^8.4.0",
+    "n-assert": "^7.0.0",
     "nyc": "^15.1.0",
-    "rollup": "^2.30.0",
+    "rollup": "^2.48.0",
     "should": "^13.2.3",
-    "sinon": "^9.2.0"
+    "sinon": "^10.0.0"
   }
 }
