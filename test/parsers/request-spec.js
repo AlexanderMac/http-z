@@ -75,7 +75,7 @@ describe('parsers / request', () => {
 
       should(parser.startRow).eql('start-line')
       should(parser.hostRow).eql('host: somehost')
-      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.headerRows).eql(['host: somehost', 'header1', 'header2', 'header3'])
       should(parser.cookiesRow).eql(undefined)
       should(parser.bodyRows).eql('')
     })
@@ -97,7 +97,7 @@ describe('parsers / request', () => {
 
       should(parser.startRow).eql('start-line')
       should(parser.hostRow).eql('host: somehost')
-      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.headerRows).eql(['host: somehost', 'header1', 'header2', 'header3'])
       should(parser.cookiesRow).eql('cookie: somecookies')
       should(parser.bodyRows).eql('')
     })
@@ -118,7 +118,7 @@ describe('parsers / request', () => {
 
       should(parser.startRow).eql('start-line')
       should(parser.hostRow).eql('host: somehost')
-      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.headerRows).eql(['host: somehost', 'header1', 'header2', 'header3'])
       should(parser.cookiesRow).eql(undefined)
       should(parser.bodyRows).eql('body')
     })
@@ -146,47 +146,10 @@ describe('parsers / request', () => {
       })
     })
 
-    it('should throw error when host header value is nil', () => {
-      let parser = getParserInstance()
-      parser.hostRow = 'Host  '
-
-      should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
-        message: 'host header value is required'
-      })
-    })
-
-    it('should throw error when host header value is empty string', () => {
-      let parser = getParserInstance()
-      parser.hostRow = 'Host:  '
-
-      should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
-        message: 'host header value must be not empty string'
-      })
-    })
-
-    it('should throw error when host header value is not valid URL', () => {
-      let parser = getParserInstance()
-      parser.hostRow = 'Host: ?!invalid-host'
-
-      should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
-        message: 'Invalid host',
-        details: '?!invalid-host'
-      })
-    })
-
-    it('should set instance.host when host header value is valid URL', () => {
+    it('should set instance.host when host header value is present', () => {
       let parser = getParserInstance()
       parser.hostRow = 'Host: www.example.com:2345'
       let expected = 'www.example.com:2345'
-
-      parser._parseHostRow()
-      should(parser.host).eql(expected)
-    })
-
-    it('should set instance.host when host header value contains url-encoded elements', () => {
-      let parser = getParserInstance()
-      parser.hostRow = 'Host: www.example.%7Bparam%7D.com:2345'
-      let expected = 'www.example.{param}.com:2345'
 
       parser._parseHostRow()
       should(parser.host).eql(expected)
@@ -197,12 +160,11 @@ describe('parsers / request', () => {
     function test({ startRow, expected }) {
       let parser = getParserInstance()
       parser.startRow = startRow
-      parser.host = 'example.com'
 
       parser._parseStartRow()
       should(parser.method).eql(expected.method)
-      should(parser.protocol).eql(expected.protocol)
       should(parser.protocolVersion).eql(expected.protocolVersion)
+      should(parser.target).eql(expected.target)
       should(parser.path).eql(expected.path)
       should(parser.params).eql(expected.params)
     }
@@ -210,10 +172,9 @@ describe('parsers / request', () => {
     function getDefaultExpected(ex) {
       let def = {
         method: 'GET',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
+        target: '/features',
         path: '/features',
-        host: 'example.com',
         queryParams: []
       }
       return _.extend(def, ex)
@@ -229,14 +190,14 @@ describe('parsers / request', () => {
       })
     })
 
-    it('should parse valid startRow (GET method)', () => {
+    it('should parse valid startRow when method is GET', () => {
       let startRow = 'GET /features HTTP/1.1'
       let expected = getDefaultExpected()
 
       test({ startRow, expected })
     })
 
-    it('should parse valid startRow (DELETE method)', () => {
+    it('should parse valid startRow when method is DELETE', () => {
       let startRow = 'DELETE /features HTTP/1.1'
       let expected = getDefaultExpected({
         method: 'DELETE'
@@ -245,7 +206,7 @@ describe('parsers / request', () => {
       test({ startRow, expected })
     })
 
-    it('should parse valid startRow (HTTP protocol v2.0)', () => {
+    it('should parse valid startRow when HTTP protocol is v2.0', () => {
       let startRow = 'GET /features HTTP/2.0'
       let expected = getDefaultExpected({
         protocolVersion: 'HTTP/2.0'
@@ -254,19 +215,22 @@ describe('parsers / request', () => {
       test({ startRow, expected })
     })
 
-    it('should parse valid startRow (path is empty)', () => {
+    it('should parse valid startRow when target is a root path', () => {
       let startRow = 'GET / HTTP/1.1'
       let expected = getDefaultExpected({
+        target: '/',
         path: '/'
       })
 
       test({ startRow, expected })
     })
 
-    it('should parse valid startRow (path contains url-encoded elements)', () => {
-      let startRow = 'GET /%7Bparam%7D HTTP/1.1'
+    it('should parse valid startRow when target is in absolute-form', () => {
+      let startRow = 'GET https://foo.com/features HTTP/1.1'
       let expected = getDefaultExpected({
-        path: '/{param}'
+        target: 'https://foo.com/features',
+        host: 'foo.com',
+        path: '/features'
       })
 
       test({ startRow, expected })
@@ -275,6 +239,7 @@ describe('parsers / request', () => {
     it('should parse valid startRow when query params with two simple parameters', () => {
       let startRow = 'GET /features?p1=v1&p2%3E=v2%3B HTTP/1.1'
       let expected = getDefaultExpected({
+        target: '/features?p1=v1&p2%3E=v2%3B',
         queryParams: [
           { name: 'p1', value: 'v1' },
           { name: 'p2>', value: 'v2;' }
@@ -287,6 +252,7 @@ describe('parsers / request', () => {
     it('should parse valid startRow when query params with object parameters', () => {
       let startRow = 'GET /features?p1[x]=v1&p1[y]=v2&p23E=v3%3B HTTP/1.1'
       let expected = getDefaultExpected({
+        target: '/features?p1[x]=v1&p1[y]=v2&p23E=v3%3B',
         queryParams: [
           { name: 'p1[x]', value: 'v1' },
           { name: 'p1[y]', value: 'v2' },
@@ -300,6 +266,7 @@ describe('parsers / request', () => {
     it('should parse valid startRow when query params with array parameters', () => {
       let startRow = 'GET /features?p1[]=v1&p1[]=v2&p2%3E=v3%3B HTTP/1.1'
       let expected = getDefaultExpected({
+        target: '/features?p1[]=v1&p1[]=v2&p2%3E=v3%3B',
         queryParams: [
           { name: 'p1[x]', value: 'v1' },
           { name: 'p1[y]', value: 'v2' },
@@ -370,15 +337,15 @@ describe('parsers / request', () => {
       parser.headersSize = 25
       parser.bodySize = 0
       parser.method = 'method'
-      parser.protocol = 'protocol'
       parser.protocolVersion = 'protocolVersion'
+      parser.target = 'target'
       parser.path = 'path'
       parser.host = 'host'
 
       let expected = {
         method: 'method',
-        protocol: 'protocol',
         protocolVersion: 'protocolVersion',
+        target: 'target',
         path: 'path',
         host: 'host',
         headersSize: 25,
@@ -393,8 +360,8 @@ describe('parsers / request', () => {
       parser.headersSize = 55
       parser.bodySize = 4
       parser.method = 'method'
-      parser.protocol = 'protocol'
       parser.protocolVersion = 'protocolVersion'
+      parser.target = 'target'
       parser.path = 'path'
       parser.host = 'host'
       parser.queryParams = 'queryParams'
@@ -404,8 +371,8 @@ describe('parsers / request', () => {
 
       let expected = {
         method: 'method',
-        protocol: 'protocol',
         protocolVersion: 'protocolVersion',
+        target: 'target',
         path: 'path',
         host: 'host',
         queryParams: 'queryParams',
@@ -431,15 +398,17 @@ describe('parsers / request', () => {
 
       let requestModel = {
         method: 'GET',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
+        target: '/features?p1=v1%3B&p2=',
         host: 'www.example.com',
         path: '/features',
         queryParams: [
           { name: 'p1', value: 'v1;' },
           { name: 'p2', value: '' }
         ],
-        headers: [],
+        headers: [
+          { name: 'Host', value: 'www.example.com' }
+        ],
         headersSize: 62,
         bodySize: 0
       }
@@ -451,7 +420,7 @@ describe('parsers / request', () => {
 
     it('should parse request without body (header names in lower case)', () => {
       let rawRequest = [
-        'GET /features HTTP/1.1',
+        'GET https://foo.com/bar HTTP/1.1',
         'host: example.com',
         'connection: ',
         'accept: */*',
@@ -467,12 +436,16 @@ describe('parsers / request', () => {
 
       let requestModel = {
         method: 'GET',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: 'https://foo.com/bar',
+        host: 'foo.com',
+        path: '/bar',
         queryParams: [],
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: ''
@@ -506,7 +479,7 @@ describe('parsers / request', () => {
             value: 'AWS4-HMAC-SHA256 Credential=CRED/20210118/eu-west-1/s3/aws4_request, SignedHeaders=host;x-amz-acl;x-amz-user-agent, Signature=fb1e6017a1d'
           }
         ],
-        headersSize: 519,
+        headersSize: 529,
         bodySize: 0
       }
 
@@ -518,7 +491,7 @@ describe('parsers / request', () => {
     it('should parse request with cookies and without body', () => {
       let rawRequest = [
         'GET /features HTTP/1.1',
-        'Host: example.com',
+        'Host: example.com:8080',
         'Connection: ',
         'Accept: */*',
         'Accept-Encoding: gzip,deflate',
@@ -530,12 +503,16 @@ describe('parsers / request', () => {
 
       let requestModel = {
         method: 'GET',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
+        target: '/features',
+        host: 'example.com:8080',
         path: '/features',
         queryParams: [],
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com:8080'
+          },
           {
             name: 'Connection',
             value: ''
@@ -558,7 +535,7 @@ describe('parsers / request', () => {
           { name: 'sessionid', value: 'sd=456def%3B' },
           { name: 'userid' }
         ],
-        headersSize: 214,
+        headersSize: 219,
         bodySize: 0
       }
 
@@ -584,12 +561,16 @@ describe('parsers / request', () => {
 
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
+        target: '/features',
         host: 'example.com',
         path: '/features',
         queryParams: [],
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
@@ -649,12 +630,16 @@ describe('parsers / request', () => {
 
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
+        target: '/features',
         host: 'example.com',
         path: '/features',
         queryParams: [],
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
@@ -734,12 +719,16 @@ describe('parsers / request', () => {
 
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
+        target: '/features',
         host: 'example.com',
         path: '/features',
         queryParams: [],
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
@@ -817,12 +806,16 @@ describe('parsers / request', () => {
 
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
+        target: '/features',
         host: 'example.com',
         path: '/features',
         queryParams: [],
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
@@ -893,12 +886,16 @@ describe('parsers / request', () => {
 
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
+        target: '/features',
         host: 'example.com',
         path: '/features',
         queryParams: [],
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'

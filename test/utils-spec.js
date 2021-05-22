@@ -46,6 +46,25 @@ describe('utils', () => {
     })
   })
 
+  describe('isAbsoluteUrl', () => {
+    function test(url, expected) {
+      let actual = utils.isAbsoluteUrl(url)
+      should(actual).eql(expected)
+    }
+
+    it('should return false when url is in origin-form', () => {
+      test('/api/users', false)
+    })
+
+    it('should return false when url is in Windos path', () => {
+      test('C:\\files', false)
+    })
+
+    it('should return true when url is in absolute-form', () => {
+      test('https://example.com/users', true)
+    })
+  })
+
   describe('parseUrl', () => {
     function getDefParsedUrl(ex) {
       return _.extend({
@@ -56,8 +75,8 @@ describe('utils', () => {
       }, ex)
     }
 
-    function test(path, origin, expected) {
-      let actual = utils.parseUrl(path, origin)
+    function test(url, host, expected) {
+      let actual = utils.parseUrl(url, host)
       should(actual).eql(expected)
     }
 

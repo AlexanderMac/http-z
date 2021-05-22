@@ -18,17 +18,28 @@ exports.splitByDelimeter = (str, delimiter) => {
   return res
 }
 
-exports.parseUrl = (path, origin) => {
-  if (!origin) {
-    origin = path
-    path = null
-  }
-  const knownProtocols = ['http', 'https']
-  if (!_.find(knownProtocols, known => _.startsWith(origin, known + '://'))) {
-    origin = 'http://' + origin
+exports.isAbsoluteUrl = (url) => {
+  // Don't match Windows paths `c:\`
+  if (/^[a-zA-Z]:\\/.test(url)) {
+    return false
   }
 
-  let parsedUrl = path ? new URL(path, origin) : new URL(origin)
+  // Scheme: https://tools.ietf.org/html/rfc3986#section-3.1
+  // Absolute URL: https://tools.ietf.org/html/rfc3986#section-4.3
+  return /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url)
+}
+
+exports.parseUrl = (url, host) => {
+  if (!host) {
+    host = url
+    url = null
+  }
+  const supportedProtocols = ['http', 'https']
+  if (!_.find(supportedProtocols, known => _.startsWith(host, known + '://'))) {
+    host = 'http://' + host
+  }
+
+  let parsedUrl = url ? new URL(url, host) : new URL(host)
   let protocol = parsedUrl.protocol.replace(':', '').toUpperCase()
   let params = []
   parsedUrl.searchParams.forEach((value, name) => params.push({ name, value }))

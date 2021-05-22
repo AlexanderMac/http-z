@@ -5,6 +5,8 @@ const utils = require('../utils')
 const validators = require('../validators')
 const Base = require('./base')
 
+const SOME_RANDOM_HOST = 'somerandomhost28476561927456.com'
+
 class HttpZRequestParser extends Base {
   static parse(...params) {
     let instance = new HttpZRequestParser(...params)
@@ -28,7 +30,7 @@ class HttpZRequestParser extends Base {
     this.startRow = startRow
     this.hostRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('host:').value())
     this.cookiesRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('cookie:').value())
-    this.headerRows = _.without(headerRows, this.hostRow, this.cookiesRow)
+    this.headerRows = _.without(headerRows, this.cookiesRow)
     this.bodyRows = bodyRows
   }
 
@@ -36,15 +38,10 @@ class HttpZRequestParser extends Base {
     validators.validateNotEmptyString(this.hostRow, 'host header')
     // eslint-disable-next-line no-unused-vars
     let [unused, value] = utils.splitByDelimeter(this.hostRow, ':')
-    validators.validateNotEmptyString(value, 'host header value')
-
-    let res = _.attempt(utils.parseUrl.bind(null, value))
-    if (_.isError(res)) {
-      throw HttpZError.get('Invalid host', value)
-    }
-    this.host = decodeURIComponent(res.host)
+    this.host = value
   }
 
+  // eslint-disable-next-line max-statements
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
       throw HttpZError.get(
@@ -56,11 +53,23 @@ class HttpZRequestParser extends Base {
     let rowElems = this.startRow.split(' ')
     this.method = rowElems[0].toUpperCase()
     this.protocolVersion = rowElems[2].toUpperCase()
-    let path = rowElems[1]
+    this.target = rowElems[1]
 
-    let parsedUrl = utils.parseUrl(path, this.host)
-    this.protocol = parsedUrl.protocol
-    this.path = decodeURIComponent(parsedUrl.path)
+    let host
+    if (utils.isAbsoluteUrl(this.target)) {
+      host = null
+    } else if (this.host) {
+      host = this.host
+    } else {
+      // SOME_RANDOM_HOST is used here to generate URL only
+      host = SOME_RANDOM_HOST
+    }
+    let parsedUrl = utils.parseUrl(this.target, host)
+
+    if (parsedUrl.host !== SOME_RANDOM_HOST) {
+      this.host = parsedUrl.host
+    }
+    this.path = parsedUrl.path
     this.queryParams = parsedUrl.params
   }
 
@@ -98,8 +107,8 @@ class HttpZRequestParser extends Base {
   _generateModel() {
     let model = {
       method: this.method,
-      protocol: this.protocol,
       protocolVersion: this.protocolVersion,
+      target: this.target,
       host: this.host,
       path: this.path,
       headersSize: this.headersSize,
