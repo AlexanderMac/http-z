@@ -4,39 +4,17 @@
 [![Code Coverage](https://codecov.io/gh/AlexanderMac/http-z/branch/master/graph/badge.svg)](https://codecov.io/gh/AlexanderMac/http-z)
 [![npm version](https://badge.fury.io/js/http-z.svg)](https://badge.fury.io/js/http-z)
 
-## Features
+### Features
 
-HTTP request/response message parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230). Works in Node.js and in the browser.
+HTTP message (request/response) parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230). Works in Node.js and in the browser.
 
-* Parse HTTP request/response raw message:
-  - method, protocol, protocol version / status code, reason
-  - query params
-  - headers
-  - cookies
-  - body, the following contentTypes are supported:
-    - `multipart/form-data`
-    - `application/x-www-form-urlencoded`
-    - `application/json`,
-    - `text/plain`
-* Build HTTP request/response raw message from model:
-  - method, protocol, protocol version / status code, reason
-  - query params
-  - headers
-  - cookies
-  - body, the following contentTypes are supported:
-    - `multipart/form-data`
-    - `application/x-www-form-urlencoded`
-    - `application/json`
-    - `text/plain`
+### Install
 
-## Commands
-
-```sh
-# Install
+```bash
 $ npm i http-z
 ```
 
-## Usage
+### Usage
 
 ```js
 const httpZ = require('http-z')
@@ -44,7 +22,7 @@ const httpZ = require('http-z')
 let rawMessage = [
   'GET /features?p1=v1 HTTP/1.1',
   'Host: example.com',
-  'Accept: */*',
+  'Accept: *',
   'Accept-Encoding: gzip,deflate',
   'Accept-Language: en-US;q=0.6, en;q=0.4',
   '',
@@ -55,20 +33,23 @@ let messageModel = httpZ.parse(rawMessage)
 console.log(JSON.stringify(messageModel, null, 2))
 
 /* output:
-{ 
-  method: 'GET',
-  protocol: 'HTTP',
-  protocolVersion: 'HTTP/1.1',
-  host: 'example.com',
-  path: '/features',
-  params: { p1: 'v1' },
-  headers: [
-    { name: 'Accept', value: '*//*' },
-    { name: 'Accept-Encoding', value: 'gzip,deflate' },
-    { name: 'Accept-Language', value: 'en-US;q=0.6, en;q=0.4' }
+{
+  "protocolVersion": "HTTP/1.1",
+  "method": "GET",
+  "target": "/features?p1=v1",
+  "host": "example.com",
+  "path": "/features",
+  "headersSize": 135,
+  "bodySize": 0,
+  "queryParams": [
+    { "name": "p1", "value": "v1" }
   ],
-  headersSize: 98,
-  bodySize: 0
+  "headers": [
+    { "name": "Host", "value": "example.com" },
+    { "name": "Accept", value": "*" },
+    { "name": "Accept-Encoding", "value": "gzip,deflate" },
+    { "name": "Accept-Language", "value": "en-US;q=0.6, en;q=0.4" }
+  ]
 }
 */
 
@@ -78,32 +59,33 @@ console.log(rawMessage)
 /* output:
 GET /features?p1=v1 HTTP/1.1
 Host: example.com
-Accept: *//*
+Accept: *
 Accept-Encoding: gzip,deflate
 Accept-Language: en-US;q=0.6, en;q=0.4
+
 
 */
 ```
 
-## API
+### API
 
-### parse(rawMessage)
+##### parse(rawMessage)
 Parses HTTP request/response raw message and returns a model.
 
 - `rawMessage` is HTTP raw message.
 
-### build(messageModel)
+##### build(messageModel)
 Builds HTTP request/response raw message from the model.
 
 - `messageModel` is HTTP message model.
 
-## References
+### References
 - [RFC 7230: Hypertext Transfer Protocol (HTTP/1.1)](https://tools.ietf.org/html/rfc7230)
 - [RFC 7578: Returning Values from Forms: multipart/form-data](https://tools.ietf.org/html/rfc7578)
 - [RFC 2046: Multipurpose Internet Mail Extensions](https://tools.ietf.org/html/rfc2046)
 
-## Author
-Alexander Mac
-
-## Licence
+### Licence
 Licensed under the MIT license.
+
+### Author
+Alexander Mac
