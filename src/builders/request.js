@@ -10,21 +10,17 @@ class HttpZRequestBuilder extends Base {
     return instance.build()
   }
 
-  constructor({ method, protocol, protocolVersion, host, path, queryParams = [], headers, cookies, body }) {
+  constructor({ method, protocolVersion, target, headers, cookies, body }) {
     super({ headers, body })
     this.method = method
-    this.protocol = protocol
     this.protocolVersion = protocolVersion
-    this.host = host
-    this.path = path
-    this.queryParams = queryParams
+    this.target = target
     this.cookies = cookies
   }
 
   build() {
     return '' +
       this._generateStartRow() +
-      this._generateHostRow() +
       this._generateHeaderRows() +
       this._generateCookiesRow() +
       consts.EOL +
@@ -33,20 +29,14 @@ class HttpZRequestBuilder extends Base {
 
   _generateStartRow() {
     validators.validateNotEmptyString(this.method, 'method')
-    validators.validateNotEmptyString(this.protocol, 'protocol')
     validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion')
-    validators.validateNotEmptyString(this.host, 'host')
-    validators.validateNotEmptyString(this.path, 'path')
+    validators.validateNotEmptyString(this.target, 'target')
 
     return '' +
       this.method.toUpperCase() + ' ' +
-      utils.generatePath(this.path, this.queryParams) + ' ' +
+      this.target + ' ' +
       this.protocolVersion.toUpperCase() +
       consts.EOL
-  }
-
-  _generateHostRow() {
-    return 'Host: ' + this.host + consts.EOL
   }
 
   _generateHeaderRows() {
@@ -54,7 +44,7 @@ class HttpZRequestBuilder extends Base {
 
     _.remove(this.headers, h => {
       let hName = _.toLower(h.name)
-      return hName === 'host' || hName === 'cookie'
+      return hName === 'cookie'
     })
 
     return super._generateHeaderRows()

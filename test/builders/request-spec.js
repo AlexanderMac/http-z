@@ -11,8 +11,8 @@ describe('builders / request', () => {
   function getBuilderInstance(exRequestModel) {
     let requestModel = _.extend({
       method: 'get',
-      protocol: 'http',
       protocolVersion: 'http/1.1',
+      target: '/',
       host: 'example.com',
       path: '/'
     }, exRequestModel)
@@ -45,14 +45,12 @@ describe('builders / request', () => {
     it('should call related methods and return request message', () => {
       let builder = getBuilderInstance()
       sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL)
-      sinon.stub(builder, '_generateHostRow').returns('hostRow' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateCookiesRow').returns('cookieRow' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
 
       let expected = [
         'startRow',
-        'hostRow',
         'headerRows',
         'cookieRow',
         '',
@@ -62,7 +60,6 @@ describe('builders / request', () => {
       should(actual).eql(expected)
 
       nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' })
-      nassert.assertFn({ inst: builder, fnName: '_generateHostRow', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateCookiesRow', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' })
@@ -78,14 +75,6 @@ describe('builders / request', () => {
       })
     })
 
-    it('should throw error when protocol is undefined', () => {
-      let builder = getBuilderInstance({ protocol: undefined })
-
-      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'protocol is required'
-      })
-    })
-
     it('should throw error when protocolVersion is undefined', () => {
       let builder = getBuilderInstance({ protocolVersion: undefined })
 
@@ -94,79 +83,12 @@ describe('builders / request', () => {
       })
     })
 
-    it('should throw error when host is undefined', () => {
-      let builder = getBuilderInstance({ host: undefined })
+    it('should throw error when target is undefined', () => {
+      let builder = getBuilderInstance({ target: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'host is required'
+        message: 'target is required'
       })
-    })
-
-    it('should throw error when path is undefined', () => {
-      let builder = getBuilderInstance({ path: undefined })
-
-      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'path is required'
-      })
-    })
-
-    it('should build startRow when query params is empty', () => {
-      let builder = getBuilderInstance()
-
-      let expected = 'GET / HTTP/1.1' + HttpZConsts.EOL
-      let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-
-    it('should build startRow when query params has two simple parameters', () => {
-      let builder = getBuilderInstance({
-        queryParams: [
-          { name: 'p1', value: 'v1' },
-          { name: 'p2>', value: 'v2;' }
-        ]
-      })
-
-      let expected = 'GET /?p1=v1&p2%3E=v2%3B HTTP/1.1' + HttpZConsts.EOL
-      let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-
-    it('should build startRow when query params contains object parameters', () => {
-      let builder = getBuilderInstance({
-        queryParams: [
-          { name: 'p1[x]', value: 'v1' },
-          { name: 'p1[y]', value: 'v2' },
-          { name: 'p2>', value: 'v3;' }
-        ]
-      })
-
-      let expected = 'GET /?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v3%3B HTTP/1.1' + HttpZConsts.EOL
-      let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-
-    it('should build startRow when query params contains array parameters', () => {
-      let builder = getBuilderInstance({
-        queryParams: [
-          { name: 'p1[x]', value: 'v1' },
-          { name: 'p1[y]', value: 'v2' },
-          { name: 'p2>', value: 'v3;' }
-        ]
-      })
-
-      let expected = 'GET /?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v3%3B HTTP/1.1' + HttpZConsts.EOL
-      let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-  })
-
-  describe('_generateHostRow', () => {
-    it('should build hostRow', () => {
-      let builder = getBuilderInstance({ host: 'example.com' })
-
-      let expected = 'Host: example.com' + HttpZConsts.EOL
-      let actual = builder._generateHostRow()
-      should(actual).eql(expected)
     })
   })
 
@@ -189,7 +111,7 @@ describe('builders / request', () => {
       nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows' })
     })
 
-    it('should remove host and cookie headers and call parent method', () => {
+    it('should remove cookie headers and call parent method', () => {
       let builder = new RequestBuilder({
         headers: [
           {
@@ -216,6 +138,10 @@ describe('builders / request', () => {
       })
       let expected = 'ok'
       let expectedHeaders = [
+        {
+          name: 'host',
+          value: 'some host'
+        },
         {
           name: 'connection',
           value: ''
@@ -286,15 +212,15 @@ describe('builders / request', () => {
     it('should build request without headers and body', () => {
       let requestModel = {
         method: 'GET',
-        protocol: 'HTTPS',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features?p1=v1%3B&p2=',
         queryParams: [
           { name: 'p1', value: 'v1;' },
           { name: 'p2' }
         ],
-        headers: []
+        headers: [
+          { name: 'Host', value: 'example.com' }
+        ]
       }
 
       let rawRequest = [
@@ -312,11 +238,13 @@ describe('builders / request', () => {
     it('should build request without body (header names in lower case)', () => {
       let requestModel = {
         method: 'get',
-        protocol: 'http',
         protocolVersion: 'http/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'connection',
             value: ''
@@ -355,10 +283,8 @@ describe('builders / request', () => {
     it('should build request with cookies, but without body', () => {
       let requestModel = {
         method: 'GET',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: 'https://www.example.com/features',
         headers: [
           {
             name: 'Host',
@@ -380,7 +306,7 @@ describe('builders / request', () => {
             name: 'Accept-Language',
             value: 'ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4'
           },
-          // it will be replaced
+          // it will be dropped
           {
             name: 'Cookie',
             value: 'firstName=John; lastName=Smith'
@@ -394,8 +320,8 @@ describe('builders / request', () => {
       }
 
       let rawRequest = [
-        'GET /features HTTP/1.1',
-        'Host: example.com',
+        'GET https://www.example.com/features HTTP/1.1',
+        'Host: www.example.com',
         'Connection: ',
         'Accept: */*',
         'Accept-Encoding: gzip, deflate',
@@ -413,11 +339,13 @@ describe('builders / request', () => {
     it('should build request with body of contentType=text/plain', () => {
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
@@ -475,11 +403,13 @@ describe('builders / request', () => {
     it('should build request with body of contentType=application/x-www-form-urlencoded', () => {
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
@@ -541,11 +471,13 @@ describe('builders / request', () => {
     it('should build request with body of contentType=multipart/form-data', () => {
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
@@ -634,11 +566,13 @@ describe('builders / request', () => {
     it('should build request with body of contentType=multipart/alternative (inline)', () => {
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
@@ -697,11 +631,13 @@ describe('builders / request', () => {
     it('should build request with body of contentType=multipart/mixed (attachment)', () => {
       let requestModel = {
         method: 'POST',
-        protocol: 'HTTP',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
           {
             name: 'Connection',
             value: 'keep-alive'
