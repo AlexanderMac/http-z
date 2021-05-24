@@ -241,7 +241,7 @@ describe('parsers / request', () => {
       let startRow = 'GET https://foo.com/users HTTP/1.1'
       let expected = getDefaultExpected({
         target: 'https://foo.com/users',
-        host: 'foo.com',
+        host: 'example.com',
         path: '/users'
       })
 
@@ -450,7 +450,7 @@ describe('parsers / request', () => {
         method: 'GET',
         protocolVersion: 'HTTP/1.1',
         target: 'https://foo.com/bar',
-        host: 'foo.com',
+        host: 'example.com',
         path: '/bar',
         queryParams: [],
         headers: [

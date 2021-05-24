@@ -43,7 +43,6 @@ class HttpZRequestParser extends Base {
     this.host = value
   }
 
-  // eslint-disable-next-line max-statements
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
       throw HttpZError.get(
@@ -57,22 +56,16 @@ class HttpZRequestParser extends Base {
     this.protocolVersion = rowElems[2].toUpperCase()
     this.target = rowElems[1]
 
-    let host
-    if (utils.isAbsoluteUrl(this.target)) {
-      host = null
-    } else if (this.host) {
-      host = this.host
-    } else {
-      // SOME_RANDOM_HOST is used here for generating URL only
-      host = SOME_RANDOM_HOST
-    }
-
+    // SOME_RANDOM_HOST is used here for generating URL only
+    let host = utils.isAbsoluteUrl(this.target) ? null : SOME_RANDOM_HOST
     let parsedUrl = _.attempt(utils.parseUrl.bind(null, this.target, host))
     if (_.isError(parsedUrl)) {
-      throw HttpZError.get('Invalid target or host header', this.target)
+      throw HttpZError.get('Invalid target', this.target)
     }
 
-    this.host = parsedUrl.host !== SOME_RANDOM_HOST ? parsedUrl.host : 'unspecified-host'
+    if (!this.host) {
+      this.host = parsedUrl.host !== SOME_RANDOM_HOST ? parsedUrl.host : 'unspecified-host'
+    }
     this.path = parsedUrl.path
     this.queryParams = parsedUrl.params
   }
