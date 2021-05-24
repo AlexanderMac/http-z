@@ -146,6 +146,15 @@ describe('parsers / request', () => {
       })
     })
 
+    it('should throw error when host header value is empty string', () => {
+      let parser = getParserInstance()
+      parser.hostRow = 'Host:  '
+
+      should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
+        message: 'host header value must be not empty string'
+      })
+    })
+
     it('should set instance.host when host header value is present', () => {
       let parser = getParserInstance()
       parser.hostRow = 'Host: www.example.com:2345'
@@ -160,11 +169,13 @@ describe('parsers / request', () => {
     function test({ startRow, expected }) {
       let parser = getParserInstance()
       parser.startRow = startRow
+      parser.host = 'example.com'
 
       parser._parseStartRow()
       should(parser.method).eql(expected.method)
       should(parser.protocolVersion).eql(expected.protocolVersion)
       should(parser.target).eql(expected.target)
+      should(parser.host).eql(expected.host)
       should(parser.path).eql(expected.path)
       should(parser.params).eql(expected.params)
     }
@@ -174,6 +185,7 @@ describe('parsers / request', () => {
         method: 'GET',
         protocolVersion: 'HTTP/1.1',
         target: '/features',
+        host: 'example.com',
         path: '/features',
         queryParams: []
       }
@@ -226,11 +238,11 @@ describe('parsers / request', () => {
     })
 
     it('should parse valid startRow when target is in absolute-form', () => {
-      let startRow = 'GET https://foo.com/features HTTP/1.1'
+      let startRow = 'GET https://foo.com/users HTTP/1.1'
       let expected = getDefaultExpected({
-        target: 'https://foo.com/features',
+        target: 'https://foo.com/users',
         host: 'foo.com',
-        path: '/features'
+        path: '/users'
       })
 
       test({ startRow, expected })

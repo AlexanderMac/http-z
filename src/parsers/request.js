@@ -38,6 +38,8 @@ class HttpZRequestParser extends Base {
     validators.validateNotEmptyString(this.hostRow, 'host header')
     // eslint-disable-next-line no-unused-vars
     let [unused, value] = utils.splitByDelimeter(this.hostRow, ':')
+    validators.validateNotEmptyString(value, 'host header value')
+
     this.host = value
   }
 
@@ -61,14 +63,16 @@ class HttpZRequestParser extends Base {
     } else if (this.host) {
       host = this.host
     } else {
-      // SOME_RANDOM_HOST is used here to generate URL only
+      // SOME_RANDOM_HOST is used here for generating URL only
       host = SOME_RANDOM_HOST
     }
-    let parsedUrl = utils.parseUrl(this.target, host)
 
-    if (parsedUrl.host !== SOME_RANDOM_HOST) {
-      this.host = parsedUrl.host
+    let parsedUrl = _.attempt(utils.parseUrl.bind(null, this.target, host))
+    if (_.isError(parsedUrl)) {
+      throw HttpZError.get('Invalid target or host header', this.target)
     }
+
+    this.host = parsedUrl.host !== SOME_RANDOM_HOST ? parsedUrl.host : 'unspecified-host'
     this.path = parsedUrl.path
     this.queryParams = parsedUrl.params
   }
