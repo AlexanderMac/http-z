@@ -1,3 +1,9 @@
+## v5.1.0
+#### _May. 24, 2021_
+  * Export the new `target` field (request target) in request parser.
+  * Don't omit `Host` header in request parser, export it as a regular header.
+  * Don't use `Host` field to generate request message in builder, use `Host` header from `headers` array instead.
+
 ## v5.0.0
 #### _May. 21, 2021_
   * **BREAKING:** Drop support for Node v10.

@@ -210,17 +210,28 @@
     return res
   };
 
-  exports.parseUrl = (path, origin) => {
-    if (!origin) {
-      origin = path;
-      path = null;
-    }
-    const knownProtocols = ['http', 'https'];
-    if (!_.find(knownProtocols, known => _.startsWith(origin, known + '://'))) {
-      origin = 'http://' + origin;
+  exports.isAbsoluteUrl = (url) => {
+    // Don't match Windows paths `c:\`
+    if (/^[a-zA-Z]:\\/.test(url)) {
+      return false
     }
 
-    let parsedUrl = path ? new URL(path, origin) : new URL(origin);
+    // Scheme: https://tools.ietf.org/html/rfc3986#section-3.1
+    // Absolute URL: https://tools.ietf.org/html/rfc3986#section-4.3
+    return /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url)
+  };
+
+  exports.parseUrl = (url, host) => {
+    if (!host) {
+      host = url;
+      url = null;
+    }
+    const supportedProtocols = ['http', 'https'];
+    if (!_.find(supportedProtocols, known => _.startsWith(host, known + '://'))) {
+      host = 'http://' + host;
+    }
+
+    let parsedUrl = url ? new URL(url, host) : new URL(host);
     let protocol = parsedUrl.protocol.replace(':', '').toUpperCase();
     let params = [];
     parsedUrl.searchParams.forEach((value, name) => params.push({ name, value }));
@@ -538,6 +549,8 @@
   const validators$3 = validators$4;
   const Base$3 = base$1;
 
+  const SOME_RANDOM_HOST = 'somerandomhost28476561927456.com';
+
   class HttpZRequestParser extends Base$3 {
     static parse(...params) {
       let instance = new HttpZRequestParser(...params);
@@ -561,7 +574,7 @@
       this.startRow = startRow;
       this.hostRow = _$6.find(headerRows, row => _$6.chain(row).toLower().startsWith('host:').value());
       this.cookiesRow = _$6.find(headerRows, row => _$6.chain(row).toLower().startsWith('cookie:').value());
-      this.headerRows = _$6.without(headerRows, this.hostRow, this.cookiesRow);
+      this.headerRows = _$6.without(headerRows, this.cookiesRow);
       this.bodyRows = bodyRows;
     }
 
@@ -571,13 +584,10 @@
       let [unused, value] = utils$3.splitByDelimeter(this.hostRow, ':');
       validators$3.validateNotEmptyString(value, 'host header value');
 
-      let res = _$6.attempt(utils$3.parseUrl.bind(null, value));
-      if (_$6.isError(res)) {
-        throw HttpZError$3.get('Invalid host', value)
-      }
-      this.host = decodeURIComponent(res.host);
+      this.host = value;
     }
 
+    // eslint-disable-next-line max-statements
     _parseStartRow() {
       if (!consts$5.regexps.requestStartRow.test(this.startRow)) {
         throw HttpZError$3.get(
@@ -589,11 +599,25 @@
       let rowElems = this.startRow.split(' ');
       this.method = rowElems[0].toUpperCase();
       this.protocolVersion = rowElems[2].toUpperCase();
-      let path = rowElems[1];
+      this.target = rowElems[1];
 
-      let parsedUrl = utils$3.parseUrl(path, this.host);
-      this.protocol = parsedUrl.protocol;
-      this.path = decodeURIComponent(parsedUrl.path);
+      let host;
+      if (utils$3.isAbsoluteUrl(this.target)) {
+        host = null;
+      } else if (this.host) {
+        host = this.host;
+      } else {
+        // SOME_RANDOM_HOST is used here for generating URL only
+        host = SOME_RANDOM_HOST;
+      }
+
+      let parsedUrl = _$6.attempt(utils$3.parseUrl.bind(null, this.target, host));
+      if (_$6.isError(parsedUrl)) {
+        throw HttpZError$3.get('Invalid target or host header', this.target)
+      }
+
+      this.host = parsedUrl.host !== SOME_RANDOM_HOST ? parsedUrl.host : 'unspecified-host';
+      this.path = parsedUrl.path;
       this.queryParams = parsedUrl.params;
     }
 
@@ -631,8 +655,8 @@
     _generateModel() {
       let model = {
         method: this.method,
-        protocol: this.protocol,
         protocolVersion: this.protocolVersion,
+        target: this.target,
         host: this.host,
         path: this.path,
         headersSize: this.headersSize,
@@ -901,12 +925,10 @@
       return instance.build()
     }
 
-    constructor({ method, protocol, protocolVersion, host, path, queryParams = [], headers, cookies, body }) {
+    constructor({ method, protocolVersion, path, queryParams = [], headers, cookies, body }) {
       super({ headers, body });
       this.method = method;
-      this.protocol = protocol;
       this.protocolVersion = protocolVersion;
-      this.host = host;
       this.path = path;
       this.queryParams = queryParams;
       this.cookies = cookies;
@@ -915,7 +937,6 @@
     build() {
       return '' +
         this._generateStartRow() +
-        this._generateHostRow() +
         this._generateHeaderRows() +
         this._generateCookiesRow() +
         consts$1.EOL +
@@ -924,9 +945,7 @@
 
     _generateStartRow() {
       validators$1.validateNotEmptyString(this.method, 'method');
-      validators$1.validateNotEmptyString(this.protocol, 'protocol');
       validators$1.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
-      validators$1.validateNotEmptyString(this.host, 'host');
       validators$1.validateNotEmptyString(this.path, 'path');
 
       return '' +
@@ -936,16 +955,12 @@
         consts$1.EOL
     }
 
-    _generateHostRow() {
-      return 'Host: ' + this.host + consts$1.EOL
-    }
-
     _generateHeaderRows() {
       validators$1.validateArray(this.headers, 'headers');
 
       _$2.remove(this.headers, h => {
         let hName = _$2.toLower(h.name);
-        return hName === 'host' || hName === 'cookie'
+        return hName === 'cookie'
       });
 
       return super._generateHeaderRows()
