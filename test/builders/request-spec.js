@@ -12,8 +12,6 @@ describe('builders / request', () => {
     let requestModel = _.extend({
       method: 'get',
       protocolVersion: 'http/1.1',
-      target: '/',
-      host: 'example.com',
       path: '/'
     }, exRequestModel)
     return new RequestBuilder(requestModel)
@@ -83,12 +81,61 @@ describe('builders / request', () => {
       })
     })
 
-    it('should throw error when target is undefined', () => {
-      let builder = getBuilderInstance({ target: undefined })
+    it('should throw error when path is undefined', () => {
+      let builder = getBuilderInstance({ path: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'target is required'
+        message: 'path is required'
       })
+    })
+
+    it('should build startRow when query params is empty', () => {
+      let builder = getBuilderInstance()
+
+      let expected = 'GET / HTTP/1.1' + HttpZConsts.EOL
+      let actual = builder._generateStartRow()
+      should(actual).eql(expected)
+    })
+
+    it('should build startRow when query params has two simple parameters', () => {
+      let builder = getBuilderInstance({
+        queryParams: [
+          { name: 'p1', value: 'v1' },
+          { name: 'p2>', value: 'v2;' }
+        ]
+      })
+
+      let expected = 'GET /?p1=v1&p2%3E=v2%3B HTTP/1.1' + HttpZConsts.EOL
+      let actual = builder._generateStartRow()
+      should(actual).eql(expected)
+    })
+
+    it('should build startRow when query params contains object parameters', () => {
+      let builder = getBuilderInstance({
+        queryParams: [
+          { name: 'p1[x]', value: 'v1' },
+          { name: 'p1[y]', value: 'v2' },
+          { name: 'p2>', value: 'v3;' }
+        ]
+      })
+
+      let expected = 'GET /?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v3%3B HTTP/1.1' + HttpZConsts.EOL
+      let actual = builder._generateStartRow()
+      should(actual).eql(expected)
+    })
+
+    it('should build startRow when query params contains array parameters', () => {
+      let builder = getBuilderInstance({
+        queryParams: [
+          { name: 'p1[x]', value: 'v1' },
+          { name: 'p1[y]', value: 'v2' },
+          { name: 'p2>', value: 'v3;' }
+        ]
+      })
+
+      let expected = 'GET /?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v3%3B HTTP/1.1' + HttpZConsts.EOL
+      let actual = builder._generateStartRow()
+      should(actual).eql(expected)
     })
   })
 
@@ -213,7 +260,8 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'GET',
         protocolVersion: 'HTTP/1.1',
-        target: '/features?p1=v1%3B&p2=',
+        host: 'example.com',
+        path: '/features',
         queryParams: [
           { name: 'p1', value: 'v1;' },
           { name: 'p2' }
@@ -239,7 +287,8 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'get',
         protocolVersion: 'http/1.1',
-        target: '/features',
+        host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Host',
@@ -284,7 +333,8 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'GET',
         protocolVersion: 'HTTP/1.1',
-        target: 'https://www.example.com/features',
+        host: 'www.example.com',
+        path: '/features',
         headers: [
           {
             name: 'Host',
@@ -320,7 +370,7 @@ describe('builders / request', () => {
       }
 
       let rawRequest = [
-        'GET https://www.example.com/features HTTP/1.1',
+        'GET /features HTTP/1.1',
         'Host: www.example.com',
         'Connection: ',
         'Accept: */*',
@@ -340,7 +390,8 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        target: '/features',
+        host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Host',
@@ -404,7 +455,8 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        target: '/features',
+        host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Host',
@@ -472,7 +524,8 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        target: '/features',
+        host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Host',
@@ -567,7 +620,8 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        target: '/features',
+        host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Host',
@@ -632,7 +686,8 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        target: '/features',
+        host: 'example.com',
+        path: '/features',
         headers: [
           {
             name: 'Host',

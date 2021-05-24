@@ -10,11 +10,12 @@ class HttpZRequestBuilder extends Base {
     return instance.build()
   }
 
-  constructor({ method, protocolVersion, target, headers, cookies, body }) {
+  constructor({ method, protocolVersion, path, queryParams = [], headers, cookies, body }) {
     super({ headers, body })
     this.method = method
     this.protocolVersion = protocolVersion
-    this.target = target
+    this.path = path
+    this.queryParams = queryParams
     this.cookies = cookies
   }
 
@@ -30,11 +31,11 @@ class HttpZRequestBuilder extends Base {
   _generateStartRow() {
     validators.validateNotEmptyString(this.method, 'method')
     validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion')
-    validators.validateNotEmptyString(this.target, 'target')
+    validators.validateNotEmptyString(this.path, 'path')
 
     return '' +
       this.method.toUpperCase() + ' ' +
-      this.target + ' ' +
+      utils.generatePath(this.path, this.queryParams) + ' ' +
       this.protocolVersion.toUpperCase() +
       consts.EOL
   }
