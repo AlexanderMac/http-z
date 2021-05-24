@@ -1,3 +1,7 @@
+## v5.1.1
+#### _May. 24, 2021_
+  * Don't validate host header.
+
 ## v5.1.0
 #### _May. 24, 2021_
   * Export the new `target` field (request target) in request parser.

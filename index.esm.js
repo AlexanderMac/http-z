@@ -587,7 +587,6 @@
       this.host = value;
     }
 
-    // eslint-disable-next-line max-statements
     _parseStartRow() {
       if (!consts$5.regexps.requestStartRow.test(this.startRow)) {
         throw HttpZError$3.get(
@@ -601,22 +600,16 @@
       this.protocolVersion = rowElems[2].toUpperCase();
       this.target = rowElems[1];
 
-      let host;
-      if (utils$3.isAbsoluteUrl(this.target)) {
-        host = null;
-      } else if (this.host) {
-        host = this.host;
-      } else {
-        // SOME_RANDOM_HOST is used here for generating URL only
-        host = SOME_RANDOM_HOST;
-      }
-
+      // SOME_RANDOM_HOST is used here for generating URL only
+      let host = utils$3.isAbsoluteUrl(this.target) ? null : SOME_RANDOM_HOST;
       let parsedUrl = _$6.attempt(utils$3.parseUrl.bind(null, this.target, host));
       if (_$6.isError(parsedUrl)) {
-        throw HttpZError$3.get('Invalid target or host header', this.target)
+        throw HttpZError$3.get('Invalid target', this.target)
       }
 
-      this.host = parsedUrl.host !== SOME_RANDOM_HOST ? parsedUrl.host : 'unspecified-host';
+      if (!this.host) {
+        this.host = parsedUrl.host !== SOME_RANDOM_HOST ? parsedUrl.host : 'unspecified-host';
+      }
       this.path = parsedUrl.path;
       this.queryParams = parsedUrl.params;
     }
