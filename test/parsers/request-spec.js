@@ -97,7 +97,7 @@ describe('parsers / request', () => {
 
       should(parser.startRow).eql('start-line')
       should(parser.hostRow).eql('host: somehost')
-      should(parser.headerRows).eql(['host: somehost', 'header1', 'header2', 'header3'])
+      should(parser.headerRows).eql(['host: somehost', 'header1', 'header2', 'header3', 'cookie: somecookies'])
       should(parser.cookiesRow).eql('cookie: somecookies')
       should(parser.bodyRows).eql('')
     })
@@ -540,6 +540,10 @@ describe('parsers / request', () => {
           {
             name: 'Accept-Language',
             value: 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
+          },
+          {
+            name: 'Cookie',
+            value: 'csrftoken=123abc;sessionid=sd=456def%3B;userid='
           }
         ],
         cookies: [

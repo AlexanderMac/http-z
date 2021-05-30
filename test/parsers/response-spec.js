@@ -91,7 +91,7 @@ describe('parsers / response', () => {
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
-      should(parser.headerRows).eql(['header1', 'header2', 'header3'])
+      should(parser.headerRows).eql(['header1', 'header2', 'header3', 'set-cookie', 'set-cookie'])
       should(parser.cookieRows).eql(['set-cookie', 'set-cookie'])
       should(parser.bodyRows).eql('')
     })
@@ -346,6 +346,18 @@ describe('parsers / response', () => {
           {
             name: 'Content-Encoding',
             value: 'gzip,deflate'
+          },
+          {
+            name: 'Set-Cookie',
+            value: 'csrftoken=123abc'
+          },
+          {
+            name: 'Set-Cookie',
+            value: 'sessionid=456def; Domain=example.com; Path=/'
+          },
+          {
+            name: 'Set-Cookie',
+            value: 'username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
           }
         ],
         cookies: [

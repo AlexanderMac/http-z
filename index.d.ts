@@ -12,7 +12,7 @@ export class consts {
   }
 }
 
-declare namespace utils {
+export namespace utils {
   function splitByDelimeter(str: string, delimiter: string): any;
   function isAbsoluteUrl(url: string): boolean;
   function parseUrl(path?: string, origin?: string): any;
@@ -75,6 +75,22 @@ declare class HttpZResponseModel {
   bodySize: number;
 }
 
+declare class HttpZRequestBuilderModel {
+  method: string;
+  protocolVersion: string;
+  target: string;
+  headers?: HttpZHeader[];
+  body: HttpZBody;
+}
+
+declare class HttpZResponseBuilderModel {
+  protocolVersion: string;
+  statusCode: number;
+  statusMessage?: string;
+  headers?: HttpZHeader[];
+  body: HttpZBody;
+}
+
 export function parse(rawMessage: string): HttpZRequestModel | HttpZResponseModel;
 
-export function build(messageModel: HttpZRequestModel | HttpZResponseModel): string;
+export function build(messageModel: HttpZRequestBuilderModel | HttpZResponseBuilderModel): string;

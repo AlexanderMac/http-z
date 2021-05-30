@@ -4,7 +4,6 @@ const should = require('should')
 const nassert = require('n-assert')
 const HttpZConsts = require('../../src/consts')
 const HttpZError = require('../../src/error')
-const BaseBuilder = require('../../src/builders/base')
 const ResponseBuilder = require('../../src/builders/response')
 
 describe('builders / response', () => {
@@ -44,13 +43,11 @@ describe('builders / response', () => {
       let builder = getBuilderInstance()
       sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
-      sinon.stub(builder, '_generateCookieRows').returns('cookieRows' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
 
       let expected = [
         'startRow',
         'headerRows',
-        'cookieRows',
         '',
         'bodyRows'
       ].join(HttpZConsts.EOL)
@@ -59,7 +56,6 @@ describe('builders / response', () => {
 
       nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
-      nassert.assertFn({ inst: builder, fnName: '_generateCookieRows', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' })
     })
   })
@@ -94,140 +90,6 @@ describe('builders / response', () => {
 
       let expected = 'HTTP/1.1 200 Ok' + HttpZConsts.EOL
       let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-  })
-
-  describe('_generateHeaderRows', () => {
-    beforeEach(() => {
-      sinon.stub(BaseBuilder.prototype, '_generateHeaderRows')
-    })
-
-    afterEach(() => {
-      BaseBuilder.prototype._generateHeaderRows.restore()
-    })
-
-    it('should throw error when instance.headers is not array', () => {
-      let builder = new ResponseBuilder({ headers: 'incorrect headers' })
-
-      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, {
-        message: 'headers must be an array'
-      })
-
-      nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows' })
-    })
-
-    it('should remove set-cookie headers and call parent method', () => {
-      let builder = new ResponseBuilder({
-        headers: [
-          {
-            name: 'set-cookie',
-            value: 'some cookie1'
-          },
-          {
-            name: 'connection',
-            value: ''
-          },
-          {
-            name: 'accept',
-            value: '*/*'
-          },
-          {
-            name: 'set-cookie',
-            value: 'some cookie2'
-          }
-        ]
-      })
-      let expected = 'ok'
-      let expectedHeaders = [
-        {
-          name: 'connection',
-          value: ''
-        },
-        {
-          name: 'accept',
-          value: '*/*'
-        }
-      ]
-
-      BaseBuilder.prototype._generateHeaderRows.returns('ok')
-
-      let actual = builder._generateHeaderRows()
-      should(actual).eql(expected)
-      should(builder.headers).eql(expectedHeaders)
-
-      nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
-    })
-  })
-
-  describe('_generateCookieRows', () => {
-    function getDefaultCookes() {
-      return [
-        { name: 'csrftoken', value: '123abc' },
-        { name: 'sessionid', params: ['Domain=example.com', 'Path=/'] },
-        { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
-      ]
-    }
-
-    it('should throw error when instance.cookies is not array', () => {
-      let builder = getBuilderInstance({ cookies: 'wrong cookies' })
-
-      should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
-        message: 'cookies must be an array'
-      })
-    })
-
-    it('should throw error when instance.cookies contains element with undefined name', () => {
-      let builder = getBuilderInstance({
-        cookies: getDefaultCookes()
-      })
-      builder.cookies[1].name = undefined
-
-      should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
-        message: 'cookie name is required',
-        details: 'cookie index: 1'
-      })
-    })
-
-    it('should throw error when instance.cookies contains element with non array params', () => {
-      let builder = getBuilderInstance({
-        cookies: getDefaultCookes()
-      })
-      builder.cookies[1].params = 'wrong params'
-
-      should(builder._generateCookieRows.bind(builder)).throw(HttpZError, {
-        message: 'cookie params must be an array',
-        details: 'cookie index: 1'
-      })
-    })
-
-    it('should return empty string when instance.cookies is undefined', () => {
-      let builder = getBuilderInstance({ cookies: undefined })
-
-      let expected = ''
-      let actual = builder._generateCookieRows()
-      should(actual).eql(expected)
-    })
-
-    it('should return empty string when instance.cookies is empty array', () => {
-      let builder = getBuilderInstance({ cookies: [] })
-
-      let expected = ''
-      let actual = builder._generateCookieRows()
-      should(actual).eql(expected)
-    })
-
-    it('should build cookie rows when instance.cookies are valid', () => {
-      let builder = getBuilderInstance({
-        cookies: getDefaultCookes()
-      })
-
-      let expected = [
-        'Set-Cookie: csrftoken=123abc',
-        'Set-Cookie: sessionid=; Domain=example.com; Path=/',
-        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
-      ].join(HttpZConsts.EOL) + HttpZConsts.EOL
-      let actual = builder._generateCookieRows()
       should(actual).eql(expected)
     })
   })
@@ -294,13 +156,15 @@ describe('builders / response', () => {
           {
             name: 'Content-Encoding',
             value: 'gzip, deflate'
+          },
+          {
+            name: 'Set-Cookie',
+            value: 'csrftoken=123abc'
+          },
+          {
+            name: 'Set-Cookie',
+            value: 'sessionid=456def; Domain=example.com; Path=/'
           }
-        ],
-        cookies: [
-          { name: 'csrftoken', value: '123abc' },
-          { name: 'sessionid', value: '456def', params: ['Domain=example.com', 'Path=/'] },
-          { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] },
-          { name: 'date' }
         ]
       }
 
@@ -312,8 +176,6 @@ describe('builders / response', () => {
         'Content-Encoding: gzip, deflate',
         'Set-Cookie: csrftoken=123abc',
         'Set-Cookie: sessionid=456def; Domain=example.com; Path=/',
-        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
-        'Set-Cookie: date=',
         '',
         ''
       ].join(HttpZConsts.EOL)

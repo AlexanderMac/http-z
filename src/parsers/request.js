@@ -5,7 +5,7 @@ const utils = require('../utils')
 const validators = require('../validators')
 const Base = require('./base')
 
-const SOME_RANDOM_HOST = 'somerandomhost28476561927456.com'
+const SUPER_RANDOM_HOST = 'superrandomhost28476561927456.com'
 
 class HttpZRequestParser extends Base {
   static parse(...params) {
@@ -29,8 +29,8 @@ class HttpZRequestParser extends Base {
 
     this.startRow = startRow
     this.hostRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('host:').value())
+    this.headerRows = headerRows
     this.cookiesRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('cookie:').value())
-    this.headerRows = _.without(headerRows, this.cookiesRow)
     this.bodyRows = bodyRows
   }
 
@@ -56,15 +56,13 @@ class HttpZRequestParser extends Base {
     this.protocolVersion = rowElems[2].toUpperCase()
     this.target = rowElems[1]
 
-    // SOME_RANDOM_HOST is used here for generating URL only
-    let host = utils.isAbsoluteUrl(this.target) ? null : SOME_RANDOM_HOST
-    let parsedUrl = _.attempt(utils.parseUrl.bind(null, this.target, host))
+    let parsedUrl = _.attempt(utils.parseUrl.bind(null, this.target, SUPER_RANDOM_HOST))
     if (_.isError(parsedUrl)) {
       throw HttpZError.get('Invalid target', this.target)
     }
 
     if (!this.host) {
-      this.host = parsedUrl.host !== SOME_RANDOM_HOST ? parsedUrl.host : 'unspecified-host'
+      this.host = parsedUrl.host !== SUPER_RANDOM_HOST ? parsedUrl.host : 'unspecified-host'
     }
     this.path = parsedUrl.path
     this.queryParams = parsedUrl.params

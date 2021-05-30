@@ -1,6 +1,4 @@
-const _ = require('lodash')
 const consts = require('../consts')
-const utils = require('../utils')
 const validators = require('../validators')
 const Base = require('./base')
 
@@ -10,20 +8,17 @@ class HttpZRequestBuilder extends Base {
     return instance.build()
   }
 
-  constructor({ method, protocolVersion, path, queryParams = [], headers, cookies, body }) {
+  constructor({ method, protocolVersion, target, headers, body }) {
     super({ headers, body })
     this.method = method
     this.protocolVersion = protocolVersion
-    this.path = path
-    this.queryParams = queryParams
-    this.cookies = cookies
+    this.target = target
   }
 
   build() {
     return '' +
       this._generateStartRow() +
       this._generateHeaderRows() +
-      this._generateCookiesRow() +
       consts.EOL +
       this._generateBodyRows()
   }
@@ -31,39 +26,13 @@ class HttpZRequestBuilder extends Base {
   _generateStartRow() {
     validators.validateNotEmptyString(this.method, 'method')
     validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion')
-    validators.validateNotEmptyString(this.path, 'path')
+    validators.validateNotEmptyString(this.target, 'target')
 
     return '' +
       this.method.toUpperCase() + ' ' +
-      utils.generatePath(this.path, this.queryParams) + ' ' +
+      this.target + ' ' +
       this.protocolVersion.toUpperCase() +
       consts.EOL
-  }
-
-  _generateHeaderRows() {
-    validators.validateArray(this.headers, 'headers')
-
-    _.remove(this.headers, h => {
-      let hName = _.toLower(h.name)
-      return hName === 'cookie'
-    })
-
-    return super._generateHeaderRows()
-  }
-
-  _generateCookiesRow() {
-    if (_.isEmpty(this.cookies)) {
-      return ''
-    }
-
-    validators.validateArray(this.cookies, 'cookies')
-
-    let cookiesStr = _.map(this.cookies, ({ name, value }, index) => {
-      validators.validateNotEmptyString(name, 'cookie name', `cookie index: ${index}`)
-      return name + '=' + (value || '')
-    })
-
-    return 'Cookie: ' + cookiesStr.join('; ') + consts.EOL
   }
 }
 

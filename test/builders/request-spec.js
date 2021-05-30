@@ -4,7 +4,6 @@ const should = require('should')
 const nassert = require('n-assert')
 const HttpZConsts = require('../../src/consts')
 const HttpZError = require('../../src/error')
-const BaseBuilder = require('../../src/builders/base')
 const RequestBuilder = require('../../src/builders/request')
 
 describe('builders / request', () => {
@@ -12,7 +11,7 @@ describe('builders / request', () => {
     let requestModel = _.extend({
       method: 'get',
       protocolVersion: 'http/1.1',
-      path: '/'
+      target: '/'
     }, exRequestModel)
     return new RequestBuilder(requestModel)
   }
@@ -44,13 +43,11 @@ describe('builders / request', () => {
       let builder = getBuilderInstance()
       sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
-      sinon.stub(builder, '_generateCookiesRow').returns('cookieRow' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
 
       let expected = [
         'startRow',
         'headerRows',
-        'cookieRow',
         '',
         'bodyRows'
       ].join(HttpZConsts.EOL)
@@ -59,7 +56,6 @@ describe('builders / request', () => {
 
       nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
-      nassert.assertFn({ inst: builder, fnName: '_generateCookiesRow', expectedArgs: '_without-args_' })
       nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' })
     })
   })
@@ -81,176 +77,19 @@ describe('builders / request', () => {
       })
     })
 
-    it('should throw error when path is undefined', () => {
-      let builder = getBuilderInstance({ path: undefined })
+    it('should throw error when target is undefined', () => {
+      let builder = getBuilderInstance({ target: undefined })
 
       should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'path is required'
+        message: 'target is required'
       })
     })
 
-    it('should build startRow when query params is empty', () => {
+    it('should build startRow when all params are valid', () => {
       let builder = getBuilderInstance()
 
       let expected = 'GET / HTTP/1.1' + HttpZConsts.EOL
       let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-
-    it('should build startRow when query params has two simple parameters', () => {
-      let builder = getBuilderInstance({
-        queryParams: [
-          { name: 'p1', value: 'v1' },
-          { name: 'p2>', value: 'v2;' }
-        ]
-      })
-
-      let expected = 'GET /?p1=v1&p2%3E=v2%3B HTTP/1.1' + HttpZConsts.EOL
-      let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-
-    it('should build startRow when query params contains object parameters', () => {
-      let builder = getBuilderInstance({
-        queryParams: [
-          { name: 'p1[x]', value: 'v1' },
-          { name: 'p1[y]', value: 'v2' },
-          { name: 'p2>', value: 'v3;' }
-        ]
-      })
-
-      let expected = 'GET /?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v3%3B HTTP/1.1' + HttpZConsts.EOL
-      let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-
-    it('should build startRow when query params contains array parameters', () => {
-      let builder = getBuilderInstance({
-        queryParams: [
-          { name: 'p1[x]', value: 'v1' },
-          { name: 'p1[y]', value: 'v2' },
-          { name: 'p2>', value: 'v3;' }
-        ]
-      })
-
-      let expected = 'GET /?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v3%3B HTTP/1.1' + HttpZConsts.EOL
-      let actual = builder._generateStartRow()
-      should(actual).eql(expected)
-    })
-  })
-
-  describe('_generateHeaderRows', () => {
-    beforeEach(() => {
-      sinon.stub(BaseBuilder.prototype, '_generateHeaderRows')
-    })
-
-    afterEach(() => {
-      BaseBuilder.prototype._generateHeaderRows.restore()
-    })
-
-    it('should throw error when instance.headers is not array', () => {
-      let builder = new RequestBuilder({ headers: 'incorrect headers' })
-
-      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, {
-        message: 'headers must be an array'
-      })
-
-      nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows' })
-    })
-
-    it('should remove cookie headers and call parent method', () => {
-      let builder = new RequestBuilder({
-        headers: [
-          {
-            name: 'host',
-            value: 'some host'
-          },
-          {
-            name: 'cookie',
-            value: 'some cookie1'
-          },
-          {
-            name: 'connection',
-            value: ''
-          },
-          {
-            name: 'accept',
-            value: '*/*'
-          },
-          {
-            name: 'cookie',
-            value: 'some cookie2'
-          }
-        ]
-      })
-      let expected = 'ok'
-      let expectedHeaders = [
-        {
-          name: 'host',
-          value: 'some host'
-        },
-        {
-          name: 'connection',
-          value: ''
-        },
-        {
-          name: 'accept',
-          value: '*/*'
-        }
-      ]
-
-      BaseBuilder.prototype._generateHeaderRows.returns('ok')
-
-      let actual = builder._generateHeaderRows()
-      should(actual).eql(expected)
-      should(builder.headers).eql(expectedHeaders)
-
-      nassert.assertFn({ inst: BaseBuilder.prototype, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
-    })
-  })
-
-  describe('_generateCookiesRow', () => {
-    it('should return empty string when instance.cookies is undefined', () => {
-      let builder = getBuilderInstance({ cookies: undefined })
-
-      let expected = ''
-      let actual = builder._generateCookiesRow()
-      should(actual).eql(expected)
-    })
-
-    it('should throw error when instance.cookies is not array', () => {
-      let builder = getBuilderInstance({ cookies: 'incorrect cookies' })
-
-      should(builder._generateCookiesRow.bind(builder)).throw(HttpZError, {
-        message: 'cookies must be an array'
-      })
-    })
-
-    it('should throw error when instance.cookies contains element with undefined name', () => {
-      let builder = getBuilderInstance({
-        cookies: [
-          { name: 'c1', value: 'v1' },
-          { value: 'v2' }
-        ]
-      })
-
-      should(builder._generateCookiesRow.bind(builder)).throw(HttpZError, {
-        message: 'cookie name is required',
-        details: 'cookie index: 1'
-      })
-    })
-
-    it('should build cookies row when all params are valid', () => {
-      let builder = getBuilderInstance({
-        cookies: [
-          { name: 'c1', value: 'v1' },
-          { name: 'c2', value: 'v2' },
-          { name: 'c3' }
-        ]
-      })
-
-      let expected = 'Cookie: c1=v1; c2=v2; c3=' + HttpZConsts.EOL
-      let actual = builder._generateCookiesRow()
       should(actual).eql(expected)
     })
   })
@@ -260,12 +99,7 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'GET',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
-        queryParams: [
-          { name: 'p1', value: 'v1;' },
-          { name: 'p2' }
-        ],
+        target: '/features?p1=v1%3B&p2=',
         headers: [
           { name: 'Host', value: 'example.com' }
         ]
@@ -287,8 +121,7 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'get',
         protocolVersion: 'http/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
           {
             name: 'Host',
@@ -333,8 +166,7 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'GET',
         protocolVersion: 'HTTP/1.1',
-        host: 'www.example.com',
-        path: '/features',
+        target: '/features',
         headers: [
           {
             name: 'Host',
@@ -356,16 +188,10 @@ describe('builders / request', () => {
             name: 'Accept-Language',
             value: 'ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4'
           },
-          // it will be dropped
           {
             name: 'Cookie',
-            value: 'firstName=John; lastName=Smith'
+            value: 'csrftoken=123abc; sessionid=456def%3B; username='
           }
-        ],
-        cookies: [
-          { name: 'csrftoken', value: '123abc' },
-          { name: 'sessionid', value: '456def%3B' },
-          { name: 'username' }
         ]
       }
 
@@ -390,8 +216,7 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
           {
             name: 'Host',
@@ -455,8 +280,7 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
           {
             name: 'Host',
@@ -524,8 +348,7 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
           {
             name: 'Host',
@@ -620,8 +443,7 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
           {
             name: 'Host',
@@ -686,8 +508,7 @@ describe('builders / request', () => {
       let requestModel = {
         method: 'POST',
         protocolVersion: 'HTTP/1.1',
-        host: 'example.com',
-        path: '/features',
+        target: '/features',
         headers: [
           {
             name: 'Host',
