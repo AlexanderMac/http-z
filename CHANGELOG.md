@@ -1,3 +1,9 @@
+## v6.0.0
+#### _May. 30, 2021_
+  * **BREAKING:** Request builder accepts `target` instead of `path` and `queryParameters` parameters.
+  * **BREAKING:** Request/Response builders don't accept `cookies` parameter anymore (cookies must be presented in `headers` array as the regular headers).
+  * **BREAKING:** Request/Response parsers don't remove `Cookie`/`Set-Cookie` headers from `headers` array anymore.
+
 ## v5.1.1
 #### _May. 24, 2021_
   * Don't validate host header.
