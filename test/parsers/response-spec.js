@@ -152,21 +152,11 @@ describe('parsers / response', () => {
     function getDefaultCookies() {
       return [
         'Set-Cookie: csrftoken=123abc',
+        'Set-Cookie: ',
         'Set-Cookie: sessionid=; Domain=example.com; Path=/',
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
       ]
     }
-
-    it('should throw error when some of cookieRows has invalid format (empty values)', () => {
-      let parser = getParserInstance()
-      parser.cookieRows = getDefaultCookies()
-      parser.cookieRows[1] = 'Set-cookie:    '
-
-      should(parser._parseCookieRows.bind(parser)).throw(HttpZError, {
-        message: 'Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;...',
-        details: 'Set-cookie:    '
-      })
-    })
 
     it('should throw error when some of cookieRows has invalid format (empty cookie name)', () => {
       let parser = getParserInstance()
@@ -193,6 +183,7 @@ describe('parsers / response', () => {
       parser.cookieRows = getDefaultCookies()
       let expected = [
         { name: 'csrftoken', value: '123abc' },
+        {},
         { name: 'sessionid', params: ['Domain=example.com', 'Path=/'] },
         { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
       ]

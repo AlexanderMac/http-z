@@ -53,7 +53,7 @@ class HttpZResponseParser extends Base {
       // eslint-disable-next-line no-unused-vars
       let [unused, values] = utils.splitByDelimeter(cookiesRow, ':')
       if (!values) {
-        throw HttpZError.get('Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;...', cookiesRow)
+        return {}
       }
       let params = _.split(values, ';')
       let paramWithName = _.head(params)
