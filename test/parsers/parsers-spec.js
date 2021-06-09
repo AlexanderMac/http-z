@@ -51,14 +51,17 @@ describe('parsers / index', () => {
       ''
     ].join(HttpZConsts.EOL)
     let expected = 'parsed-request'
-    let expectedArgs = rawMessage
+    let expectedMultipleArgs = [
+      rawMessage,
+      {}
+    ]
 
     RequestParser.parse.returns('parsed-request')
 
     let actual = parser(rawMessage)
     should(actual).eql(expected)
 
-    nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedArgs })
+    nassert.assertFn({ inst: RequestParser, fnName: 'parse', expectedMultipleArgs })
     nassert.assertFn({ inst: ResponseParser, fnName: 'parse' })
   })
 

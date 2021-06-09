@@ -69,15 +69,17 @@ Accept-Language: en-US;q=0.6, en;q=0.4
 
 ### API
 
-##### parse(rawMessage)
+##### parse(rawMessage, opts)
 Parses HTTP request/response raw message and returns a model.
 
 - `rawMessage` is HTTP raw message.
+- `opts` - options object, can be skipped.
 
-##### build(messageModel)
+##### build(messageModel, opts)
 Builds HTTP request/response raw message from the model.
 
 - `messageModel` is HTTP message model.
+- `opts` - options object, can be skipped.
 
 ### References
 - [RFC 7230: Hypertext Transfer Protocol (HTTP/1.1)](https://tools.ietf.org/html/rfc7230)

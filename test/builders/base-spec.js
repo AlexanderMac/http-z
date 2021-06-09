@@ -7,8 +7,8 @@ const HttpZError = require('../../src/error')
 const BaseBuilder = require('../../src/builders/base')
 
 describe('builders / base', () => {
-  function getBuilderInstance(params) {
-    return new BaseBuilder(params)
+  function getBuilderInstance(...params) {
+    return new BaseBuilder(...params)
   }
 
   describe('_generateHeaderRows', () => {

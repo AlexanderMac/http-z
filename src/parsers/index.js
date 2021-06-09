@@ -4,7 +4,7 @@ const HttpZError = require('../error')
 const RequestParser = require('./request')
 const ResponseParser = require('./response')
 
-module.exports = (rawMessage) => {
+module.exports = (rawMessage, opts = {}) => {
   if (_.isNil(rawMessage)) {
     throw HttpZError.get('rawMessage is required')
   }
@@ -14,7 +14,7 @@ module.exports = (rawMessage) => {
 
   let firstRow = _.chain(rawMessage).split(consts.EOL).head().value()
   if (consts.regexps.requestStartRow.test(firstRow)) {
-    return RequestParser.parse(rawMessage)
+    return RequestParser.parse(rawMessage, opts)
   }
   if (consts.regexps.responseStartRow.test(firstRow)) {
     return ResponseParser.parse(rawMessage)

@@ -7,13 +7,13 @@ const HttpZError = require('../../src/error')
 const RequestBuilder = require('../../src/builders/request')
 
 describe('builders / request', () => {
-  function getBuilderInstance(exRequestModel) {
+  function getBuilderInstance(exRequestModel, opts = {}) {
     let requestModel = _.extend({
       method: 'get',
       protocolVersion: 'http/1.1',
       target: '/'
     }, exRequestModel)
-    return new RequestBuilder(requestModel)
+    return new RequestBuilder(requestModel, opts)
   }
 
   describe('static build', () => {
@@ -90,6 +90,44 @@ describe('builders / request', () => {
 
       let expected = 'GET / HTTP/1.1' + HttpZConsts.EOL
       let actual = builder._generateStartRow()
+      should(actual).eql(expected)
+    })
+  })
+
+  describe('_generateHeaderRows', () => {
+    it('should throw error when opts.mandatoryHost is true and host header is missing', () => {
+      let builder = getBuilderInstance(
+        { headers: [{ name: 'Some-Header', value: 'SomeValue' }] },
+        { mandatoryHost: true }
+      )
+
+      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, {
+        message: 'Host header is required'
+      })
+    })
+
+    it('should build headerRows when opts.mandatoryHost is false and host header is missing', () => {
+      let builder = getBuilderInstance(
+        { headers: [{ name: 'Some-Header', value: 'SomeValue' }] },
+        { mandatoryHost: false }
+      )
+
+      let expected = 'Some-Header: SomeValue' + HttpZConsts.EOL
+      let actual = builder._generateHeaderRows()
+      should(actual).eql(expected)
+    })
+
+    it('should build headerRows when opts.mandatoryHost is true and host header is present', () => {
+      let builder = getBuilderInstance(
+        { headers: [
+          { name: 'Host', value: 'SomeHost' },
+          { name: 'Some-Header', value: 'SomeValue' }
+        ] },
+        { mandatoryHost: false }
+      )
+
+      let expected = 'Host: SomeHost' + HttpZConsts.EOL + 'Some-Header: SomeValue' + HttpZConsts.EOL
+      let actual = builder._generateHeaderRows()
       should(actual).eql(expected)
     })
   })

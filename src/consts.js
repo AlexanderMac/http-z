@@ -101,6 +101,7 @@ http.contentTypes = {
 }
 
 http.headers = {
+  host: 'host',
   contentType: 'Content-Type',
   contentLength: 'Content-Length',
   userAgent: 'User-Agent',

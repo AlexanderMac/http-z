@@ -50,14 +50,14 @@ describe('builders / index', () => {
       method: 'GET'
     }
     let expected = 'built-request'
-    let expectedArgs = messageModel
+    let expectedMultipleArgs = [messageModel, {}]
 
     RequestBuilder.build.returns('built-request')
 
     let actual = builder(messageModel)
     should(actual).eql(expected)
 
-    nassert.assertFn({ inst: RequestBuilder, fnName: 'build', expectedArgs })
+    nassert.assertFn({ inst: RequestBuilder, fnName: 'build', expectedMultipleArgs })
     nassert.assertFn({ inst: ResponseBuilder, fnName: 'build' })
   })
 

@@ -91,6 +91,10 @@ declare class HttpZResponseBuilderModel {
   body: HttpZBody;
 }
 
-export function parse(rawMessage: string): HttpZRequestModel | HttpZResponseModel;
+declare class HttpZOptions {
+  mandatoryHost: boolean;
+}
 
-export function build(messageModel: HttpZRequestBuilderModel | HttpZResponseBuilderModel): string;
+export function parse(rawMessage: string, opts?: HttpZOptions): HttpZRequestModel | HttpZResponseModel;
+
+export function build(messageModel: HttpZRequestBuilderModel | HttpZResponseBuilderModel, opts?: HttpZOptions): string;

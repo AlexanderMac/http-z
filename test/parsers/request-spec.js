@@ -7,8 +7,8 @@ const HttpZError = require('../../src/error')
 const RequestParser = require('../../src/parsers/request')
 
 describe('parsers / request', () => {
-  function getParserInstance(...params) {
-    return new RequestParser(...params)
+  function getParserInstance(rawMessage, opts = {}) {
+    return new RequestParser(rawMessage, opts)
   }
 
   describe('static parse', () => {
@@ -35,7 +35,7 @@ describe('parsers / request', () => {
 
   describe('parse', () => {
     it('should call related methods and return request model', () => {
-      let parser = getParserInstance('rawRequest', 'EOL')
+      let parser = getParserInstance('rawRequest')
       sinon.stub(parser, '_parseMessageForRows')
       sinon.stub(parser, '_parseHostRow')
       sinon.stub(parser, '_parseStartRow')
@@ -125,34 +125,37 @@ describe('parsers / request', () => {
   })
 
   describe('_parseHostRow', () => {
-    it('should throw error when hostRow is nil', () => {
+    it('should throw error when opts.mandatoryHost is true and hostRow is nil or empty', () => {
       const ERR = {
         message: 'host header is required'
       }
-      let parser = getParserInstance()
+      let parser = getParserInstance('HTTP Request Message', { mandatoryHost: true })
 
       parser.hostRow = undefined
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, ERR)
       parser.hostRow = null
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, ERR)
-    })
-
-    it('should throw error when hostRow is empty string', () => {
-      let parser = getParserInstance()
       parser.hostRow = ''
-
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'host header must be not empty string'
       })
-    })
-
-    it('should throw error when host header value is empty string', () => {
-      let parser = getParserInstance()
-      parser.hostRow = 'Host:  '
-
+      parser.hostRow = 'Host: '
       should(parser._parseHostRow.bind(parser)).throw(HttpZError, {
         message: 'host header value must be not empty string'
       })
+    })
+
+    it('should not throw error when opts.mandatoryHost is false and hostRow is nil or empty', () => {
+      let parser = getParserInstance('HTTP Request Message', { mandatoryHost: false })
+
+      parser.hostRow = undefined
+      parser._parseHostRow()
+      parser.hostRow = null
+      parser._parseHostRow()
+      parser.hostRow = ''
+      parser._parseHostRow()
+      parser.hostRow = 'Host: '
+      parser._parseHostRow()
     })
 
     it('should set instance.host when host header value is present', () => {

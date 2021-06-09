@@ -13,6 +13,11 @@ class HttpZRequestParser extends Base {
     return instance.parse()
   }
 
+  constructor(rawMessage, opts) {
+    super(rawMessage)
+    this.opts = opts
+  }
+
   parse() {
     this._parseMessageForRows()
     this._parseHostRow()
@@ -35,10 +40,14 @@ class HttpZRequestParser extends Base {
   }
 
   _parseHostRow() {
-    validators.validateNotEmptyString(this.hostRow, 'host header')
+    if (this.opts.mandatoryHost) {
+      validators.validateNotEmptyString(this.hostRow, 'host header')
+    }
     // eslint-disable-next-line no-unused-vars
-    let [unused, value] = utils.splitByDelimeter(this.hostRow, ':')
-    validators.validateNotEmptyString(value, 'host header value')
+    let [unused, value] = utils.splitByDelimeter(this.hostRow || '', ':')
+    if (this.opts.mandatoryHost) {
+      validators.validateNotEmptyString(value, 'host header value')
+    }
 
     this.host = value
   }
