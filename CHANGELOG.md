@@ -1,3 +1,7 @@
+## v6.1.0
+#### _Jun. 9, 2021_
+  * Add options to request parser/builder, if `mandatoryHost` is true, host header is validated.
+
 ## v6.0.0
 #### _May. 30, 2021_
   * **BREAKING:** Request builder accepts `target` instead of `path` and `queryParameters` parameters.
