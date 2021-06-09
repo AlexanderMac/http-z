@@ -737,7 +737,7 @@
         // eslint-disable-next-line no-unused-vars
         let [unused, values] = utils$2.splitByDelimeter(cookiesRow, ':');
         if (!values) {
-          throw HttpZError$3.get('Incorrect set-cookie row format, expected: Set-Cookie: Name1=Value1;...', cookiesRow)
+          return {}
         }
         let params = _$4.split(values, ';');
         let paramWithName = _$4.head(params);

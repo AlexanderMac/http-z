@@ -1,3 +1,7 @@
+## v6.1.1
+#### _Jun. 9, 2021_
+  * Allow empty Set-Cookie header.
+
 ## v6.1.0
 #### _Jun. 9, 2021_
   * Add options to request parser/builder, if `mandatoryHost` is true, host header is validated.
