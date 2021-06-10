@@ -56,7 +56,7 @@ class HttpZBaseParser {
     this.body = {}
     let contentTypeHeader = this._getContentTypeValue()
     if (contentTypeHeader) {
-      this.body.contentType = contentTypeHeader.split(';')[0]
+      this.body.contentType = contentTypeHeader.toLowerCase().split(';')[0]
     }
     switch (this.body.contentType) {
       case consts.http.contentTypes.multipart.formData:
@@ -109,7 +109,7 @@ class HttpZBaseParser {
     if (!contentTypeHeader.value) {
       return
     }
-    return contentTypeHeader.value.toLowerCase()
+    return contentTypeHeader.value
   }
 
   _getBoundary() {

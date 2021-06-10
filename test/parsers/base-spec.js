@@ -366,7 +366,7 @@ describe('parsers / base', () => {
         },
         {
           name: 'Content-Type',
-          value: 'Application/json'
+          value: 'application/json'
         }
       ]
     }
