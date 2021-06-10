@@ -1,3 +1,7 @@
+## v6.1.2
+#### _Jun. 10, 2021_
+  * Fix bug in form params parser.
+
 ## v6.1.1
 #### _Jun. 9, 2021_
   * Allow empty Set-Cookie header.
