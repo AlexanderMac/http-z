@@ -20,17 +20,20 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Install Dependencies
-        run: npm install && npm install -g codecov
+        run: pnpm install && pnpm install -g codecov
 
       - name: Lint codebase
-        run: npm run lint
+        run: pnpm lint
 
       - name: Test codebase
-        run: npm test
+        run: pnpm test
 
       - name: Code coverage
-        run: npm run coverage-gh
+        run: pnpm coverage-gh
       
       - name: Upload coverage reports
         uses: codecov/codecov-action@v1

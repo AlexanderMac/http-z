@@ -11,7 +11,7 @@ HTTP message (request/response) parser/builder according to the rules defined in
 ### Install
 
 ```bash
-$ npm i http-z
+$ pnpm i http-z
 ```
 
 ### Usage
