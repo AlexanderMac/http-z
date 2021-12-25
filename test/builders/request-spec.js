@@ -8,11 +8,14 @@ const RequestBuilder = require('../../src/builders/request')
 
 describe('builders / request', () => {
   function getBuilderInstance(exRequestModel, opts = {}) {
-    let requestModel = _.extend({
-      method: 'get',
-      protocolVersion: 'http/1.1',
-      target: '/'
-    }, exRequestModel)
+    let requestModel = _.extend(
+      {
+        method: 'get',
+        protocolVersion: 'http/1.1',
+        target: '/'
+      },
+      exRequestModel
+    )
     return new RequestBuilder(requestModel, opts)
   }
 
@@ -45,12 +48,7 @@ describe('builders / request', () => {
       sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
 
-      let expected = [
-        'startRow',
-        'headerRows',
-        '',
-        'bodyRows'
-      ].join(HttpZConsts.EOL)
+      let expected = ['startRow', 'headerRows', '', 'bodyRows'].join(HttpZConsts.EOL)
       let actual = builder.build()
       should(actual).eql(expected)
 
@@ -119,10 +117,12 @@ describe('builders / request', () => {
 
     it('should build headerRows when opts.mandatoryHost is true and host header is present', () => {
       let builder = getBuilderInstance(
-        { headers: [
-          { name: 'Host', value: 'SomeHost' },
-          { name: 'Some-Header', value: 'SomeValue' }
-        ] },
+        {
+          headers: [
+            { name: 'Host', value: 'SomeHost' },
+            { name: 'Some-Header', value: 'SomeValue' }
+          ]
+        },
         { mandatoryHost: false }
       )
 
@@ -138,17 +138,10 @@ describe('builders / request', () => {
         method: 'GET',
         protocolVersion: 'HTTP/1.1',
         target: '/features?p1=v1%3B&p2=',
-        headers: [
-          { name: 'Host', value: 'example.com' }
-        ]
+        headers: [{ name: 'Host', value: 'example.com' }]
       }
 
-      let rawRequest = [
-        'GET /features?p1=v1%3B&p2= HTTP/1.1',
-        'Host: example.com',
-        '',
-        ''
-      ].join(HttpZConsts.EOL)
+      let rawRequest = ['GET /features?p1=v1%3B&p2= HTTP/1.1', 'Host: example.com', '', ''].join(HttpZConsts.EOL)
 
       let builder = getBuilderInstance(requestModel)
       let actual = builder.build()
@@ -355,11 +348,7 @@ describe('builders / request', () => {
         ],
         body: {
           contentType: 'application/x-www-form-urlencoded',
-          params: [
-            { name: 'firstName', value: 'John' },
-            { name: 'lastName' },
-            { name: 'age', value: '25;' }
-          ]
+          params: [{ name: 'firstName', value: 'John' }, { name: 'lastName' }, { name: 'age', value: '25;' }]
         }
       }
 
@@ -475,7 +464,6 @@ describe('builders / request', () => {
       let actual = builder.build()
       should(actual).eql(rawRequest)
     })
-
 
     it('should build request with body of contentType=multipart/alternative (inline)', () => {
       let requestModel = {

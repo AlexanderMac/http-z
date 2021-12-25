@@ -45,16 +45,9 @@ describe('parsers / index', () => {
   })
 
   it('should call RequestParser.parse when rawMessage is request', () => {
-    let rawMessage = [
-      'GET /features HTTP/1.1',
-      'host: example.com',
-      ''
-    ].join(HttpZConsts.EOL)
+    let rawMessage = ['GET /features HTTP/1.1', 'host: example.com', ''].join(HttpZConsts.EOL)
     let expected = 'parsed-request'
-    let expectedMultipleArgs = [
-      rawMessage,
-      {}
-    ]
+    let expectedMultipleArgs = [rawMessage, {}]
 
     RequestParser.parse.returns('parsed-request')
 
@@ -66,11 +59,7 @@ describe('parsers / index', () => {
   })
 
   it('should call ResponseParser.parse when rawMessage is response', () => {
-    let rawMessage = [
-      'HTTP/1.1 200 Ok',
-      'host: example.com',
-      ''
-    ].join(HttpZConsts.EOL)
+    let rawMessage = ['HTTP/1.1 200 Ok', 'host: example.com', ''].join(HttpZConsts.EOL)
     let expected = 'parsed-response'
     let expectedArgs = rawMessage
 

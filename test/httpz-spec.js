@@ -1,7 +1,7 @@
 const should = require('should')
 const httpZ = require('../')
 
-describe('httpz', ()=> {
+describe('httpz', () => {
   it('should httpz.consts be an object', () => {
     should(httpZ.consts).is.Object()
   })

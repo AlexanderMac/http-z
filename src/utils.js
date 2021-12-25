@@ -18,7 +18,7 @@ exports.splitByDelimeter = (str, delimiter) => {
   return res
 }
 
-exports.isAbsoluteUrl = (url) => {
+exports.isAbsoluteUrl = url => {
   // Don't match Windows paths `c:\`
   if (/^[a-zA-Z]:\\/.test(url)) {
     return false
@@ -76,24 +76,17 @@ exports.generatePath = (path, params) => {
   return path + '?' + new URLSearchParams(paramPairs).toString()
 }
 
-exports.convertParamsArrayToPairs = (params) => {
+exports.convertParamsArrayToPairs = params => {
   validators.validateArray(params, 'params')
 
-  return _.map(params, ({ name, value }) => [
-    name,
-    exports.getEmptyStringForUndefined(value)]
-  )
+  return _.map(params, ({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
 }
 
-exports.pretifyHeaderName = (name) => {
-  return _.chain(name)
-    .split('-')
-    .map(_.capitalize)
-    .join('-')
-    .value()
+exports.pretifyHeaderName = name => {
+  return _.chain(name).split('-').map(_.capitalize).join('-').value()
 }
 
-exports.getEmptyStringForUndefined = (val) => {
+exports.getEmptyStringForUndefined = val => {
   if (_.isUndefined(val)) {
     return ''
   }

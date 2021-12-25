@@ -54,10 +54,7 @@ class HttpZRequestParser extends Base {
 
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
-      throw HttpZError.get(
-        'Incorrect startRow format, expected: Method request-target HTTP-Version',
-        this.startRow
-      )
+      throw HttpZError.get('Incorrect startRow format, expected: Method request-target HTTP-Version', this.startRow)
     }
 
     let rowElems = this.startRow.split(' ')

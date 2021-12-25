@@ -60,15 +60,7 @@ describe('parsers / request', () => {
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows when message is without Cookie and Body rows', () => {
-      let rawRequest = [
-        'start-line',
-        'host: somehost',
-        'header1',
-        'header2',
-        'header3',
-        '',
-        ''
-      ].join(HttpZConsts.EOL)
+      let rawRequest = ['start-line', 'host: somehost', 'header1', 'header2', 'header3', '', ''].join(HttpZConsts.EOL)
 
       let parser = getParserInstance(rawRequest)
       parser._parseMessageForRows()
@@ -103,15 +95,9 @@ describe('parsers / request', () => {
     })
 
     it('should parse message for rows when message contains Body rows', () => {
-      let rawRequest = [
-        'start-line',
-        'host: somehost',
-        'header1',
-        'header2',
-        'header3',
-        '',
-        'body'
-      ].join(HttpZConsts.EOL)
+      let rawRequest = ['start-line', 'host: somehost', 'header1', 'header2', 'header3', '', 'body'].join(
+        HttpZConsts.EOL
+      )
 
       let parser = getParserInstance(rawRequest)
       parser._parseMessageForRows()
@@ -404,12 +390,7 @@ describe('parsers / request', () => {
 
   describe('functional tests', () => {
     it('should parse request without headers and body', () => {
-      let rawRequest = [
-        'GET /features?p1=v1%3B&p2= HTTP/1.1',
-        'host: www.example.com',
-        '',
-        ''
-      ].join(HttpZConsts.EOL)
+      let rawRequest = ['GET /features?p1=v1%3B&p2= HTTP/1.1', 'host: www.example.com', '', ''].join(HttpZConsts.EOL)
 
       let requestModel = {
         method: 'GET',
@@ -421,9 +402,7 @@ describe('parsers / request', () => {
           { name: 'p1', value: 'v1;' },
           { name: 'p2', value: '' }
         ],
-        headers: [
-          { name: 'Host', value: 'www.example.com' }
-        ],
+        headers: [{ name: 'Host', value: 'www.example.com' }],
         headersSize: 62,
         bodySize: 0
       }
@@ -491,7 +470,8 @@ describe('parsers / request', () => {
           },
           {
             name: 'Authorization',
-            value: 'AWS4-HMAC-SHA256 Credential=CRED/20210118/eu-west-1/s3/aws4_request, SignedHeaders=host;x-amz-acl;x-amz-user-agent, Signature=fb1e6017a1d'
+            value:
+              'AWS4-HMAC-SHA256 Credential=CRED/20210118/eu-west-1/s3/aws4_request, SignedHeaders=host;x-amz-acl;x-amz-user-agent, Signature=fb1e6017a1d'
           }
         ],
         headersSize: 529,

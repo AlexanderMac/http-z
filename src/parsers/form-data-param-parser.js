@@ -16,9 +16,7 @@ class FormDataParamParser {
 
   // TODO: test it
   parse() {
-    this.paramGroup = this.paramGroup
-      .replace(consts.regexps.startNl, '')
-      .replace(consts.regexps.endNl, '')
+    this.paramGroup = this.paramGroup.replace(consts.regexps.startNl, '').replace(consts.regexps.endNl, '')
 
     let contentDispositionHeader = this._getContentDisposition()
     let contentType = this._getContentType()

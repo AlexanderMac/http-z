@@ -57,14 +57,7 @@ describe('parsers / response', () => {
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows when message is without Set-Cookie and Body rows', () => {
-      let rawResponse = [
-        'start-line',
-        'header1',
-        'header2',
-        'header3',
-        '',
-        ''
-      ].join(HttpZConsts.EOL)
+      let rawResponse = ['start-line', 'header1', 'header2', 'header3', '', ''].join(HttpZConsts.EOL)
 
       let parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
@@ -76,16 +69,9 @@ describe('parsers / response', () => {
     })
 
     it('should parse message for rows when message contains Set-Cookie rows', () => {
-      let rawResponse = [
-        'start-line',
-        'header1',
-        'header2',
-        'header3',
-        'set-cookie',
-        'set-cookie',
-        '',
-        ''
-      ].join(HttpZConsts.EOL)
+      let rawResponse = ['start-line', 'header1', 'header2', 'header3', 'set-cookie', 'set-cookie', '', ''].join(
+        HttpZConsts.EOL
+      )
 
       let parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
@@ -97,14 +83,7 @@ describe('parsers / response', () => {
     })
 
     it('should parse message for rows when message contains Body rows', () => {
-      let rawResponse = [
-        'start-line',
-        'header1',
-        'header2',
-        'header3',
-        '',
-        'body'
-      ].join(HttpZConsts.EOL)
+      let rawResponse = ['start-line', 'header1', 'header2', 'header3', '', 'body'].join(HttpZConsts.EOL)
 
       let parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
@@ -241,11 +220,7 @@ describe('parsers / response', () => {
 
   describe('functional tests', () => {
     it('should parse response without headers and body', () => {
-      let rawResponse = [
-        'HTTP/1.1 204 No content',
-        '',
-        ''
-      ].join(HttpZConsts.EOL)
+      let rawResponse = ['HTTP/1.1 204 No content', '', ''].join(HttpZConsts.EOL)
 
       let responseModel = {
         protocolVersion: 'HTTP/1.1',

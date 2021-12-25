@@ -16,11 +16,7 @@ class HttpZResponseBuilder extends Base {
   }
 
   build() {
-    return '' +
-      this._generateStartRow() +
-      this._generateHeaderRows() +
-      consts.EOL +
-      this._generateBodyRows()
+    return '' + this._generateStartRow() + this._generateHeaderRows() + consts.EOL + this._generateBodyRows()
   }
 
   _generateStartRow() {

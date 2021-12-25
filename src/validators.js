@@ -30,7 +30,7 @@ exports.validateNumber = (val, field, details) => {
 
 exports.validatePositiveNumber = (val, field, details) => {
   exports.validateNumber(val, field, details)
-  if ( val <= 0) {
+  if (val <= 0) {
     throw HttpZError.get(`${field} must be a positive number`, details)
   }
 }

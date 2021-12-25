@@ -36,7 +36,7 @@ describe('builders / base', () => {
     it('should throw error when instance.headers is undefined', () => {
       let expected = HttpZError.get('headers is required')
 
-      let builder = getBuilderInstance({ })
+      let builder = getBuilderInstance({})
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
@@ -109,7 +109,8 @@ describe('builders / base', () => {
   })
 
   describe('_generateBodyRows', () => {
-    function test({ body, expected, expectedFnArgs = {}}) {
+    // eslint-disable-next-line object-curly-spacing
+    function test({ body, expected, expectedFnArgs = {} }) {
       let builder = getBuilderInstance({ body })
       sinon.stub(builder, '_generateFormDataBody').returns('FormDataBody')
       sinon.stub(builder, '_generateUrlencodedBody').returns('UrlencodedBody')
@@ -123,7 +124,11 @@ describe('builders / base', () => {
       }
 
       nassert.assertFn({ inst: builder, fnName: '_generateFormDataBody', expectedArgs: expectedFnArgs.genFormDataBody })
-      nassert.assertFn({ inst: builder, fnName: '_generateUrlencodedBody', expectedArgs: expectedFnArgs.genUrlencodedBody })
+      nassert.assertFn({
+        inst: builder,
+        fnName: '_generateUrlencodedBody',
+        expectedArgs: expectedFnArgs.genUrlencodedBody
+      })
       nassert.assertFn({ inst: builder, fnName: '_generateTextBody', expectedArgs: expectedFnArgs.genTextBody })
     }
 

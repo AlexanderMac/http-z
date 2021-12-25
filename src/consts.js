@@ -14,7 +14,10 @@ regexps.responseStartRow = new RegExp(`^${HTTP_PROTOCOL_VERSIONS} \\d{3} ${BASIC
 // eslint-disable-next-line no-control-regex
 regexps.quoutedHeaderValue = new RegExp('^"[\\u0009\\u0020\\u0021\\u0023-\\u007E]+"$')
 regexps.boundary = /(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}/
-regexps.contentDisposition = new RegExp(`^Content-Disposition: *(form-data|inline|attachment)${BASIC_LATIN}*${EOL}`, 'i')
+regexps.contentDisposition = new RegExp(
+  `^Content-Disposition: *(form-data|inline|attachment)${BASIC_LATIN}*${EOL}`,
+  'i'
+)
 regexps.contentType = new RegExp(`^Content-Type:[\\S ]*${EOL}`, 'i')
 regexps.contentDispositionType = /(?<=Content-Disposition:) *(form-data|inline|attachment)/
 regexps.dispositionName = new RegExp(`(?<=name=)"${PARAM_NAME}+"`, 'i')
@@ -45,11 +48,7 @@ http.methods = {
   delete: 'DELETE'
 }
 
-http.postMethods = [
-  http.methods.post,
-  http.methods.put,
-  http.methods.patch
-]
+http.postMethods = [http.methods.post, http.methods.put, http.methods.patch]
 
 http.contentTypes = {
   text: {

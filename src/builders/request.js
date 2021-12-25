@@ -20,11 +20,7 @@ class HttpZRequestBuilder extends Base {
   }
 
   build() {
-    return '' +
-      this._generateStartRow() +
-      this._generateHeaderRows() +
-      consts.EOL +
-      this._generateBodyRows()
+    return '' + this._generateStartRow() + this._generateHeaderRows() + consts.EOL + this._generateBodyRows()
   }
 
   _generateStartRow() {
@@ -32,11 +28,7 @@ class HttpZRequestBuilder extends Base {
     validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion')
     validators.validateNotEmptyString(this.target, 'target')
 
-    return '' +
-      this.method.toUpperCase() + ' ' +
-      this.target + ' ' +
-      this.protocolVersion.toUpperCase() +
-      consts.EOL
+    return '' + this.method.toUpperCase() + ' ' + this.target + ' ' + this.protocolVersion.toUpperCase() + consts.EOL
   }
 
   _generateHeaderRows() {

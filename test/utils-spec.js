@@ -67,12 +67,15 @@ describe('utils', () => {
 
   describe('parseUrl', () => {
     function getDefParsedUrl(ex) {
-      return _.extend({
-        protocol: 'HTTP',
-        host: 'example.com',
-        path: '/',
-        params: []
-      }, ex)
+      return _.extend(
+        {
+          protocol: 'HTTP',
+          host: 'example.com',
+          path: '/',
+          params: []
+        },
+        ex
+      )
     }
 
     function test(url, host, expected) {
@@ -98,7 +101,11 @@ describe('utils', () => {
       })
 
       it('should parse url with path and params', () => {
-        test('http://example.com/home?p1=v1', undefined, getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }))
+        test(
+          'http://example.com/home?p1=v1',
+          undefined,
+          getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] })
+        )
       })
     })
 
@@ -120,7 +127,11 @@ describe('utils', () => {
       })
 
       it('should parse url with path and params', () => {
-        test('/home?p1=v1', 'http://example.com', getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }))
+        test(
+          '/home?p1=v1',
+          'http://example.com',
+          getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] })
+        )
       })
     })
   })
@@ -155,26 +166,38 @@ describe('utils', () => {
     })
 
     it('should generate path with two simple parameters', () => {
-      test('/features', [
-        { name: 'p1', value: 'v1' },
-        { name: 'p2>', value: 'v2;' }
-      ], '/features?p1=v1&p2%3E=v2%3B')
+      test(
+        '/features',
+        [
+          { name: 'p1', value: 'v1' },
+          { name: 'p2>', value: 'v2;' }
+        ],
+        '/features?p1=v1&p2%3E=v2%3B'
+      )
     })
 
     it('should generate path with object parameters', () => {
-      test('/features', [
-        { name: 'p1[x]', value: 'v1' },
-        { name: 'p1[y]', value: 'v2' },
-        { name: 'p2>', value: 'v2;' }
-      ], '/features?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v2%3B')
+      test(
+        '/features',
+        [
+          { name: 'p1[x]', value: 'v1' },
+          { name: 'p1[y]', value: 'v2' },
+          { name: 'p2>', value: 'v2;' }
+        ],
+        '/features?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v2%3B'
+      )
     })
 
     it('should generate path with array parameters', () => {
-      test('/features', [
-        { name: 'p1[]', value: 'v1' },
-        { name: 'p1[]', value: 'v2' },
-        { name: 'p2>', value: 'v2;' }
-      ], '/features?p1%5B%5D=v1&p1%5B%5D=v2&p2%3E=v2%3B')
+      test(
+        '/features',
+        [
+          { name: 'p1[]', value: 'v1' },
+          { name: 'p1[]', value: 'v2' },
+          { name: 'p2>', value: 'v2;' }
+        ],
+        '/features?p1%5B%5D=v1&p1%5B%5D=v2&p2%3E=v2%3B'
+      )
     })
   })
 
@@ -199,11 +222,7 @@ describe('utils', () => {
 
     it('should return param pairs', () => {
       test(
-        [
-          { name: 'p1', value: 'v1' },
-          { name: 'p2', value: null },
-          { name: 'p3' }
-        ],
+        [{ name: 'p1', value: 'v1' }, { name: 'p2', value: null }, { name: 'p3' }],
         [
           ['p1', 'v1'],
           ['p2', null],
@@ -258,9 +277,12 @@ describe('utils', () => {
 
   describe('extendIfNotUndefined', () => {
     function getDefObject(ex) {
-      return _.extend({
-        name: 'John'
-      }, ex)
+      return _.extend(
+        {
+          name: 'John'
+        },
+        ex
+      )
     }
 
     function test(fieldName, fieldValue, expected) {

@@ -31,10 +31,7 @@ class HttpZResponseParser extends Base {
 
   _parseStartRow() {
     if (!consts.regexps.responseStartRow.test(this.startRow)) {
-      throw HttpZError.get(
-        'Incorrect startRow format, expected: HTTP-Version status-code reason-phrase',
-        this.startRow
-      )
+      throw HttpZError.get('Incorrect startRow format, expected: HTTP-Version status-code reason-phrase', this.startRow)
     }
 
     let rowElems = this.startRow.split(' ')

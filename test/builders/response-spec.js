@@ -8,11 +8,14 @@ const ResponseBuilder = require('../../src/builders/response')
 
 describe('builders / response', () => {
   function getBuilderInstance(exResponseModel) {
-    let responseModel = _.extend({
-      protocolVersion: 'HTTP/1.1',
-      statusCode: 200,
-      statusMessage: 'Ok'
-    }, exResponseModel)
+    let responseModel = _.extend(
+      {
+        protocolVersion: 'HTTP/1.1',
+        statusCode: 200,
+        statusMessage: 'Ok'
+      },
+      exResponseModel
+    )
     return new ResponseBuilder(responseModel)
   }
 
@@ -45,12 +48,7 @@ describe('builders / response', () => {
       sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
       sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
 
-      let expected = [
-        'startRow',
-        'headerRows',
-        '',
-        'bodyRows'
-      ].join(HttpZConsts.EOL)
+      let expected = ['startRow', 'headerRows', '', 'bodyRows'].join(HttpZConsts.EOL)
       let actual = builder.build()
       should(actual).eql(expected)
 

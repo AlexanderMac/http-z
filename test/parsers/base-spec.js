@@ -12,10 +12,7 @@ describe('parsers / base', () => {
 
   describe('_parseMessageForRows', () => {
     it('should throw error when message does not have start-line', () => {
-      let rawRequest = [
-        '',
-        'Body'
-      ].join(HttpZConsts.EOL)
+      let rawRequest = ['', 'Body'].join(HttpZConsts.EOL)
       let parser = getParserInstance(rawRequest)
 
       should(parser._parseMessageForRows.bind(parser)).throw(Error, {
@@ -24,11 +21,7 @@ describe('parsers / base', () => {
     })
 
     it('should throw error when message does not have empty line between headers and body', () => {
-      let rawRequest = [
-        'start-line',
-        'host-line',
-        'Header1'
-      ].join(HttpZConsts.EOL)
+      let rawRequest = ['start-line', 'host-line', 'Header1'].join(HttpZConsts.EOL)
       let parser = getParserInstance(rawRequest)
 
       should(parser._parseMessageForRows.bind(parser)).throw(HttpZError, {
@@ -37,16 +30,9 @@ describe('parsers / base', () => {
     })
 
     it('should parse message for rows without body', () => {
-      let rawRequest = [
-        'start-line',
-        'host-line',
-        'Header1',
-        'Header2',
-        'Header3',
-        'Cookie',
-        '',
-        ''
-      ].join(HttpZConsts.EOL)
+      let rawRequest = ['start-line', 'host-line', 'Header1', 'Header2', 'Header3', 'Cookie', '', ''].join(
+        HttpZConsts.EOL
+      )
       let parser = getParserInstance(rawRequest)
 
       let actual = parser._parseMessageForRows()
@@ -58,16 +44,9 @@ describe('parsers / base', () => {
     })
 
     it('should parse message for rows with body', () => {
-      let rawRequest = [
-        'start-line',
-        'host-line',
-        'Header1',
-        'Header2',
-        'Header3',
-        'Cookie',
-        '',
-        'Body'
-      ].join(HttpZConsts.EOL)
+      let rawRequest = ['start-line', 'host-line', 'Header1', 'Header2', 'Header3', 'Cookie', '', 'Body'].join(
+        HttpZConsts.EOL
+      )
       let parser = getParserInstance(rawRequest)
 
       let actual = parser._parseMessageForRows()
@@ -82,11 +61,7 @@ describe('parsers / base', () => {
   describe('_parseHeaderRows', () => {
     it('should throw error when headerRows has invalid format', () => {
       let parser = getParserInstance()
-      parser.headerRows = [
-        'Header1: value',
-        'Header2 - value',
-        'Header3:    value   '
-      ]
+      parser.headerRows = ['Header1: value', 'Header2 - value', 'Header3:    value   ']
 
       should(parser._parseHeaderRows.bind(parser)).throw(HttpZError, {
         message: 'Incorrect header row format, expected: Name: Value',
@@ -127,11 +102,18 @@ describe('parsers / base', () => {
   })
 
   describe('_parseBodyRows', () => {
-    function test({ headers, bodyRows, expected, expectedFnArgs = {}}) {
+    // eslint-disable-next-line object-curly-spacing
+    function test({ headers, bodyRows, expected, expectedFnArgs = {} }) {
       let parser = getParserInstance()
-      sinon.stub(parser, '_parseFormDataBody').callsFake(() => parser.body.params = 'body')
-      sinon.stub(parser, '_parseUrlencodedBody').callsFake(() => parser.body.params = 'body')
-      sinon.stub(parser, '_parseTextBody').callsFake(() => parser.body.text = 'body')
+      sinon.stub(parser, '_parseFormDataBody').callsFake(() => {
+        parser.body.params = 'body'
+      })
+      sinon.stub(parser, '_parseUrlencodedBody').callsFake(() => {
+        parser.body.params = 'body'
+      })
+      sinon.stub(parser, '_parseTextBody').callsFake(() => {
+        parser.body.text = 'body'
+      })
       parser.headers = headers
       parser.bodyRows = bodyRows
 
@@ -139,7 +121,11 @@ describe('parsers / base', () => {
       should(parser.body).eql(expected)
 
       nassert.assertFn({ inst: parser, fnName: '_parseFormDataBody', expectedArgs: expectedFnArgs.parseFormDataBody })
-      nassert.assertFn({ inst: parser, fnName: '_parseUrlencodedBody', expectedArgs: expectedFnArgs.parseUrlencodedBody })
+      nassert.assertFn({
+        inst: parser,
+        fnName: '_parseUrlencodedBody',
+        expectedArgs: expectedFnArgs.parseUrlencodedBody
+      })
       nassert.assertFn({ inst: parser, fnName: '_parseTextBody', expectedArgs: expectedFnArgs.parseTextBody })
     }
 
@@ -201,10 +187,12 @@ describe('parsers / base', () => {
     it('should throw error when bodyRows contains param with incorrect format', () => {
       let parser = getParserInstance()
       parser.body = {}
-      parser.headers = [{
-        name: 'Content-Type',
-        value: 'multipart/form-data;boundary=11136253119209'
-      }]
+      parser.headers = [
+        {
+          name: 'Content-Type',
+          value: 'multipart/form-data;boundary=11136253119209'
+        }
+      ]
       parser.bodyRows = [
         '--11136253119209',
         'Content-Disposition: form-data; name="firstName"',
@@ -218,19 +206,19 @@ describe('parsers / base', () => {
 
       should(parser._parseFormDataBody.bind(parser)).throw(HttpZError, {
         message: 'Incorrect form-data parameter',
-        details: [
-          '25'
-        ].join('')
+        details: ['25'].join('')
       })
     })
 
     it('should set instance.body when bodyRows is empty', () => {
       let parser = getParserInstance()
       parser.body = {}
-      parser.headers = [{
-        name: 'Content-Type',
-        value: 'multipart/form-data;boundary=11136253119209'
-      }]
+      parser.headers = [
+        {
+          name: 'Content-Type',
+          value: 'multipart/form-data;boundary=11136253119209'
+        }
+      ]
       parser.bodyRows = ''
 
       parser._parseFormDataBody()
@@ -245,10 +233,12 @@ describe('parsers / base', () => {
     it('should set instance.body when bodyRows contains all valid params', () => {
       let parser = getParserInstance()
       parser.body = {}
-      parser.headers = [{
-        name: 'Content-Type',
-        value: 'multipart/form-data;boundary=11136253119209'
-      }]
+      parser.headers = [
+        {
+          name: 'Content-Type',
+          value: 'multipart/form-data;boundary=11136253119209'
+        }
+      ]
       parser.bodyRows = [
         '--11136253119209',
         'Content-Disposition: form-data; name="firstName"',
