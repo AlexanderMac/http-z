@@ -8,6 +8,7 @@ specifiers:
   mocha: ^9.1.3
   n-assert: ^7.0.0
   nyc: ^15.1.0
+  prettier: ^2.5.1
   rollup: ^2.62.0
   should: ^13.2.3
   sinon: ^12.0.1
@@ -22,6 +23,7 @@ devDependencies:
   mocha: 9.1.3
   n-assert: 7.0.0
   nyc: 15.1.0
+  prettier: 2.5.1
   rollup: 2.62.0
   should: 13.2.3
   sinon: 12.0.1
@@ -1602,6 +1604,12 @@ packages:
   /prelude-ls/1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+    dev: true
+
+  /prettier/2.5.1:
+    resolution: {integrity: sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /process-on-spawn/1.0.0:
