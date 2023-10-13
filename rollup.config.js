@@ -1,22 +1,24 @@
+const resolve = require('@rollup/plugin-node-resolve')
 const commonjs = require('@rollup/plugin-commonjs')
-const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const pkg = require('./package.json')
 
-module.exports = {
-  input: 'index.js',
-  output: {
-    file: pkg.module,
-    name: 'httpZ',
-    format: 'umd',
-    globals: {
-      'lodash': '_'
-    }
-  },
-  plugins: [
-    nodeResolve(),
-    commonjs()
-  ],
-  external: [
-    'lodash'
-  ]
-}
+module.exports = [
+  {
+    input: 'index.js',
+    output: {
+      name: 'httpZ',
+      file: pkg.browser,
+      format: 'umd',
+      globals: {
+        'lodash': '_'
+      }
+    },
+    plugins: [
+      resolve(),
+      commonjs()
+    ],
+    external: [
+      'lodash'
+    ]
+  }
+]
