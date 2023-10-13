@@ -21,7 +21,7 @@
     "lint": "eslint --ext .js src/ test/",
     "test": "NODE_ENV=test mocha",
     "coverage": "nyc npm test",
-    "coverage-gh": "nyc --reporter=lcov npm test && codecov"
+    "coverage:codecov": "nyc --reporter=lcov npm test && codecov"
   },
   "repository": {
     "type": "git",
