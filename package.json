@@ -3,8 +3,8 @@
   "version": "6.1.2",
   "description": "HTTP message parser and builder",
   "engines": {
-    "node": ">=12",
-    "pnpm": ">=6"
+    "node": ">=16",
+    "pnpm": ">=8"
   },
   "main": "index.js",
   "module": "index.esm.js",
@@ -30,7 +30,7 @@
   "keywords": [
     "http",
     "http-utility",
-    "message",
+    "http-message",
     "builder",
     "parser",
     "request",
@@ -46,15 +46,15 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^21.1.0",
-    "@rollup/plugin-node-resolve": "^13.3.0",
-    "eslint": "^8.17.0",
-    "mocha": "^10.0.0",
+    "@rollup/plugin-commonjs": "^25.0.5",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "eslint": "^8.51.0",
+    "mocha": "^10.2.0",
     "n-assert": "^7.0.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.7.1",
-    "rollup": "^2.75.6",
+    "prettier": "^3.0.3",
+    "rollup": "^4.0.2",
     "should": "^13.2.3",
-    "sinon": "^14.0.0"
+    "sinon": "^16.1.0"
   }
 }
