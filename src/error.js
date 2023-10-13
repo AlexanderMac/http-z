@@ -9,6 +9,8 @@ module.exports = class HttpZError extends Error {
     this.name = this.constructor.name
     this.details = details
 
-    Error.captureStackTrace(this, this.constructor)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor)
+    }
   }
 }

@@ -16,7 +16,7 @@
     "index.d.ts"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && cp index.umd.js docs/http-z.js",
     "prettify": "prettier './src/**/*.js' './test/**/*.js' --write",
     "lint": "eslint --ext .js src/ test/",
     "test": "NODE_ENV=test mocha",
