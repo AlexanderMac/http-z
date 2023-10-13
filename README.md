@@ -1,12 +1,14 @@
-# http-z
-
-[![Build Status](https://github.com/AlexanderMac/http-z/workflows/CI/badge.svg)](https://github.com/AlexanderMac/http-z/actions?query=workflow%3ACI)
-[![Code Coverage](https://codecov.io/gh/AlexanderMac/http-z/branch/master/graph/badge.svg)](https://codecov.io/gh/AlexanderMac/http-z)
-[![npm version](https://badge.fury.io/js/http-z.svg)](https://badge.fury.io/js/http-z)
-
-### Features
-
-HTTP message (request/response) parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230). Works in Node.js and in the browser.
+<p align="center">
+  <h1 align="center">http-z</h1>
+  <p align="center">HTTP message (request/response) parser/builder according to the rules defined in [RFC 7230](https://tools.ietf.org/html/rfc7230). Works in Node.js and in the browser.</p>
+  <p align="center">
+    <a href="https://github.com/alexandermac/http-z/actions/workflows/ci.yml?query=branch%3Amaster"><img src="https://github.com/alexandermac/http-z/actions/workflows/ci.yml/badge.svg" alt="Build Status"></a>
+    <a href="https://codecov.io/gh/AlexanderMac/http-z"><img src="https://codecov.io/gh/AlexanderMac/http-z/branch/master/graph/badge.svg" alt="Code Coverage"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/github/license/alexandermac/http-z.svg" alt="License"></a>
+    <a href="https://badge.fury.io/js/http-z"><img src="https://badge.fury.io/js/http-z.svg" alt="npm version"></a>
+  </p>
+  <h3 align="center"><a href="https://alexandermac.github.io/http-z">Demo</a></h3>
+</p>
 
 ### Install
 
@@ -19,7 +21,7 @@ $ pnpm i http-z
 ```js
 const httpZ = require('http-z')
 
-let rawMessage = [
+const plainMessage = [
   'GET /features?p1=v1 HTTP/1.1',
   'Host: example.com',
   'Accept: *',
@@ -29,7 +31,7 @@ let rawMessage = [
   ''
 ].join('\r\n')
 
-let messageModel = httpZ.parse(rawMessage)
+const messageModel = httpZ.parse(plainMessage)
 console.log(JSON.stringify(messageModel, null, 2))
 
 /* output:
@@ -53,8 +55,8 @@ console.log(JSON.stringify(messageModel, null, 2))
 }
 */
 
-rawMessage = httpZ.build(messageModel)
-console.log(rawMessage)
+const plainMessageParsed = httpZ.build(messageModel)
+console.log(plainMessageParsed)
 
 /* output:
 GET /features?p1=v1 HTTP/1.1
