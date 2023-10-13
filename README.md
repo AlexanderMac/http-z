@@ -1,6 +1,7 @@
 <p align="center">
   <h1 align="center">http-z</h1>
-  <p align="center">HTTP message (request/response) parser/builder according to the rules defined in <a href="https://tools.ietf.org/html/rfc7230">RFC 7230</a>. Works in Node.js and in the browser.</p>
+  <p align="center">HTTP message (request/response) parser/builder according to the rules defined in <a href="https://tools.ietf.org/html/rfc7230">RFC 7230</a></p>
+  <p align="center">Works in Node.js and in the browser.</p>
   <p align="center">
     <a href="https://github.com/alexandermac/http-z/actions/workflows/ci.yml?query=branch%3Amaster"><img src="https://github.com/alexandermac/http-z/actions/workflows/ci.yml/badge.svg" alt="Build Status"></a>
     <a href="https://codecov.io/gh/AlexanderMac/http-z"><img src="https://codecov.io/gh/AlexanderMac/http-z/branch/master/graph/badge.svg" alt="Code Coverage"></a>
