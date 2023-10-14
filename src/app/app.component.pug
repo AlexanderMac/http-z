@@ -1,0 +1,49 @@
+h1.text-center.mt-2 HttpZ demo
+div(style='position: absolute; right: 1em; top: 1.5em')
+  a(href='https://github.com/AlexanderMac/http-z') GitHub Repo
+hr
+
+.container
+  .row.mb-3
+    label.col-2.col-form-label(for='samples') Samples
+    .col-10
+      select#samples.form-control(
+        '[(ngModel)]'="selectedSample"
+        '(click)'="selectSample()"
+      )
+        option(
+          *ngFor="let sample of samples"
+          '[ngValue]'="sample"
+          '[disabled]'="sample.isSeparator"
+        ) {{ sample.name }}
+
+  .row.row-cols-lg-auto.align-items-center.mb-3
+    .col-12
+      .form-check
+        input#plainToModel.form-check-input(name='operation' type='radio' checked='')
+        label.form-check-label(for='plainToModel')
+          | Plain to Model
+    .col-12
+      .form-check
+        input#modelToPlain.form-check-input(name='operation' type='radio')
+        label.form-check-label(for='modelToPlain')
+          | Model to Plain
+
+  .row.mb-3
+    .col
+      h3 Input
+      textarea.form-control(
+        rows='20'
+        '[(ngModel)]'="inputVal"
+      )
+    .col
+      h3 Output
+      textarea.form-control(
+        rows='20'
+        '[(ngModel)]'="outputVal"
+      )
+
+  .row
+    .col.d-grid.gap-2
+      button.btn.btn-primary('(click)'="exec()") 
+        | Execute

@@ -1,38 +1,67 @@
 {
-  "name": "http-z",
+  "name": "httz-demo",
   "version": "0.0.1",
-  "description": "Parse and build HTTP message",
+  "description": "http-z demo",
+  "private": true,
   "engines": {
-    "node": ">=8"
+    "node": ">=20",
+    "pnpm": ">=7"
   },
-  "main": "index.js",
-  "files": [
-    "index.js",
-    "src"
-  ],
   "scripts": {
-    "lint": "eslint --ext .js src/ test/",
-    "test": "NODE_ENV=test mocha",
-    "coverage": "nyc npm test"
+    "ng": "ng",
+    "generate": "ng generate",
+    "build": "ng build --configuration development",
+    "build:prod": "ng build --base-href /http-z/",
+    "start": "ng serve",
+    "lint": "ng lint --fix",
+    "prettify": "prettier --write \"src/**/*.ts\"",
+    "format": "pnpm lint && pnpm prettify"
+  },
+  "dependencies": {
+    "@angular/common": "^16.2.5",
+    "@angular/compiler": "^16.2.5",
+    "@angular/core": "^16.2.5",
+    "@angular/forms": "^16.2.5",
+    "@angular/platform-browser": "^16.2.5",
+    "@angular/platform-browser-dynamic": "^16.2.5",
+    "@angular/router": "^16.2.5",
+    "bootstrap": "^5.3.2",
+    "http-z": "github:AlexanderMac/http-z",
+    "lodash": "^4.17.21",
+    "rxjs": "^7.8.1",
+    "zone.js": "^0.13.3"
+  },
+  "devDependencies": {
+    "@angular-builders/custom-webpack": "^16.0.1",
+    "@angular-eslint/builder": "^16.1.2",
+    "@angular-eslint/eslint-plugin": "^16.1.2",
+    "@angular-eslint/eslint-plugin-template": "^16.1.2",
+    "@angular-eslint/schematics": "^16.1.2",
+    "@angular-eslint/template-parser": "^16.1.2",
+    "@angular/cli": "^16.2.2",
+    "@angular/compiler-cli": "^16.2.5",
+    "@types/lodash": "^4.14.198",
+    "@types/node": "^20.6.2",
+    "@typescript-eslint/eslint-plugin": "6.7.0",
+    "@typescript-eslint/parser": "6.7.0",
+    "eslint": "^8.49.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "prettier": "^3.0.3",
+    "pug-html-loader": "^1.1.5",
+    "raw-loader": "^4.0.2",
+    "tslib": "^2.6.2",
+    "typescript": "~5.1.6",
+    "webpack": "^5.88.2"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/AlexanderMac/http-z"
   },
-  "keywords": [
-    "http",
-    "http-utility",
-    "builder",
-    "parser",
-    "request",
-    "response"
-  ],
   "author": "Alexander Mac",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/AlexanderMac/http-z/issues"
   },
-  "homepage": "https://github.com/AlexanderMac/http-z#readme",
-  "dependencies": {},
-  "devDependencies": {}
+  "homepage": "https://github.com/AlexanderMac/http-z"
 }
