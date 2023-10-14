@@ -21,7 +21,7 @@ class HttpZBaseBuilder {
         validators.validateNotEmptyString(header.name, 'header name', `header index: ${index}`)
         validators.validateString(header.value, 'header.value', `header index: ${index}`)
 
-        let headerName = utils.pretifyHeaderName(header.name)
+        let headerName = utils.prettifyHeaderName(header.name)
         let headerValue = header.value
 
         return headerName + ': ' + headerValue

@@ -48,7 +48,7 @@ class HttpZResponseParser extends Base {
     // eslint-disable-next-line max-statements
     this.cookies = _.map(this.cookieRows, cookiesRow => {
       // eslint-disable-next-line no-unused-vars
-      let [unused, values] = utils.splitByDelimeter(cookiesRow, ':')
+      let [unused, values] = utils.splitByDelimiter(cookiesRow, ':')
       if (!values) {
         return {}
       }

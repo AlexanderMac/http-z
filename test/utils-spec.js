@@ -4,44 +4,44 @@ const HttpZError = require('../src/error')
 const utils = require('../src/utils')
 
 describe('utils', () => {
-  describe('splitByDelimeter', () => {
+  describe('splitByDelimiter', () => {
     const delimiter = ';'
 
     it('should return empty array when str is nil or empty', () => {
-      let actual = utils.splitByDelimeter(undefined, delimiter)
+      let actual = utils.splitByDelimiter(undefined, delimiter)
       should(actual).eql([])
 
-      actual = utils.splitByDelimeter(null, delimiter)
+      actual = utils.splitByDelimiter(null, delimiter)
       should(actual).eql([])
 
-      actual = utils.splitByDelimeter('', delimiter)
+      actual = utils.splitByDelimiter('', delimiter)
       should(actual).eql([])
     })
 
     it('should return empty array when str does not contain delimiter', () => {
-      let actual = utils.splitByDelimeter('somestring', delimiter)
+      let actual = utils.splitByDelimiter('somestring', delimiter)
       should(actual).eql([])
 
-      actual = utils.splitByDelimeter('1234567890', delimiter)
+      actual = utils.splitByDelimiter('1234567890', delimiter)
       should(actual).eql([])
     })
 
     it('should return empty array with one empty element when str does not contain two parts', () => {
-      let actual = utils.splitByDelimeter('somestring  ;  ', delimiter)
+      let actual = utils.splitByDelimiter('somestring  ;  ', delimiter)
       should(actual).eql(['somestring', ''])
 
-      actual = utils.splitByDelimeter('  ;  somestring', delimiter)
+      actual = utils.splitByDelimiter('  ;  somestring', delimiter)
       should(actual).eql(['', 'somestring'])
     })
 
     it('should return array of two elements when str contains two parts', () => {
-      let actual = utils.splitByDelimeter('partOne; partTwo', delimiter)
+      let actual = utils.splitByDelimiter('partOne; partTwo', delimiter)
       should(actual).eql(['partOne', 'partTwo'])
 
-      actual = utils.splitByDelimeter('partOne  ;  partTwo   ', delimiter)
+      actual = utils.splitByDelimiter('partOne  ;  partTwo   ', delimiter)
       should(actual).eql(['partOne', 'partTwo'])
 
-      actual = utils.splitByDelimeter('partOne; partTwo partThree', delimiter)
+      actual = utils.splitByDelimiter('partOne; partTwo partThree', delimiter)
       should(actual).eql(['partOne', 'partTwo partThree'])
     })
   })
@@ -232,9 +232,9 @@ describe('utils', () => {
     })
   })
 
-  describe('pretifyHeaderName', () => {
+  describe('prettifyHeaderName', () => {
     function test(name, expected) {
-      let actual = utils.pretifyHeaderName(name)
+      let actual = utils.prettifyHeaderName(name)
       should(actual).eql(expected)
     }
 

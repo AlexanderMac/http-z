@@ -195,7 +195,7 @@
 		const _ = require$$0;
 		const validators = validators$4;
 
-		exports.splitByDelimeter = (str, delimiter) => {
+		exports.splitByDelimiter = (str, delimiter) => {
 		  if (_.isEmpty(str)) {
 		    return []
 		  }
@@ -276,7 +276,7 @@
 		  return _.map(params, ({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
 		};
 
-		exports.pretifyHeaderName = name => {
+		exports.prettifyHeaderName = name => {
 		  return _.chain(name).split('-').map(_.capitalize).join('-').value()
 		};
 
@@ -412,7 +412,7 @@
 	  }
 
 	  _parseMessageForRows() {
-	    let [headers, body] = utils$4.splitByDelimeter(this.rawMessage, consts$6.EOL2X);
+	    let [headers, body] = utils$4.splitByDelimiter(this.rawMessage, consts$6.EOL2X);
 	    if (_$6.isNil(headers) || _$6.isNil(body)) {
 	      throw HttpZError$5.get(
 	        'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
@@ -431,7 +431,7 @@
 
 	  _parseHeaderRows() {
 	    this.headers = _$6.map(this.headerRows, hRow => {
-	      let [name, value] = utils$4.splitByDelimeter(hRow, ':');
+	      let [name, value] = utils$4.splitByDelimiter(hRow, ':');
 	      if (!name) {
 	        throw HttpZError$5.get('Incorrect header row format, expected: Name: Value', hRow)
 	      }
@@ -444,7 +444,7 @@
 	      }
 
 	      return {
-	        name: utils$4.pretifyHeaderName(name),
+	        name: utils$4.prettifyHeaderName(name),
 	        value
 	      }
 	    });
@@ -581,7 +581,7 @@
 	      validators$3.validateNotEmptyString(this.hostRow, 'host header');
 	    }
 	    // eslint-disable-next-line no-unused-vars
-	    let [unused, value] = utils$3.splitByDelimeter(this.hostRow || '', ':');
+	    let [unused, value] = utils$3.splitByDelimiter(this.hostRow || '', ':');
 	    if (this.opts.mandatoryHost) {
 	      validators$3.validateNotEmptyString(value, 'host header value');
 	    }
@@ -616,7 +616,7 @@
 	      return
 	    }
 
-	    let [cookieHeaderName, values] = utils$3.splitByDelimeter(this.cookiesRow, ':');
+	    let [cookieHeaderName, values] = utils$3.splitByDelimiter(this.cookiesRow, ':');
 	    if (!cookieHeaderName) {
 	      throw HttpZError$4.get('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow)
 	    }
@@ -627,7 +627,7 @@
 	    this.cookies = _$5.chain(values)
 	      .split(';')
 	      .map(pair => {
-	        let [name, value] = utils$3.splitByDelimeter(pair, '=');
+	        let [name, value] = utils$3.splitByDelimiter(pair, '=');
 	        let cookie = {
 	          name
 	        };
@@ -721,7 +721,7 @@
 	    // eslint-disable-next-line max-statements
 	    this.cookies = _$4.map(this.cookieRows, cookiesRow => {
 	      // eslint-disable-next-line no-unused-vars
-	      let [unused, values] = utils$2.splitByDelimeter(cookiesRow, ':');
+	      let [unused, values] = utils$2.splitByDelimiter(cookiesRow, ':');
 	      if (!values) {
 	        return {}
 	      }
@@ -821,7 +821,7 @@
 	        validators$2.validateNotEmptyString(header.name, 'header name', `header index: ${index}`);
 	        validators$2.validateString(header.value, 'header.value', `header index: ${index}`);
 
-	        let headerName = utils$1.pretifyHeaderName(header.name);
+	        let headerName = utils$1.prettifyHeaderName(header.name);
 	        let headerValue = header.value;
 
 	        return headerName + ': ' + headerValue
@@ -936,7 +936,7 @@
 	  _generateHeaderRows() {
 	    validators$1.validateArray(this.headers, 'headers');
 	    if (this.opts.mandatoryHost) {
-	      let hostHeader = _$1.find(this.headers, name => utils.pretifyHeaderName(name) === consts$1.http.headers.host);
+	      let hostHeader = _$1.find(this.headers, name => utils.prettifyHeaderName(name) === consts$1.http.headers.host);
 	      if (!hostHeader) {
 	        throw HttpZError$1.get('Host header is required')
 	      }

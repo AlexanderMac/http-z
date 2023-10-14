@@ -34,7 +34,7 @@ class HttpZRequestBuilder extends Base {
   _generateHeaderRows() {
     validators.validateArray(this.headers, 'headers')
     if (this.opts.mandatoryHost) {
-      let hostHeader = _.find(this.headers, name => utils.pretifyHeaderName(name) === consts.http.headers.host)
+      let hostHeader = _.find(this.headers, name => utils.prettifyHeaderName(name) === consts.http.headers.host)
       if (!hostHeader) {
         throw HttpZError.get('Host header is required')
       }

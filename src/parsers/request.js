@@ -44,7 +44,7 @@ class HttpZRequestParser extends Base {
       validators.validateNotEmptyString(this.hostRow, 'host header')
     }
     // eslint-disable-next-line no-unused-vars
-    let [unused, value] = utils.splitByDelimeter(this.hostRow || '', ':')
+    let [unused, value] = utils.splitByDelimiter(this.hostRow || '', ':')
     if (this.opts.mandatoryHost) {
       validators.validateNotEmptyString(value, 'host header value')
     }
@@ -79,7 +79,7 @@ class HttpZRequestParser extends Base {
       return
     }
 
-    let [cookieHeaderName, values] = utils.splitByDelimeter(this.cookiesRow, ':')
+    let [cookieHeaderName, values] = utils.splitByDelimiter(this.cookiesRow, ':')
     if (!cookieHeaderName) {
       throw HttpZError.get('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow)
     }
@@ -90,7 +90,7 @@ class HttpZRequestParser extends Base {
     this.cookies = _.chain(values)
       .split(';')
       .map(pair => {
-        let [name, value] = utils.splitByDelimeter(pair, '=')
+        let [name, value] = utils.splitByDelimiter(pair, '=')
         let cookie = {
           name
         }

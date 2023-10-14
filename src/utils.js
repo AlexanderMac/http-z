@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const validators = require('./validators')
 
-exports.splitByDelimeter = (str, delimiter) => {
+exports.splitByDelimiter = (str, delimiter) => {
   if (_.isEmpty(str)) {
     return []
   }
@@ -82,7 +82,7 @@ exports.convertParamsArrayToPairs = params => {
   return _.map(params, ({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
 }
 
-exports.pretifyHeaderName = name => {
+exports.prettifyHeaderName = name => {
   return _.chain(name).split('-').map(_.capitalize).join('-').value()
 }
 

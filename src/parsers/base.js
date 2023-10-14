@@ -10,7 +10,7 @@ class HttpZBaseParser {
   }
 
   _parseMessageForRows() {
-    let [headers, body] = utils.splitByDelimeter(this.rawMessage, consts.EOL2X)
+    let [headers, body] = utils.splitByDelimiter(this.rawMessage, consts.EOL2X)
     if (_.isNil(headers) || _.isNil(body)) {
       throw HttpZError.get(
         'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
@@ -29,7 +29,7 @@ class HttpZBaseParser {
 
   _parseHeaderRows() {
     this.headers = _.map(this.headerRows, hRow => {
-      let [name, value] = utils.splitByDelimeter(hRow, ':')
+      let [name, value] = utils.splitByDelimiter(hRow, ':')
       if (!name) {
         throw HttpZError.get('Incorrect header row format, expected: Name: Value', hRow)
       }
@@ -42,7 +42,7 @@ class HttpZBaseParser {
       }
 
       return {
-        name: utils.pretifyHeaderName(name),
+        name: utils.prettifyHeaderName(name),
         value
       }
     })
