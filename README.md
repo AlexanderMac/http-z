@@ -9,6 +9,9 @@
     <a href="https://badge.fury.io/js/http-z"><img src="https://badge.fury.io/js/http-z.svg" alt="npm version"></a>
   </p>
   <h3 align="center"><a href="https://alexandermac.github.io/http-z">Demo</a></h3>
+  <div align="center">
+    <img src="https://github.com/AlexanderMac/http-z/assets/1192919/c9320a61-6402-47b2-925e-48a76de4ff0c"/>
+  </div>
 </p>
 
 ### Install
