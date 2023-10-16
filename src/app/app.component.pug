@@ -5,11 +5,21 @@ hr
 
 .container
   .row.mb-3
-    label.col-2.col-form-label(for='samples') Samples
-    .col-10
+    label.col-lg-2.col-form-label(for='operation') Operation
+    .col-lg-10
+      select#operation.form-control(
+        '[(ngModel)]'="selectedOperation"
+        '(change)'="selectOperation()"
+      )
+        option(value="parse") Parse (plain to model)
+        option(value="build") Build (model to plain)
+
+  .row.mb-3
+    label.col-lg-2.col-form-label(for='samples') Samples
+    .col-lg-10
       select#samples.form-control(
         '[(ngModel)]'="selectedSample"
-        '(click)'="selectSample()"
+        '(change)'="selectSample()"
       )
         option(
           *ngFor="let sample of samples"
@@ -17,31 +27,15 @@ hr
           '[disabled]'="sample.isSeparator"
         ) {{ sample.name }}
 
-  .row.row-cols-lg-auto.align-items-center.mb-3
-    .col-12
-      .form-check
-        input#plainToModel.form-check-input(name='operation' type='radio' checked='')
-        label.form-check-label(for='plainToModel')
-          | Plain to Model
-    .col-12
-      .form-check
-        input#modelToPlain.form-check-input(name='operation' type='radio')
-        label.form-check-label(for='modelToPlain')
-          | Model to Plain
-
   .row.mb-3
-    .col
+    .col-lg-6
       h3 Input
-      textarea.form-control(
-        rows='20'
-        '[(ngModel)]'="inputVal"
-      )
-    .col
+        small.text-body-secondary.ms-1 ({{ selectedOperation === 'parse' ? 'Plain HTTP Message' : 'Model' }})
+      .cm(#input="")
+    .col-lg-6
       h3 Output
-      textarea.form-control(
-        rows='20'
-        '[(ngModel)]'="outputVal"
-      )
+        small.text-body-secondary.ms-1 ({{ selectedOperation === 'parse' ? 'Model' : 'Plain HTTP Message' }})
+      .cm(#output="")
 
   .row
     .col.d-grid.gap-2
