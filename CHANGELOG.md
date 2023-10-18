@@ -1,3 +1,9 @@
+## v7.0.0
+#### _Oct. 12, 2023_
+  * **BREAKING:** Drop support for Node versions prior v16.
+  * Create online demo.
+  * Fix bugs in type definitions.
+
 ## v6.1.2
 #### _Jun. 10, 2021_
   * Fix bug in form params parser.
@@ -28,7 +34,7 @@
 
 ## v5.0.0
 #### _May. 21, 2021_
-  * **BREAKING:** Drop support for Node v10.
+  * **BREAKING:** Drop support for Node versions prior v12.
 
 ## v4.0.4
 #### _Feb. 26, 2021_
@@ -128,7 +134,7 @@
 
 ## v0.12.0.
 #### _Jan. 15, 2020_
-  * **BREAKING**: Drop support for Node v8.
+  * **BREAKING**: Drop support for Node v8 and less.
 
 ## v0.11.1.
 #### _Oct. 30, 2019_
@@ -161,7 +167,7 @@
 
 ## v0.8.0
 #### _Aug. 9, 2019_
-  * **BREAKING**: Drop support for Node v6.
+  * **BREAKING**: Drop support for Node v6 and less.
   * Throw `HttpZError`. Don't extend `err.message` by error details, provide it as `err.details` field instead.
 
 ## v0.7.0
