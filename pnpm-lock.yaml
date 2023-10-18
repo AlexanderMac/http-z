@@ -46,7 +46,7 @@ dependencies:
     version: 6.0.1(@lezer/common@1.1.0)
   http-z:
     specifier: github:AlexanderMac/http-z
-    version: github.com/AlexanderMac/http-z/e7464193a225aaf7814d3355e19c77949c6188bc
+    version: github.com/AlexanderMac/http-z/1228809fe3749f1512ac3f7bf2157b4ecfd1fdfa
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
@@ -8669,10 +8669,10 @@ packages:
     dependencies:
       tslib: 2.6.2
 
-  github.com/AlexanderMac/http-z/e7464193a225aaf7814d3355e19c77949c6188bc:
-    resolution: {tarball: https://codeload.github.com/AlexanderMac/http-z/tar.gz/e7464193a225aaf7814d3355e19c77949c6188bc}
+  github.com/AlexanderMac/http-z/1228809fe3749f1512ac3f7bf2157b4ecfd1fdfa:
+    resolution: {tarball: https://codeload.github.com/AlexanderMac/http-z/tar.gz/1228809fe3749f1512ac3f7bf2157b4ecfd1fdfa}
     name: http-z
-    version: 6.1.2
+    version: 7.0.0
     engines: {node: '>=16', pnpm: '>=8'}
     dependencies:
       lodash: 4.17.21
