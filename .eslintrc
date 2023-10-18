@@ -1,43 +1,233 @@
 {
-  "env": {
-    "node": true,
-    "es6": true
-  },
-  "parserOptions": {
-    "ecmaVersion": 2017,
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "impliedStrict": false
+  "root": true,
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "parserOptions": {
+        "project": "tsconfig.json"
+      },
+      "plugins": [
+        "@typescript-eslint/eslint-plugin",
+        "simple-import-sort",
+        "unused-imports"
+      ],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
+      "rules": {
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "app",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
+          }
+        ],
+        "brace-style": "error",
+        "comma-dangle": [
+          "error",
+          "always-multiline"
+        ],
+        "curly": "error",
+        "global-require": "error",
+        "handle-callback-err": "error",
+        "key-spacing": [
+          "error",
+          {
+            "beforeColon": false
+          }
+        ],
+        "linebreak-style": "off",
+        "max-len": [
+          "error",
+          {
+            "code": 120,
+            "ignoreRegExpLiterals": true,
+            "ignoreUrls": true,
+            "ignoreComments": true
+          }
+        ],
+        "max-params": [
+          "error",
+          6
+        ],
+        "no-case-declarations": "off",
+        "no-lonely-if": "error",
+        "no-multiple-empty-lines": "error",
+        "no-new-require": "error",
+        "no-path-concat": "error",
+        "no-constant-condition": "off",
+        "no-duplicate-imports": "error",
+        "object-curly-spacing": [
+          "error",
+          "always"
+        ],
+        "semi": "off",
+        "quotes": [
+          "error",
+          "single",
+          {
+            "avoidEscape": true
+          }
+        ],
+        "@typescript-eslint/member-ordering": "off",
+        "@typescript-eslint/no-angle-bracket-type-assertion": "off",
+        "@typescript-eslint/no-empty-function": "error",
+        "@typescript-eslint/no-unnecessary-condition": "off",
+        "@typescript-eslint/no-confusing-non-null-assertion": "error",
+        "@typescript-eslint/no-duplicate-enum-values": "error",
+        "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/no-unnecessary-type-assertion": "error",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-inferrable-types": "error",
+        "@typescript-eslint/await-thenable": "error",
+        "@typescript-eslint/ban-ts-comment": "error",
+        "@typescript-eslint/ban-tslint-comment": "error",
+        "@typescript-eslint/consistent-indexed-object-style": "error",
+        "@typescript-eslint/consistent-type-definitions": "off",
+        "@typescript-eslint/consistent-type-imports": "off",
+        "@typescript-eslint/no-misused-new": "error",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/no-require-imports": "error",
+        "@typescript-eslint/keyword-spacing": "error",
+        "@typescript-eslint/no-namespace": "error",
+        "@typescript-eslint/no-this-alias": "error",
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/no-use-before-declare": "off",
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/prefer-for-of": "error",
+        "@typescript-eslint/prefer-function-type": "error",
+        "@typescript-eslint/prefer-namespace-keyword": "error",
+        "@typescript-eslint/naming-convention": [
+          "error",
+          // Enforce that all variables, functions and properties follow are camelCase
+          {
+            "selector": "variableLike",
+            "format": [
+              "camelCase"
+            ],
+            "leadingUnderscore": "allow",
+            "filter": {
+              "regex": "^npm_",
+              "match": false
+            }
+          },
+          // Enforce that boolean variables are prefixed with "is", "has", "should"
+          {
+            "selector": "variable",
+            "format": [
+              "PascalCase"
+            ],
+            "types": [
+              "boolean"
+            ],
+            "prefix": [
+              "is",
+              "has",
+              "should"
+            ],
+            "leadingUnderscore": "allow"
+          },
+          // Enforce that const variables are in camelCase, PascalCase, UPPER_CASE
+          {
+            "selector": "variable",
+            "modifiers": [
+              "const"
+            ],
+            "format": [
+              "camelCase",
+              "PascalCase",
+              "UPPER_CASE"
+            ],
+            "leadingUnderscore": "allow",
+            "filter": {
+              "regex": "^npm_",
+              "match": false
+            }
+          },
+          // Enforce that class, interface, type and enum follow are PascalCase
+          {
+            "selector": "typeLike",
+            "format": [
+              "PascalCase"
+            ]
+          },
+          // Enforce that interface names do not begin with an I
+          {
+            "selector": "interface",
+            "format": [
+              "PascalCase"
+            ],
+            "custom": {
+              "regex": "^I[A-Z]",
+              "match": false
+            }
+          },
+          // Enforce that enum members are in UPPER_CASE
+          {
+            "selector": "enumMember",
+            "format": [
+              "UPPER_CASE"
+            ]
+          }
+        ],
+        "simple-import-sort/imports": [
+          "error",
+          {
+            "groups": [
+              [
+                // Side effect imports
+                "^\\u0000"
+              ],
+              [
+                // Node.js builtins prefixed with `node:`
+                "^node:"
+              ],
+              [
+                // Packages, things that start with a letter (or digit or underscore), or `@` followed by a letter
+                "^@?\\w"
+              ],
+              ["^(@|@env|@core|@shared|@app)(/.*|$)"]
+            ]
+          }
+        ],
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": [
+          "warn",
+          {
+            "vars": "all",
+            "args": "after-used"
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended"
+      ],
+      "rules": {}
     }
-  },
-  "extends": "eslint:recommended",
-  "rules": {
-    "array-bracket-spacing": [2, "never"],
-    "block-scoped-var": 2,
-    "brace-style": [2, "1tbs"],
-    "camelcase": 1,
-    "computed-property-spacing": [2, "never"],
-    "complexity": [2, 12],
-    "curly": 2,
-    "eol-last": 2,
-    "indent": [2, 2, { "SwitchCase": 1, "MemberExpression": 1 }],
-    "eqeqeq": [2, "smart"],
-    "keyword-spacing": [2, { "before": true, "after": true }],
-    "max-depth": [1, 3],
-    "max-len": [1, 130],
-    "max-nested-callbacks": [1, 3],
-    "max-params": [1, 3],
-    "max-statements": [1, 15],
-    "new-cap": 1,
-    "no-extend-native": 2,
-    "no-mixed-spaces-and-tabs": 2,
-    "no-trailing-spaces": 2,
-    "no-unused-vars": 2,
-    "no-use-before-define": 0,
-    "object-curly-spacing": [2, "always", { "objectsInObjects": false }],
-    "semi": [2, "always"],
-    "space-infix-ops": 2,
-    "space-unary-ops": 2,
-    "quotes": [2, "single", "avoid-escape"]
-  }
+  ]
 }
