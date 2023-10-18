@@ -27,7 +27,7 @@ hr
           '[disabled]'="sample.isSeparator"
         ) {{ sample.name }}
 
-  .row.mb-3
+  .row
     .col-lg-6
       h3 Input
         small.text-body-secondary.ms-1 ({{ selectedOperation === 'parse' ? 'Plain HTTP Message' : 'Model' }})
@@ -36,6 +36,12 @@ hr
       h3 Output
         small.text-body-secondary.ms-1 ({{ selectedOperation === 'parse' ? 'Model' : 'Plain HTTP Message' }})
       .cm(#output="")
+
+  .row.mb-3
+    .col
+      strong.me-1 Result:
+      span.text-success(*ngIf="inputSuccess") {{ inputSuccess }}
+      span.text-danger(*ngIf="inputError") {{ inputError }}
 
   .row
     .col.d-grid.gap-2

@@ -1,12 +1,13 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core'
+import { json } from '@codemirror/lang-json'
+import { StreamLanguage } from '@codemirror/language'
+import { http } from '@codemirror/legacy-modes/mode/http'
+import { Compartment, EditorState, Extension } from '@codemirror/state'
+import { basicSetup, EditorView } from 'codemirror'
 import * as httpZ from 'http-z'
+import { attempt, isError } from 'lodash'
 
 import { ModelSamples, PlainSamples, Sample } from '@app/samples'
-import { EditorState, Compartment, Extension } from '@codemirror/state'
-import { EditorView, basicSetup } from 'codemirror'
-import {http} from "@codemirror/legacy-modes/mode/http"
-import { StreamLanguage } from '@codemirror/language'
-import { json } from '@codemirror/lang-json'
 
 @Component({
   selector: 'app-root',
@@ -18,13 +19,15 @@ export class AppComponent implements AfterViewInit {
   samples: Sample[] = []
   cmInputEditor!: EditorView
   cmOutputEditor!: EditorView
+  inputSuccess = ''
+  inputError = ''
 
-  @ViewChild('input', { static: false }) input: any;
-  @ViewChild('output', { static: false }) output: any;
+  @ViewChild('input', { static: false }) input: any
+  @ViewChild('output', { static: false }) output: any
 
   ngAfterViewInit(): void {
     this.cmInputEditor = this._createCmEditor(this.input.nativeElement)
-    this.cmOutputEditor = this._createCmEditor(this.output.nativeElement, true)
+    this.cmOutputEditor = this._createCmEditor(this.output.nativeElement)
     this._setOperation()
   }
 
@@ -38,20 +41,45 @@ export class AppComponent implements AfterViewInit {
   }
 
   exec(): void {
-    if (this.selectedOperation === 'parse') {
-      const input = this.cmInputEditor.state.doc.toString()
-      const plain = this._getPlainFromInput(input)
-
-      const model = httpZ.parse(plain) // TODO: try/catch
-      const output = JSON.stringify(model, null, '  ')
-      this._setCmEditorText(this.cmOutputEditor, output)
-    } else {
-      const input = this.cmInputEditor.state.doc.toString()
-      const model = JSON.parse(input) // TODO: try/catch
-
-      const plain = httpZ.build(model) // TODO: try/catch
-      this._setCmEditorText(this.cmOutputEditor, plain)
+    this._clearMessages()
+    const success = this.selectedOperation === 'parse' ? this._parse() : this._build()
+    if (success) {
+      this.inputSuccess = 'Success'
     }
+  }
+
+  private _parse(): boolean {
+    const input = this.cmInputEditor.state.doc.toString()
+    const plain = this._getPlainFromInput(input)
+
+    const model = attempt(httpZ.parse.bind(httpZ, plain))
+    if (isError(model)) {
+      this.inputError = model.message
+      return false
+    }
+
+    const output = JSON.stringify(model, null, '  ')
+    this._setCmEditorText(this.cmOutputEditor, output)
+
+    return true
+  }
+
+  private _build(): boolean {
+    const input = this.cmInputEditor.state.doc.toString()
+    const model = attempt(JSON.parse.bind(JSON, input))
+    if (isError(model)) {
+      this.inputError = model.message
+      return false
+    }
+
+    const plain = attempt(httpZ.build.bind(httpZ, model))
+    if (isError(plain)) {
+      this.inputError = plain.message
+      return false
+    }
+    this._setCmEditorText(this.cmOutputEditor, plain)
+
+    return true
   }
 
   private _setOperation(): void {
@@ -75,43 +103,35 @@ export class AppComponent implements AfterViewInit {
     })
   }
 
-  private _createCmEditor(nativeElement: any, isReadonly = false): EditorView {
+  private _createCmEditor(nativeElement: any): EditorView {
     return new EditorView({
       parent: nativeElement,
       state: EditorState.create({
-        extensions: [
-          basicSetup,
-        ]
+        extensions: [basicSetup],
       }),
-    });
+    })
   }
 
   private _createCmHttpState(isReadonly = false): EditorState {
-    const extensions = [
-      basicSetup,
-      StreamLanguage.define(http)
-    ]
+    const extensions = [basicSetup, StreamLanguage.define(http)]
     if (isReadonly) {
       extensions.push(this._createCmStateReadonly())
     }
     return EditorState.create({
       doc: '',
       extensions,
-    });
+    })
   }
 
   private _createCmJsonState(isReadonly = false): EditorState {
-    const extensions = [
-      basicSetup,
-      json(),
-    ]
+    const extensions = [basicSetup, json()]
     if (isReadonly) {
       extensions.push(this._createCmStateReadonly())
     }
     return EditorState.create({
       doc: '',
       extensions,
-    });
+    })
   }
 
   private _createCmStateReadonly(): Extension {
@@ -120,14 +140,21 @@ export class AppComponent implements AfterViewInit {
   }
 
   private _setCmEditorText(cmEditor: EditorView, text: string): void {
-    cmEditor.dispatch({changes: {
-      from: 0,
-      to: cmEditor.state.doc.length,
-      insert: text
-    }})
+    cmEditor.dispatch({
+      changes: {
+        from: 0,
+        to: cmEditor.state.doc.length,
+        insert: text,
+      },
+    })
   }
 
   private _getPlainFromInput(input: string): string {
     return input.replace(/\r\n/g, '\n').replace(/\n/g, '\r\n')
+  }
+
+  private _clearMessages(): void {
+    this.inputSuccess = ''
+    this.inputError = ''
   }
 }

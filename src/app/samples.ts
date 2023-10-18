@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import * as httpZ from 'http-z'
 
 export type Sample = {
@@ -8,12 +9,7 @@ export type Sample = {
 export const PlainSamples: Sample[] = [
   {
     name: 'Request without headers and body',
-    message: [
-      'GET /features?p1=v1%3B&p2= HTTP/1.1',
-      'host: www.example.com',
-      '',
-      '',
-    ].join(httpZ.consts.EOL),
+    message: ['GET /features?p1=v1%3B&p2= HTTP/1.1', 'host: www.example.com', '', ''].join(httpZ.consts.EOL),
   },
   {
     name: 'Request without body',
@@ -159,11 +155,7 @@ SignedHeaders=host;x-amz-acl;x-amz-user-agent, Signature=fb1e6017a1d',
   },
   {
     name: 'Response without headers and body',
-    message: [
-      'HTTP/1.1 204 No content',
-      '',
-      '',
-    ].join(httpZ.consts.EOL),
+    message: ['HTTP/1.1 204 No content', '', ''].join(httpZ.consts.EOL),
   },
   {
     name: 'Response without body (header names in lower case)',
@@ -577,7 +569,7 @@ export const ModelSamples: Sample[] = [
       }
     ]
   }
-}`
+}`,
   },
   {
     name: 'Request with body of contentType=multipart/mixed (attachment)',
