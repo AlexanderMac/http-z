@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const validators = require('./validators')
-const pkg = require('../package.json')
 
 exports.splitByDelimiter = (str, delimiter) => {
   if (_.isEmpty(str)) {
@@ -101,5 +100,5 @@ exports.extendIfNotUndefined = (obj, fieldName, fieldValue) => {
 }
 
 exports.getLibVersion = () => {
-  return pkg.version
+  return '7.1.0'
 }
