@@ -149,6 +149,31 @@ SignedHeaders=host;x-amz-acl;x-amz-user-agent, Signature=fb1e6017a1d',
     ].join(httpZ.consts.EOL),
   },
   {
+    name: 'Request with transferEncoding=chunked',
+    message: [
+      'POST /features HTTP/1.1',
+      'Host: example.com',
+      'Connection: keep-alive',
+      'Accept: */*',
+      'Accept-Encoding: gzip, deflate',
+      'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
+      'Content-Type: text/plain;charset=UTF-8',
+      'Content-Encoding: gzip, deflate',
+      'Transfer-Encoding: chunked',
+      '',
+      '25',
+      'The Transfer-Encoding hea',
+      '25',
+      'der specifies the form of',
+      '25',
+      ' encoding used to safely ',
+      '25',
+      'transfer the payload body',
+      '12',
+      ' to the user',
+    ].join(httpZ.consts.EOL),
+  },
+  {
     name: '──────────',
     message: '',
     isSeparator: true,
@@ -195,6 +220,28 @@ SignedHeaders=host;x-amz-acl;x-amz-user-agent, Signature=fb1e6017a1d',
       'Content-Length: 301',
       '',
       'Text data',
+    ].join(httpZ.consts.EOL),
+  },
+  {
+    name: 'Response with transferEncoding=chunked',
+    message: [
+      'HTTP/1.1 200 Ok',
+      'Connection: keep-alive',
+      'Cache-Control: no-cache',
+      'Content-Encoding: gzip, deflate',
+      'Content-Type: text/plain;charset=UTF-8',
+      'Transfer-Encoding: chunked',
+      '',
+      '25',
+      'The Transfer-Encoding hea',
+      '25',
+      'der specifies the form of',
+      '25',
+      ' encoding used to safely ',
+      '25',
+      'transfer the payload body',
+      '12',
+      ' to the user',
     ].join(httpZ.consts.EOL),
   },
 ]
@@ -631,6 +678,57 @@ export const ModelSamples: Sample[] = [
 }`,
   },
   {
+    name: 'Request with transferEncoding=chunked',
+    message: `{
+  "method": "POST",
+  "protocolVersion": "HTTP/1.1",
+  "target": "/features",
+  "host": "example.com",
+  "path": "/features",
+  "headersSize": 269,
+  "bodySize": 140,
+  "queryParams": [],
+  "headers": [
+    {
+      "name": "Host",
+      "value": "example.com"
+    },
+    {
+      "name": "Connection",
+      "value": "keep-alive"
+    },
+    {
+      "name": "Accept",
+      "value": "*/*"
+    },
+    {
+      "name": "Accept-Encoding",
+      "value": "gzip,deflate"
+    },
+    {
+      "name": "Accept-Language",
+      "value": "ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4"
+    },
+    {
+      "name": "Content-Type",
+      "value": "text/plain; charset=UTF-8"
+    },
+    {
+      "name": "Content-Encoding",
+      "value": "gzip,deflate"
+    },
+    {
+      "name": "Transfer-Encoding",
+      "value": "chunked"
+    }
+  ],
+  "body": {
+    "contentType": "text/plain",
+    "text": "The Transfer-Encoding header specifies the form of encoding used to safely transfer the payload body to the user"
+  }
+}`,
+  },
+  {
     name: '──────────',
     message: '',
     isSeparator: true,
@@ -770,6 +868,42 @@ export const ModelSamples: Sample[] = [
   "body": {
     "contentType": "text/plain",
     "text": "Text data"
+  }
+}`,
+  },
+  {
+    name: 'Response with transferEncoding=chunked',
+    message: `{
+  "protocolVersion": "HTTP/1.1",
+  "statusCode": 200,
+  "statusMessage": "Ok",
+  "headersSize": 169,
+  "bodySize": 140,
+  "headers": [
+    {
+      "name": "Connection",
+      "value": "keep-alive"
+    },
+    {
+      "name": "Cache-Control",
+      "value": "no-cache"
+    },
+    {
+      "name": "Content-Type",
+      "value": "text/plain; charset=UTF-8"
+    },
+    {
+      "name": "Content-Encoding",
+      "value": "gzip,deflate"
+    },
+    {
+      "name": "Transfer-Encoding",
+      "value": "chunked"
+    }
+  ],
+  "body": {
+    "contentType": "text/plain",
+    "text": "The Transfer-Encoding header specifies the form of encoding used to safely transfer the payload body to the user"
   }
 }`,
   },
