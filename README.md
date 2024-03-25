@@ -89,7 +89,7 @@ Builds HTTP request/response raw message from the model.
 - [RFC 7578: Returning Values from Forms: multipart/form-data](https://tools.ietf.org/html/rfc7578)
 - [RFC 2046: Multipurpose Internet Mail Extensions](https://tools.ietf.org/html/rfc2046)
 
-### Licence
+### License
 Licensed under the MIT license.
 
 ### Author

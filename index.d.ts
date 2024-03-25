@@ -1,11 +1,11 @@
 type HttpZParam = {
   name: string;
-  value?: string;
+  value: string;
 }
 
 type HttpZHeader = {
   name: string;
-  value?: string;
+  value: string;
 }
 
 type HttpZBodyParam = {
@@ -28,9 +28,9 @@ type HttpZRequestModel = {
   target: string;
   host: string;
   path: string;
-  queryParams?: HttpZParam[];
-  headers?: HttpZHeader[];
-  cookies?: HttpZParam[];
+  queryParams: HttpZParam[];
+  headers: HttpZHeader[];
+  cookies: HttpZParam[];
   body: HttpZBody;
   headersSize: number;
   bodySize: number;
@@ -39,9 +39,9 @@ type HttpZRequestModel = {
 type HttpZResponseModel = {
   protocolVersion: string;
   statusCode: number;
-  statusMessage?: string;
-  headers?: HttpZHeader[];
-  cookies?: HttpZParam[];
+  statusMessage: string;
+  headers: HttpZHeader[];
+  cookies: HttpZParam[];
   body: HttpZBody;
   headersSize: number;
   bodySize: number;
@@ -51,15 +51,15 @@ type HttpZRequestBuilderModel = {
   method: string;
   protocolVersion: string;
   target: string;
-  headers?: HttpZHeader[];
+  headers: HttpZHeader[];
   body: HttpZBody;
 }
 
 type HttpZResponseBuilderModel = {
   protocolVersion: string;
   statusCode: number;
-  statusMessage?: string;
-  headers?: HttpZHeader[];
+  statusMessage: string;
+  headers: HttpZHeader[];
   body: HttpZBody;
 }
 
@@ -102,6 +102,6 @@ export declare namespace utils {
   function extendIfNotUndefined(obj: any, fieldName: string, fieldValue?: any): any;
 }
 
-export function parse(rawMessage: string, opts?: HttpZOptions): HttpZRequestModel | HttpZResponseModel;
+export function parse(rawMessage: string, opts: HttpZOptions = {}): HttpZRequestModel | HttpZResponseModel;
 
-export function build(messageModel: HttpZRequestBuilderModel | HttpZResponseBuilderModel, opts?: HttpZOptions): string;
+export function build(messageModel: HttpZRequestBuilderModel | HttpZResponseBuilderModel, opts: HttpZOptions = {}): string;
