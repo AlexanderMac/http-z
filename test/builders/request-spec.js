@@ -597,5 +597,78 @@ describe('builders / request', () => {
       let actual = builder.build()
       should(actual).eql(rawRequest)
     })
+
+    it('should build request with body of contentType=text/plain and transfer-encoding=chunked', () => {
+      let requestModel = {
+        method: 'POST',
+        protocolVersion: 'HTTP/1.1',
+        target: '/features',
+        headers: [
+          {
+            name: 'Host',
+            value: 'example.com'
+          },
+          {
+            name: 'Connection',
+            value: 'keep-alive'
+          },
+          {
+            name: 'Accept',
+            value: '*/*'
+          },
+          {
+            name: 'Accept-Encoding',
+            value: 'gzip, deflate'
+          },
+          {
+            name: 'Accept-Language',
+            value: 'ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4'
+          },
+          {
+            name: 'Content-Type',
+            value: 'text/plain;charset=UTF-8'
+          },
+          {
+            name: 'Content-Encoding',
+            value: 'gzip, deflate'
+          },
+          {
+            name: 'Transfer-Encoding',
+            value: 'chunked'
+          }
+        ],
+        body: {
+          contentType: 'text/plain',
+          text: 'The Transfer-Encoding header specifies the form of encoding used to safely transfer the payload body to the user'
+        }
+      }
+
+      let rawRequest = [
+        'POST /features HTTP/1.1',
+        'Host: example.com',
+        'Connection: keep-alive',
+        'Accept: */*',
+        'Accept-Encoding: gzip, deflate',
+        'Accept-Language: ru-RU, ru;q=0.8, en-US;q=0.6, en;q=0.4',
+        'Content-Type: text/plain;charset=UTF-8',
+        'Content-Encoding: gzip, deflate',
+        'Transfer-Encoding: chunked',
+        '',
+        '25',
+        'The Transfer-Encoding hea',
+        '25',
+        'der specifies the form of',
+        '25',
+        ' encoding used to safely ',
+        '25',
+        'transfer the payload body',
+        '12',
+        ' to the user'
+      ].join(HttpZConsts.EOL)
+
+      let builder = getBuilderInstance(requestModel)
+      let actual = builder.build()
+      should(actual).eql(rawRequest)
+    })
   })
 })

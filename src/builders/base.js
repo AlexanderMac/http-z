@@ -37,6 +37,8 @@ class HttpZBaseBuilder {
       return ''
     }
 
+    this._processTransferEncodingChunked()
+
     switch (this.body.contentType) {
       case consts.http.contentTypes.multipart.formData:
       case consts.http.contentTypes.multipart.alternative:
@@ -48,6 +50,27 @@ class HttpZBaseBuilder {
       default:
         return this._generateTextBody()
     }
+  }
+
+  _processTransferEncodingChunked() {
+    const isChunked = this.headers.find(
+      h => h.name === consts.http.headers.transferEncoding && h.value.includes('chunked')
+    )
+    if (!isChunked) {
+      return
+    }
+
+    const body = utils.getEmptyStringForUndefined(this.body.text)
+    const defChunkLength = 25
+    const buffer = []
+    let index = 0
+    while (index < body.length) {
+      const chunk = body.slice(index, index + defChunkLength)
+      buffer.push(chunk.length)
+      buffer.push(chunk)
+      index += defChunkLength
+    }
+    this.body.text = buffer.join(consts.EOL)
   }
 
   _generateFormDataBody() {

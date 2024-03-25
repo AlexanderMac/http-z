@@ -112,6 +112,7 @@ describe('builders / base', () => {
     // eslint-disable-next-line object-curly-spacing
     function test({ body, expected, expectedFnArgs = {} }) {
       let builder = getBuilderInstance({ body })
+      sinon.stub(builder, '_processTransferEncodingChunked')
       sinon.stub(builder, '_generateFormDataBody').returns('FormDataBody')
       sinon.stub(builder, '_generateUrlencodedBody').returns('UrlencodedBody')
       sinon.stub(builder, '_generateTextBody').returns('TextBody')
@@ -207,6 +208,43 @@ describe('builders / base', () => {
       let expectedFnArgs = { genTextBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
+    })
+  })
+
+  describe('_processTransferEncodingChunked', () => {
+    function getDefaultBody() {
+      return {
+        text: 'This is a long string\r\n11\r\n with new lines and numbers'
+      }
+    }
+
+    it("should don't body when transfer-encoding is not chunked", () => {
+      let headers = []
+      let body = getDefaultBody()
+
+      let builder = getBuilderInstance({ headers, body })
+      builder._processTransferEncodingChunked()
+
+      const expected = body.text
+      should(builder.body.text).equal(expected)
+    })
+
+    it('should change body when transfer-encoding is chunked', () => {
+      let headers = [
+        {
+          name: 'Transfer-Encoding',
+          value: 'chunked'
+        }
+      ]
+      let body = getDefaultBody()
+
+      let builder = getBuilderInstance({ headers, body })
+      builder._processTransferEncodingChunked()
+
+      const expected = ['25', 'This is a long string', '11', '25', '', ' with new lines and num', '4', 'bers'].join(
+        HttpZConsts.EOL
+      )
+      should(builder.body.text).equal(expected)
     })
   })
 
@@ -407,7 +445,7 @@ describe('builders / base', () => {
       should(actual).eql(expected)
     })
 
-    it('should return BodyRows when instance.body.text is not empty', () => {
+    it('should return Body when instance.body.text is not empty', () => {
       let body = getDefaultBody()
       let expected = 'text data'
 

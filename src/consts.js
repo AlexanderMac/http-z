@@ -22,6 +22,7 @@ regexps.contentType = new RegExp(`^Content-Type:[\\S ]*${EOL}`, 'i')
 regexps.contentDispositionType = /(?<=Content-Disposition:) *(form-data|inline|attachment)/
 regexps.dispositionName = new RegExp(`(?<=name=)"${PARAM_NAME}+"`, 'i')
 regexps.dispositionFileName = new RegExp(`(?<=filename=)"${PARAM_NAME}+"`, 'i')
+regexps.chunkRow = new RegExp(`^\\d+${EOL}`)
 
 const http = {}
 
@@ -100,11 +101,12 @@ http.contentTypes = {
 }
 
 http.headers = {
-  host: 'host',
+  host: 'Host',
   contentType: 'Content-Type',
   contentLength: 'Content-Length',
   userAgent: 'User-Agent',
-  setCookie: 'Set-Cookie'
+  setCookie: 'Set-Cookie',
+  transferEncoding: 'Transfer-Encoding'
 }
 
 module.exports = {

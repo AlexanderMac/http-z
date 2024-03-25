@@ -202,12 +202,12 @@ describe('builders / response', () => {
             value: 'gzip, deflate'
           },
           {
-            name: 'Content-Length',
-            value: '301'
-          },
-          {
             name: 'Content-Type',
             value: 'text/plain;charset=UTF-8'
+          },
+          {
+            name: 'Content-Length',
+            value: '301'
           }
         ],
         body: {
@@ -221,10 +221,68 @@ describe('builders / response', () => {
         'Connection: keep-alive',
         'Cache-Control: no-cache',
         'Content-Encoding: gzip, deflate',
-        'Content-Length: 301',
         'Content-Type: text/plain;charset=UTF-8',
+        'Content-Length: 301',
         '',
         'Text data'
+      ].join(HttpZConsts.EOL)
+
+      let builder = getBuilderInstance(responseModel)
+      let actual = builder.build()
+      should(actual).eql(rawResponse)
+    })
+
+    it('should build response with body of contentType=text/plain and transfer-encoding=chunked', () => {
+      let responseModel = {
+        protocolVersion: 'HTTP/1.1',
+        statusCode: 200,
+        statusMessage: 'Ok',
+        headers: [
+          {
+            name: 'Connection',
+            value: 'keep-alive'
+          },
+          {
+            name: 'Cache-Control',
+            value: 'no-cache'
+          },
+          {
+            name: 'Content-Encoding',
+            value: 'gzip, deflate'
+          },
+          {
+            name: 'Content-Type',
+            value: 'text/plain;charset=UTF-8'
+          },
+          {
+            name: 'Transfer-Encoding',
+            value: 'chunked'
+          }
+        ],
+        body: {
+          contentType: 'text/plain',
+          text: 'The Transfer-Encoding header specifies the form of encoding used to safely transfer the payload body to the user'
+        }
+      }
+
+      let rawResponse = [
+        'HTTP/1.1 200 Ok',
+        'Connection: keep-alive',
+        'Cache-Control: no-cache',
+        'Content-Encoding: gzip, deflate',
+        'Content-Type: text/plain;charset=UTF-8',
+        'Transfer-Encoding: chunked',
+        '',
+        '25',
+        'The Transfer-Encoding hea',
+        '25',
+        'der specifies the form of',
+        '25',
+        ' encoding used to safely ',
+        '25',
+        'transfer the payload body',
+        '12',
+        ' to the user'
       ].join(HttpZConsts.EOL)
 
       let builder = getBuilderInstance(responseModel)
