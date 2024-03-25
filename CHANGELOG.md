@@ -1,3 +1,8 @@
+## v7.1.0
+#### _Mar. 25, 2024_
+  * Add support for `Transfer-Encoding: chunked`.
+  * Fix bugs in type definitions.
+
 ## v7.0.0
 #### _Oct. 12, 2023_
   * **BREAKING:** Drop support for Node versions prior v16.

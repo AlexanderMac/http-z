@@ -32,6 +32,7 @@
 	regexps.contentDispositionType = /(?<=Content-Disposition:) *(form-data|inline|attachment)/;
 	regexps.dispositionName = new RegExp(`(?<=name=)"${PARAM_NAME}+"`, 'i');
 	regexps.dispositionFileName = new RegExp(`(?<=filename=)"${PARAM_NAME}+"`, 'i');
+	regexps.chunkRow = new RegExp(`^\\d+${EOL}`);
 
 	const http = {};
 
@@ -110,11 +111,12 @@
 	};
 
 	http.headers = {
-	  host: 'host',
+	  host: 'Host',
 	  contentType: 'Content-Type',
 	  contentLength: 'Content-Length',
 	  userAgent: 'User-Agent',
-	  setCookie: 'Set-Cookie'
+	  setCookie: 'Set-Cookie',
+	  transferEncoding: 'Transfer-Encoding'
 	};
 
 	var consts$8 = {
@@ -291,6 +293,10 @@
 		  if (!_.isUndefined(fieldValue)) {
 		    obj[fieldName] = fieldValue;
 		  }
+		};
+
+		exports.getLibVersion = () => {
+		  return '7.1.0'
 		}; 
 	} (utils$6));
 
@@ -455,6 +461,8 @@
 	      return
 	    }
 
+	    this._processTransferEncodingChunked();
+
 	    this.body = {};
 	    let contentTypeHeader = this._getContentTypeValue();
 	    if (contentTypeHeader) {
@@ -474,6 +482,33 @@
 	        this._parseTextBody();
 	        break
 	    }
+	  }
+
+	  // eslint-disable-next-line max-statements
+	  _processTransferEncodingChunked() {
+	    const isChunked = this.headers.find(
+	      h => h.name === consts$6.http.headers.transferEncoding && h.value.includes('chunked')
+	    );
+	    if (!isChunked) {
+	      return
+	    }
+
+	    let text = this.bodyRows;
+	    const buffer = [];
+	    do {
+	      const rows = text.match(consts$6.regexps.chunkRow);
+	      const firstRow = rows ? rows[0] : '';
+	      const chunkLength = +(firstRow || '').trim();
+	      if (!chunkLength) {
+	        throw HttpZError$5.get('Incorrect row, expected: NumberEOL', this.bodyRows)
+	      }
+	      text = text.slice(firstRow.length);
+	      const chunk = text.slice(0, chunkLength);
+	      buffer.push(chunk);
+	      text = text.slice(chunkLength + consts$6.EOL.length);
+	    } while (text)
+
+	    this.bodyRows = buffer.join('');
 	  }
 
 	  _parseFormDataBody() {
@@ -837,6 +872,8 @@
 	      return ''
 	    }
 
+	    this._processTransferEncodingChunked();
+
 	    switch (this.body.contentType) {
 	      case consts$2.http.contentTypes.multipart.formData:
 	      case consts$2.http.contentTypes.multipart.alternative:
@@ -848,6 +885,27 @@
 	      default:
 	        return this._generateTextBody()
 	    }
+	  }
+
+	  _processTransferEncodingChunked() {
+	    const isChunked = this.headers.find(
+	      h => h.name === consts$2.http.headers.transferEncoding && h.value.includes('chunked')
+	    );
+	    if (!isChunked) {
+	      return
+	    }
+
+	    const body = utils$1.getEmptyStringForUndefined(this.body.text);
+	    const defChunkLength = 25;
+	    const buffer = [];
+	    let index = 0;
+	    while (index < body.length) {
+	      const chunk = body.slice(index, index + defChunkLength);
+	      buffer.push(chunk.length);
+	      buffer.push(chunk);
+	      index += defChunkLength;
+	    }
+	    this.body.text = buffer.join(consts$2.EOL);
 	  }
 
 	  _generateFormDataBody() {
