@@ -390,5 +390,65 @@ describe('parsers / response', () => {
       let actual = parser.parse()
       should(actual).eql(responseModel)
     })
+
+    it('should parse response with body of contentType=text/plain and transfer-encoding=chunked', () => {
+      let rawResponse = [
+        'HTTP/1.1 200 Ok',
+        'Connection: keep-alive',
+        'Cache-Control: no-cache',
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Encoding: gzip,deflate',
+        'Transfer-Encoding: chunked',
+        '',
+        '25',
+        'The Transfer-Encoding hea',
+        '25',
+        'der specifies the form of',
+        '25',
+        ' encoding used to safely ',
+        '25',
+        'transfer the payload body',
+        '12',
+        ' to the user'
+      ].join(HttpZConsts.EOL)
+
+      let responseModel = {
+        protocolVersion: 'HTTP/1.1',
+        statusCode: 200,
+        statusMessage: 'Ok',
+        headers: [
+          {
+            name: 'Connection',
+            value: 'keep-alive'
+          },
+          {
+            name: 'Cache-Control',
+            value: 'no-cache'
+          },
+          {
+            name: 'Content-Type',
+            value: 'text/plain; charset=UTF-8'
+          },
+          {
+            name: 'Content-Encoding',
+            value: 'gzip,deflate'
+          },
+          {
+            name: 'Transfer-Encoding',
+            value: 'chunked'
+          }
+        ],
+        body: {
+          contentType: 'text/plain',
+          text: 'The Transfer-Encoding header specifies the form of encoding used to safely transfer the payload body to the user'
+        },
+        headersSize: 169,
+        bodySize: 140
+      }
+
+      let parser = getParserInstance(rawResponse)
+      let actual = parser.parse()
+      should(actual).eql(responseModel)
+    })
   })
 })

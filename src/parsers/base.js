@@ -53,6 +53,8 @@ class HttpZBaseParser {
       return
     }
 
+    this._processTransferEncodingChunked()
+
     this.body = {}
     let contentTypeHeader = this._getContentTypeValue()
     if (contentTypeHeader) {
@@ -72,6 +74,33 @@ class HttpZBaseParser {
         this._parseTextBody()
         break
     }
+  }
+
+  // eslint-disable-next-line max-statements
+  _processTransferEncodingChunked() {
+    const isChunked = this.headers.find(
+      h => h.name === consts.http.headers.transferEncoding && h.value.includes('chunked')
+    )
+    if (!isChunked) {
+      return
+    }
+
+    let text = this.bodyRows
+    const buffer = []
+    do {
+      const rows = text.match(consts.regexps.chunkRow)
+      const firstRow = rows ? rows[0] : ''
+      const chunkLength = +(firstRow || '').trim()
+      if (!chunkLength) {
+        throw HttpZError.get('Incorrect row, expected: NumberEOL', this.bodyRows)
+      }
+      text = text.slice(firstRow.length)
+      const chunk = text.slice(0, chunkLength)
+      buffer.push(chunk)
+      text = text.slice(chunkLength + consts.EOL.length)
+    } while (text)
+
+    this.bodyRows = buffer.join('')
   }
 
   _parseFormDataBody() {

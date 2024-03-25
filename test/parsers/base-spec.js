@@ -105,6 +105,7 @@ describe('parsers / base', () => {
     // eslint-disable-next-line object-curly-spacing
     function test({ headers, bodyRows, expected, expectedFnArgs = {} }) {
       let parser = getParserInstance()
+      sinon.stub(parser, '_processTransferEncodingChunked')
       sinon.stub(parser, '_parseFormDataBody').callsFake(() => {
         parser.body.params = 'body'
       })
@@ -180,6 +181,57 @@ describe('parsers / base', () => {
       let expectedFnArgs = { parseTextBody: '_without-args_' }
 
       test({ bodyRows, expected, expectedFnArgs })
+    })
+  })
+
+  describe('_processTransferEncodingChunked', () => {
+    function getDefaultBodyRows() {
+      return ['25', 'This is a long string', '11', '25', '', ' with new lines and num', '4', 'bers'].join(
+        HttpZConsts.EOL
+      )
+    }
+
+    it("should don't change bodyRows when transfer-encoding is not chunked", () => {
+      let parser = getParserInstance()
+      parser.headers = []
+      parser.bodyRows = getDefaultBodyRows()
+
+      parser._processTransferEncodingChunked()
+
+      const expected = parser.bodyRows
+      should(parser.bodyRows).eql(expected)
+    })
+
+    it('should change bodyRows when transfer-encoding is chunked', () => {
+      let parser = getParserInstance()
+      parser.headers = [
+        {
+          name: 'Transfer-Encoding',
+          value: 'chunked'
+        }
+      ]
+      parser.bodyRows = getDefaultBodyRows()
+
+      parser._processTransferEncodingChunked()
+
+      const expected = 'This is a long string\r\n11\r\n with new lines and numbers'
+      should(parser.bodyRows).eql(expected)
+    })
+
+    it('should throw error when transfer-encoding is chunked but body has incorrect format', () => {
+      let parser = getParserInstance()
+      parser.headers = [
+        {
+          name: 'Transfer-Encoding',
+          value: 'chunked'
+        }
+      ]
+      parser.bodyRows = '5\r\nStart\r\n2\r\nEnd\r\n'
+
+      should(parser._processTransferEncodingChunked.bind(parser)).throw(HttpZError, {
+        message: 'Incorrect row, expected: NumberEOL',
+        details: parser.bodyRows
+      })
     })
   })
 
