@@ -100,5 +100,5 @@ exports.extendIfNotUndefined = (obj, fieldName, fieldValue) => {
 }
 
 exports.getLibVersion = () => {
-  return '7.1.0'
+  return '7.1.1'
 }
