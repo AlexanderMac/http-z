@@ -1,3 +1,7 @@
+## v7.1.1
+#### _Mar. 27, 2024_
+  * Fix type definitions.
+
 ## v7.1.0
 #### _Mar. 25, 2024_
   * Add support for `Transfer-Encoding: chunked`.
