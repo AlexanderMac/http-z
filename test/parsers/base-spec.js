@@ -186,7 +186,7 @@ describe('parsers / base', () => {
 
   describe('_processTransferEncodingChunked', () => {
     function getDefaultBodyRows() {
-      return ['25', 'This is a long string', '11', '25', '', ' with new lines and num', '4', 'bers'].join(
+      return ['19', 'This is a long string', '11', '19', '', ' with new lines and num', '4', 'bers'].join(
         HttpZConsts.EOL
       )
     }
