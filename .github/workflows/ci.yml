@@ -28,8 +28,8 @@ jobs:
       - name: Run linter
         run: pnpm lint
       - name: Run tests
-        run: npm test
+        run: pnpm test
       - name: Code coverage
         run: pnpm coverage:codecov
       - name: Upload coverage reports
-      - run: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v5
