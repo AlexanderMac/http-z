@@ -1,0 +1,43 @@
+<h1 class="text-center mt-2">HttpZ demo</h1>
+<div style="position: absolute; right: 1em; top: 1.0em"><a href="https://github.com/AlexanderMac/http-z">GitHub Repo</a>
+  <div>v{{libVersion}}</div>
+</div>
+<hr/>
+<div class="container">
+  <div class="row mb-3">
+    <label class="col-lg-2 col-form-label" for="operation">Operation</label>
+    <div class="col-lg-10">
+      <select class="form-control" id="operation" [(ngModel)]="selectedOperation" (change)="selectOperation()">
+        <option value="parse">Parse (plain to model)</option>
+        <option value="build">Build (model to plain)</option>
+      </select>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label class="col-lg-2 col-form-label" for="samples">Samples</label>
+    <div class="col-lg-10">
+      <select class="form-control" id="samples" [(ngModel)]="selectedSample" (change)="selectSample()">
+        <option *ngFor="let sample of samples" [ngValue]="sample" [disabled]="sample.isSeparator">{{ sample.name }}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <h3>Input<small class="text-body-secondary ms-1">({{ selectedOperation === 'parse' ? 'Plain HTTP Message' : 'Model' }})</small></h3>
+      <div class="cm" #input=""></div>
+    </div>
+    <div class="col-lg-6">
+      <h3>Output<small class="text-body-secondary ms-1">({{ selectedOperation === 'parse' ? 'Model' : 'Plain HTTP Message' }})</small></h3>
+      <div class="cm" #output=""></div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col"><strong class="me-1">Status:</strong><span class="text-success" *ngIf="inputSuccess">{{ inputSuccess }}</span><span class="text-danger" *ngIf="inputError">{{ inputError }}</span></div>
+  </div>
+  <div class="row">
+    <div class="col d-grid gap-2">
+      <button class="btn btn-primary" (click)="exec()">
+         Execute</button>
+    </div>
+  </div>
+</div>

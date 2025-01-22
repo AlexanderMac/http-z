@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import { json } from '@codemirror/lang-json'
 import { StreamLanguage } from '@codemirror/language'
 import { http } from '@codemirror/legacy-modes/mode/http'
@@ -8,10 +9,15 @@ import * as httpZ from 'http-z'
 import { attempt, isError } from 'lodash'
 
 import { ModelSamples, PlainSamples, Sample } from '@app/samples'
+import { CommonModule } from '@angular/common'
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.pug',
+  templateUrl: './app.component.html',
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
 })
 export class AppComponent implements AfterViewInit {
   selectedOperation: 'parse' | 'build' = 'parse'

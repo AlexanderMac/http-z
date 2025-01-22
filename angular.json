@@ -1,12 +1,18 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
+  "cli": {
+    "packageManager": "pnpm",
+    "analytics": false
+  },
   "newProjectRoot": "projects",
   "projects": {
     "httpz-demo": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
+          "inlineTemplate": true,
+          "inlineStyle": true,
           "style": "sass",
           "skipTests": true
         },
@@ -37,14 +43,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "customWebpackConfig": {
-              "path": "./angular-webpack.config.js"
-            },
             "outputPath": "docs",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -54,8 +57,10 @@
             ],
             "inlineStyleLanguage": "sass",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
               "bootstrap/dist/css/bootstrap.css",
@@ -70,24 +75,21 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "2Mb",
+                  "maximumError": "5MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "3kb",
-                  "maximumError": "5kb"
+                  "maximumWarning": "10kB",
+                  "maximumError": "50kB"
                 }
               ],
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -99,44 +101,22 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "port": 3000
+            "port": 3001
           },
           "configurations": {
             "production": {
-              "browserTarget": "httpz-demo:build:production"
+              "buildTarget": "httpz-demo:build:production"
             },
             "development": {
-              "browserTarget": "httpz-demo:build:development"
+              "buildTarget": "httpz-demo:build:development"
             }
           },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular-builders/custom-webpack:extract-i18n",
-          "options": {
-            "browserTarget": "httpz-demo:build"
-          }
-        },
-        "test": {
-          "builder": "@angular-builders/custom-webpack:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "sass",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.sass"
-            ],
-            "scripts": []
-          }
+          "builder": "@angular-devkit/build-angular:extract-i18n"
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
@@ -149,10 +129,5 @@
         }
       }
     }
-  },
-  "cli": {
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ]
   }
 }
