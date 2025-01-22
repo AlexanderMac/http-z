@@ -32,4 +32,4 @@ jobs:
       - name: Code coverage
         run: pnpm coverage:codecov
       - name: Upload coverage reports
-      - uses: codecov/codecov-action@v5
+      - run: codecov/codecov-action@v5
