@@ -16,9 +16,6 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 6
-          run_install: |
-            - recursive: true
-              args: [--frozen-lockfile, --strict-peer-dependencies]
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
