@@ -46,15 +46,15 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "eslint": "^8.57.0",
-    "mocha": "^10.3.0",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "eslint": "^8.57.1",
+    "mocha": "^11.0.1",
     "n-assert": "^7.0.0",
-    "nyc": "^15.1.0",
-    "prettier": "^3.2.5",
-    "rollup": "^4.13.0",
+    "nyc": "^17.1.0",
+    "prettier": "^3.4.2",
+    "rollup": "^4.31.0",
     "should": "^13.2.3",
-    "sinon": "^17.0.1"
+    "sinon": "^19.0.2"
   }
 }
