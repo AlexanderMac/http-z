@@ -66,7 +66,7 @@ class HttpZBaseBuilder {
     let index = 0
     while (index < body.length) {
       const chunk = body.slice(index, index + defChunkLength)
-      buffer.push(chunk.length)
+      buffer.push(chunk.length.toString(16).toUpperCase())
       buffer.push(chunk)
       index += defChunkLength
     }

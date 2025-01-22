@@ -241,7 +241,7 @@ describe('builders / base', () => {
       let builder = getBuilderInstance({ headers, body })
       builder._processTransferEncodingChunked()
 
-      const expected = ['25', 'This is a long string', '11', '25', '', ' with new lines and num', '4', 'bers'].join(
+      const expected = ['19', 'This is a long string', '11', '19', '', ' with new lines and num', '4', 'bers'].join(
         HttpZConsts.EOL
       )
       should(builder.body.text).equal(expected)

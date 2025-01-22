@@ -273,15 +273,15 @@ describe('builders / response', () => {
         'Content-Type: text/plain;charset=UTF-8',
         'Transfer-Encoding: chunked',
         '',
-        '25',
+        '19',
         'The Transfer-Encoding hea',
-        '25',
+        '19',
         'der specifies the form of',
-        '25',
+        '19',
         ' encoding used to safely ',
-        '25',
+        '19',
         'transfer the payload body',
-        '12',
+        'C',
         ' to the user'
       ].join(HttpZConsts.EOL)
 
