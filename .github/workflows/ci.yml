@@ -8,32 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x]
+        node-version: [16, 18, 20, 22]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - name: Fetch Repository
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 6
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: false
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pnpm install && pnpm install -g codecov
       - name: Run linter
         run: pnpm lint
@@ -42,4 +32,4 @@ jobs:
       - name: Code coverage
         run: pnpm coverage:codecov
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v5
