@@ -90,7 +90,7 @@ class HttpZBaseParser {
     do {
       const rows = text.match(consts.regexps.chunkRow)
       const firstRow = rows ? rows[0] : ''
-      const chunkLength = +(firstRow || '').trim()
+      const chunkLength = +('0x' + firstRow || '').trim()
       if (!chunkLength) {
         throw HttpZError.get('Incorrect row, expected: NumberEOL', this.bodyRows)
       }

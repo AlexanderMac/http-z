@@ -32,7 +32,7 @@
 	regexps.contentDispositionType = /(?<=Content-Disposition:) *(form-data|inline|attachment)/;
 	regexps.dispositionName = new RegExp(`(?<=name=)"${PARAM_NAME}+"`, 'i');
 	regexps.dispositionFileName = new RegExp(`(?<=filename=)"${PARAM_NAME}+"`, 'i');
-	regexps.chunkRow = new RegExp(`^\\d+${EOL}`);
+	regexps.chunkRow = new RegExp(`^[0-9a-fA-F]+${EOL}`);
 
 	const http = {};
 
@@ -498,7 +498,7 @@
 	    do {
 	      const rows = text.match(consts$6.regexps.chunkRow);
 	      const firstRow = rows ? rows[0] : '';
-	      const chunkLength = +(firstRow || '').trim();
+	      const chunkLength = +('0x' + firstRow || '').trim();
 	      if (!chunkLength) {
 	        throw HttpZError$5.get('Incorrect row, expected: NumberEOL', this.bodyRows)
 	      }

@@ -400,15 +400,15 @@ describe('parsers / response', () => {
         'Content-Encoding: gzip,deflate',
         'Transfer-Encoding: chunked',
         '',
-        '25',
+        '19',
         'The Transfer-Encoding hea',
-        '25',
+        '19',
         'der specifies the form of',
-        '25',
+        '19',
         ' encoding used to safely ',
-        '25',
+        '19',
         'transfer the payload body',
-        '12',
+        'C',
         ' to the user'
       ].join(HttpZConsts.EOL)
 
@@ -443,7 +443,7 @@ describe('parsers / response', () => {
           text: 'The Transfer-Encoding header specifies the form of encoding used to safely transfer the payload body to the user'
         },
         headersSize: 169,
-        bodySize: 140
+        bodySize: 139
       }
 
       let parser = getParserInstance(rawResponse)
