@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: pnpm install && pnpm install -g codecov
+        run: pnpm install
       - name: Run linter
         run: pnpm lint
       - name: Run tests

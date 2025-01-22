@@ -20,8 +20,8 @@
     "prettify": "prettier './src/**/*.js' './test/**/*.js' --write",
     "lint": "eslint --ext .js src/ test/",
     "test": "NODE_ENV=test mocha",
-    "coverage": "nyc npm test",
-    "coverage:codecov": "nyc --reporter=lcov npm test && codecov"
+    "coverage": "nyc pnpm test",
+    "coverage:codecov": "nyc --reporter=lcov pnpm test"
   },
   "repository": {
     "type": "git",
