@@ -1,7 +1,10 @@
 # Changelog
 
+## v7.1.3 (Jan. 22, 2025)
+- Fix building messages for `Transfer-Encoding: chunked`.
+
 ## v7.1.2 (Jan. 22, 2025)
-- Fix `Transfer-Encoding: chunked` parsing, https://github.com/AlexanderMac/http-z/pull/67
+- Fix parsing messages for `Transfer-Encoding: chunked`, https://github.com/AlexanderMac/http-z/pull/67.
 
 ## v7.1.1 (Mar. 27, 2024)
 - Fix type definitions.
