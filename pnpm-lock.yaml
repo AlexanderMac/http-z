@@ -49,7 +49,7 @@ importers:
         version: 6.0.1(@lezer/common@1.2.1)
       http-z:
         specifier: github:AlexanderMac/http-z
-        version: https://codeload.github.com/AlexanderMac/http-z/tar.gz/be0c2755e0507ca82ed26af4eefcbbdc949a7139
+        version: https://codeload.github.com/AlexanderMac/http-z/tar.gz/cdc5f93665fea4196bc560b40e5300008fffe3ac
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -2858,9 +2858,9 @@ packages:
     resolution: {integrity: sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==}
     engines: {node: '>=8.0.0'}
 
-  http-z@https://codeload.github.com/AlexanderMac/http-z/tar.gz/be0c2755e0507ca82ed26af4eefcbbdc949a7139:
-    resolution: {tarball: https://codeload.github.com/AlexanderMac/http-z/tar.gz/be0c2755e0507ca82ed26af4eefcbbdc949a7139}
-    version: 7.1.3
+  http-z@https://codeload.github.com/AlexanderMac/http-z/tar.gz/cdc5f93665fea4196bc560b40e5300008fffe3ac:
+    resolution: {tarball: https://codeload.github.com/AlexanderMac/http-z/tar.gz/cdc5f93665fea4196bc560b40e5300008fffe3ac}
+    version: 8.0.0-dev
     engines: {node: '>=16', pnpm: '>=8'}
 
   https-proxy-agent@7.0.4:
@@ -7546,9 +7546,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  http-z@https://codeload.github.com/AlexanderMac/http-z/tar.gz/be0c2755e0507ca82ed26af4eefcbbdc949a7139:
-    dependencies:
-      lodash: 4.17.21
+  http-z@https://codeload.github.com/AlexanderMac/http-z/tar.gz/cdc5f93665fea4196bc560b40e5300008fffe3ac: {}
 
   https-proxy-agent@7.0.4:
     dependencies:
