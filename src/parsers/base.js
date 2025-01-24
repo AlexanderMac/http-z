@@ -1,7 +1,7 @@
-const _ = require('lodash')
 const consts = require('../consts')
 const HttpZError = require('../error')
-const utils = require('../utils')
+const { isNil, trim } = require('../utils')
+const { splitByDelimiter, prettifyHeaderName, head, tail } = require('../utils')
 const formDataParamParser = require('./form-data-param-parser')
 
 class HttpZBaseParser {
@@ -10,40 +10,40 @@ class HttpZBaseParser {
   }
 
   _parseMessageForRows() {
-    let [headers, body] = utils.splitByDelimiter(this.rawMessage, consts.EOL2X)
-    if (_.isNil(headers) || _.isNil(body)) {
+    const [headers, body] = splitByDelimiter(this.rawMessage, consts.EOL2X)
+    if (isNil(headers) || isNil(body)) {
       throw HttpZError.get(
-        'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
+        'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]',
       )
     }
 
     this._calcSizes(headers, body)
-    let headerRows = _.split(headers, consts.EOL)
+    const headerRows = headers.split(consts.EOL)
 
     return {
-      startRow: _.head(headerRows),
-      headerRows: _.tail(headerRows),
-      bodyRows: body
+      startRow: head(headerRows),
+      headerRows: tail(headerRows),
+      bodyRows: body,
     }
   }
 
   _parseHeaderRows() {
-    this.headers = _.map(this.headerRows, hRow => {
-      let [name, value] = utils.splitByDelimiter(hRow, ':')
+    this.headers = this.headerRows.map((hRow) => {
+      let [name, value] = splitByDelimiter(hRow, ':')
       if (!name) {
         throw HttpZError.get('Incorrect header row format, expected: Name: Value', hRow)
       }
 
       // quoted string must be parsed as a single value (https://tools.ietf.org/html/rfc7230#section-3.2.6)
-      if (_.isNil(value)) {
+      if (isNil(value)) {
         value = ''
       } else if (consts.regexps.quoutedHeaderValue.test(value)) {
-        value = _.trim(value, '"')
+        value = trim(value, '"')
       }
 
       return {
-        name: utils.prettifyHeaderName(name),
-        value
+        name: prettifyHeaderName(name),
+        value,
       }
     })
   }
@@ -56,7 +56,7 @@ class HttpZBaseParser {
     this._processTransferEncodingChunked()
 
     this.body = {}
-    let contentTypeHeader = this._getContentTypeValue()
+    const contentTypeHeader = this._getContentTypeValue()
     if (contentTypeHeader) {
       this.body.contentType = contentTypeHeader.toLowerCase().split(';')[0]
     }
@@ -79,7 +79,7 @@ class HttpZBaseParser {
   // eslint-disable-next-line max-statements
   _processTransferEncodingChunked() {
     const isChunked = this.headers.find(
-      h => h.name === consts.http.headers.transferEncoding && h.value.includes('chunked')
+      (h) => h.name === consts.http.headers.transferEncoding && h.value.includes('chunked'),
     )
     if (!isChunked) {
       return
@@ -105,16 +105,15 @@ class HttpZBaseParser {
 
   _parseFormDataBody() {
     this.body.boundary = this._getBoundary()
-    this.body.params = _.chain(this.bodyRows)
+    this.body.params = this.bodyRows
       .split(`--${this.body.boundary}`)
       // skip first and last items, which contains boundary
       .filter((unused, index, params) => index > 0 && index < params.length - 1)
-      .map(paramGroup => formDataParamParser.parse(paramGroup))
-      .value()
+      .map((paramGroup) => formDataParamParser.parse(paramGroup))
   }
 
   _parseUrlencodedBody() {
-    let params = new URLSearchParams(this.bodyRows)
+    const params = new URLSearchParams(this.bodyRows)
     this.body.params = []
     params.forEach((value, name) => {
       this.body.params.push({ name, value })
@@ -131,7 +130,7 @@ class HttpZBaseParser {
   }
 
   _getContentTypeValue() {
-    let contentTypeHeader = _.find(this.headers, { name: consts.http.headers.contentType })
+    const contentTypeHeader = (this.headers ?? []).find((h) => h.name === consts.http.headers.contentType)
     if (!contentTypeHeader) {
       return
     }
@@ -142,21 +141,21 @@ class HttpZBaseParser {
   }
 
   _getBoundary() {
-    let contentTypeValue = this._getContentTypeValue()
+    const contentTypeValue = this._getContentTypeValue()
     if (!contentTypeValue) {
       throw HttpZError.get('Message with multipart/form-data body must have Content-Type header with boundary')
     }
 
-    let params = contentTypeValue.split(';')[1]
+    const params = contentTypeValue.split(';')[1]
     if (!params) {
       throw HttpZError.get('Message with multipart/form-data body must have Content-Type header with boundary')
     }
 
-    let boundary = params.match(consts.regexps.boundary)
+    const boundary = params.match(consts.regexps.boundary)
     if (!boundary) {
       throw HttpZError.get('Incorrect boundary, expected: boundary=value', params)
     }
-    return _.trim(boundary[0], '"')
+    return trim(boundary[0], '"')
   }
 }
 

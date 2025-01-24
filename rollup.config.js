@@ -8,17 +8,11 @@ module.exports = [
     output: {
       name: 'httpZ',
       file: pkg.browser,
-      format: 'umd',
-      globals: {
-        'lodash': '_'
-      }
+      format: 'umd'
     },
     plugins: [
       resolve(),
       commonjs()
-    ],
-    external: [
-      'lodash'
     ]
   }
 ]

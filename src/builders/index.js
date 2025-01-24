@@ -1,13 +1,13 @@
-const _ = require('lodash')
+const { isNil, isPlainObject } = require('../utils')
 const HttpZError = require('../error')
 const RequestBuilder = require('./request')
 const ResponseBuilder = require('./response')
 
 module.exports = (messageModel, opts = {}) => {
-  if (_.isNil(messageModel)) {
+  if (isNil(messageModel)) {
     throw HttpZError.get('messageModel is required')
   }
-  if (!_.isPlainObject(messageModel)) {
+  if (!isPlainObject(messageModel)) {
     throw HttpZError.get('messageModel must be a plain object')
   }
   if (messageModel.method) {

@@ -1,18 +1,18 @@
-const _ = require('lodash')
 const consts = require('../consts')
+const { head, isNil, isString } = require('../utils')
 const HttpZError = require('../error')
 const RequestParser = require('./request')
 const ResponseParser = require('./response')
 
 module.exports = (rawMessage, opts = {}) => {
-  if (_.isNil(rawMessage)) {
+  if (isNil(rawMessage)) {
     throw HttpZError.get('rawMessage is required')
   }
-  if (!_.isString(rawMessage)) {
+  if (!isString(rawMessage)) {
     throw HttpZError.get('rawMessage must be a string')
   }
 
-  let firstRow = _.chain(rawMessage).split(consts.EOL).head().value()
+  const firstRow = head(rawMessage.split(consts.EOL))
   if (consts.regexps.requestStartRow.test(firstRow)) {
     return RequestParser.parse(rawMessage, opts)
   }

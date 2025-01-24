@@ -1,6 +1,4 @@
-const _ = require('lodash')
 const should = require('should')
-const HttpZError = require('../src/error')
 const utils = require('../src/utils')
 
 describe('utils', () => {
@@ -48,7 +46,7 @@ describe('utils', () => {
 
   describe('isAbsoluteUrl', () => {
     function test(url, expected) {
-      let actual = utils.isAbsoluteUrl(url)
+      const actual = utils.isAbsoluteUrl(url)
       should(actual).eql(expected)
     }
 
@@ -67,19 +65,17 @@ describe('utils', () => {
 
   describe('parseUrl', () => {
     function getDefParsedUrl(ex) {
-      return _.extend(
-        {
-          protocol: 'HTTP',
-          host: 'example.com',
-          path: '/',
-          params: []
-        },
-        ex
-      )
+      return {
+        protocol: 'HTTP',
+        host: 'example.com',
+        path: '/',
+        params: [],
+        ...ex,
+      }
     }
 
     function test(url, host, expected) {
-      let actual = utils.parseUrl(url, host)
+      const actual = utils.parseUrl(url, host)
       should(actual).eql(expected)
     }
 
@@ -104,7 +100,7 @@ describe('utils', () => {
         test(
           'http://example.com/home?p1=v1',
           undefined,
-          getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] })
+          getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }),
         )
       })
     })
@@ -130,95 +126,17 @@ describe('utils', () => {
         test(
           '/home?p1=v1',
           'http://example.com',
-          getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] })
+          getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }),
         )
       })
     })
   })
 
-  describe('generateUrl', () => {
-    function test(protocol, host, port, path, params, expected) {
-      let actual = utils.generateUrl(protocol, host, port, path, params)
-      should(actual).eql(expected)
-    }
-
-    it('should generate url without host', () => {
-      test(null, null, null, '/features', null, '/features')
-    })
-
-    it('should generate url with host', () => {
-      test('http', 'example.com', null, '/features', null, 'http://example.com/features')
-    })
-
-    it('should generate url with host and port', () => {
-      test('http', 'example.com', 8080, '/features', null, 'http://example.com:8080/features')
-    })
-  })
-
-  describe('generatePath', () => {
-    function test(path, params, expected) {
-      let actual = utils.generatePath(path, params)
-      should(actual).eql(expected)
-    }
-
-    it('should generate path without params', () => {
-      test('/features', null, '/features')
-    })
-
-    it('should generate path with two simple parameters', () => {
-      test(
-        '/features',
-        [
-          { name: 'p1', value: 'v1' },
-          { name: 'p2>', value: 'v2;' }
-        ],
-        '/features?p1=v1&p2%3E=v2%3B'
-      )
-    })
-
-    it('should generate path with object parameters', () => {
-      test(
-        '/features',
-        [
-          { name: 'p1[x]', value: 'v1' },
-          { name: 'p1[y]', value: 'v2' },
-          { name: 'p2>', value: 'v2;' }
-        ],
-        '/features?p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v2%3B'
-      )
-    })
-
-    it('should generate path with array parameters', () => {
-      test(
-        '/features',
-        [
-          { name: 'p1[]', value: 'v1' },
-          { name: 'p1[]', value: 'v2' },
-          { name: 'p2>', value: 'v2;' }
-        ],
-        '/features?p1%5B%5D=v1&p1%5B%5D=v2&p2%3E=v2%3B'
-      )
-    })
-  })
-
   describe('convertParamsArrayToPairs', () => {
     function test(params, expected) {
-      let actual = utils.convertParamsArrayToPairs(params)
+      const actual = utils.convertParamsArrayToPairs(params)
       should(actual).eql(expected)
     }
-
-    it('should throw error when params is nil', () => {
-      let expected = HttpZError.get('params is required')
-
-      should(utils.convertParamsArrayToPairs.bind(null)).throw(HttpZError, expected)
-    })
-
-    it('should throw error when params is not array', () => {
-      let params = 'params'
-      let expected = HttpZError.get('params must be an array')
-
-      should(utils.convertParamsArrayToPairs.bind(null, params)).throw(HttpZError, expected)
-    })
 
     it('should return param pairs', () => {
       test(
@@ -226,15 +144,15 @@ describe('utils', () => {
         [
           ['p1', 'v1'],
           ['p2', null],
-          ['p3', '']
-        ]
+          ['p3', ''],
+        ],
       )
     })
   })
 
   describe('prettifyHeaderName', () => {
     function test(name, expected) {
-      let actual = utils.prettifyHeaderName(name)
+      const actual = utils.prettifyHeaderName(name)
       should(actual).eql(expected)
     }
 
@@ -262,7 +180,7 @@ describe('utils', () => {
 
   describe('getEmptyStringForUndefined', () => {
     function test(val, expected) {
-      let actual = utils.getEmptyStringForUndefined(val)
+      const actual = utils.getEmptyStringForUndefined(val)
       should(actual).eql(expected)
     }
 
@@ -277,16 +195,14 @@ describe('utils', () => {
 
   describe('extendIfNotUndefined', () => {
     function getDefObject(ex) {
-      return _.extend(
-        {
-          name: 'John'
-        },
-        ex
-      )
+      return {
+        name: 'John',
+        ...ex,
+      }
     }
 
     function test(fieldName, fieldValue, expected) {
-      let obj = getDefObject()
+      const obj = getDefObject()
       utils.extendIfNotUndefined(obj, fieldName, fieldValue)
       should(obj).eql(expected)
     }

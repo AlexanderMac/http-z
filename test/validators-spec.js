@@ -6,7 +6,7 @@ describe('validators', () => {
   function validateRequired(fn, name) {
     it('should throw error when val is nil (undefined, null)', () => {
       const ERR = {
-        message: `${name} is required`
+        message: `${name} is required`,
       }
       should(fn.bind(null, undefined, name)).throw(HttpZError, ERR)
       should(fn.bind(null, null, name)).throw(HttpZError, ERR)
@@ -16,7 +16,7 @@ describe('validators', () => {
   function validateString(fn, name) {
     it('should throw error when val is not a string (number, date, object, array)', () => {
       const ERR = {
-        message: 'username must be a string'
+        message: 'username must be a string',
       }
       should(fn.bind(null, 10, name)).throw(HttpZError, ERR)
       should(fn.bind(null, new Date(), name)).throw(HttpZError, ERR)
@@ -28,7 +28,7 @@ describe('validators', () => {
   function validateNumber(fn, name) {
     it('should throw error when val is not a number (string, date, object, array)', () => {
       const ERR = {
-        message: 'age must be a number'
+        message: 'age must be a number',
       }
       should(fn.bind(null, '10', name)).throw(HttpZError, ERR)
       should(fn.bind(null, new Date(), name)).throw(HttpZError, ERR)
@@ -38,7 +38,7 @@ describe('validators', () => {
   }
 
   describe('validateRequired', () => {
-    let name = 'username'
+    const name = 'username'
 
     validateRequired(validators.validateRequired, name)
 
@@ -48,21 +48,21 @@ describe('validators', () => {
   })
 
   describe('validateString', () => {
-    let name = 'username'
+    const name = 'username'
 
     validateRequired(validators.validateString, name)
     validateString(validators.validateString, name)
   })
 
   describe('validateNotEmptyString', () => {
-    let name = 'username'
+    const name = 'username'
 
     validateRequired(validators.validateNotEmptyString, name)
     validateString(validators.validateNotEmptyString, name)
 
     it('should throw error when val is an empty string', () => {
       should(validators.validateNotEmptyString.bind(null, '', name)).throw(HttpZError, {
-        message: 'username must be not empty string'
+        message: 'username must be not empty string',
       })
     })
 
@@ -72,7 +72,7 @@ describe('validators', () => {
   })
 
   describe('validateNumber', () => {
-    let name = 'age'
+    const name = 'age'
 
     validateRequired(validators.validateNumber, name)
     validateNumber(validators.validateNumber, name)
@@ -84,17 +84,17 @@ describe('validators', () => {
   })
 
   describe('validatePositiveNumber', () => {
-    let name = 'age'
+    const name = 'age'
 
     validateRequired(validators.validatePositiveNumber, name)
     validateNumber(validators.validatePositiveNumber, name)
 
     it('should throw error when val is less or equal to zero', () => {
       should(validators.validatePositiveNumber.bind(null, -5, name)).throw(HttpZError, {
-        message: 'age must be a positive number'
+        message: 'age must be a positive number',
       })
       should(validators.validatePositiveNumber.bind(null, 0, name)).throw(HttpZError, {
-        message: 'age must be a positive number'
+        message: 'age must be a positive number',
       })
     })
 
@@ -104,13 +104,13 @@ describe('validators', () => {
   })
 
   describe('validateArray', () => {
-    let name = 'cookies'
+    const name = 'cookies'
 
     validateRequired(validators.validateArray, name)
 
     it('should throw error when val is not an array (string, number, date, object)', () => {
       const ERR = {
-        message: 'cookies must be an array'
+        message: 'cookies must be an array',
       }
       should(validators.validateArray.bind(null, '10', name)).throw(HttpZError, ERR)
       should(validators.validateArray.bind(null, 10, name)).throw(HttpZError, ERR)

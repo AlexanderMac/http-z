@@ -1,6 +1,6 @@
 {
   "name": "http-z",
-  "version": "7.1.3",
+  "version": "8.0.0-dev",
   "description": "HTTP message parser and builder",
   "engines": {
     "node": ">=16",
@@ -41,10 +41,8 @@
   "bugs": {
     "url": "https://github.com/AlexanderMac/http-z/issues"
   },
-  "homepage": "https://github.com/AlexanderMac/http-z#readme",
-  "dependencies": {
-    "lodash": "^4.17.21"
-  },
+  "homepage": "https://github.com/AlexanderMac/http-z",
+  "dependencies": {},
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",

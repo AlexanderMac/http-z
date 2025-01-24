@@ -1,12 +1,11 @@
-const _ = require('lodash')
 const consts = require('../consts')
 const HttpZError = require('../error')
-const utils = require('../utils')
+const { splitByDelimiter, head, tail, isEmpty } = require('../utils')
 const Base = require('./base')
 
 class HttpZResponseParser extends Base {
   static parse(...params) {
-    let instance = new HttpZResponseParser(...params)
+    const instance = new HttpZResponseParser(...params)
     return instance.parse()
   }
 
@@ -21,11 +20,11 @@ class HttpZResponseParser extends Base {
   }
 
   _parseMessageForRows() {
-    let { startRow, headerRows, bodyRows } = super._parseMessageForRows()
+    const { startRow, headerRows, bodyRows } = super._parseMessageForRows()
 
     this.startRow = startRow
     this.headerRows = headerRows
-    this.cookieRows = _.filter(headerRows, row => _.chain(row).toLower().startsWith('set-cookie').value())
+    this.cookieRows = headerRows.filter((row) => row.toLowerCase().startsWith('set-cookie'))
     this.bodyRows = bodyRows
   }
 
@@ -34,43 +33,43 @@ class HttpZResponseParser extends Base {
       throw HttpZError.get('Incorrect startRow format, expected: HTTP-Version status-code reason-phrase', this.startRow)
     }
 
-    let rowElems = this.startRow.split(' ')
+    const rowElems = this.startRow.split(' ')
     this.protocolVersion = rowElems[0].toUpperCase()
     this.statusCode = +rowElems[1]
     this.statusMessage = rowElems.splice(2).join(' ')
   }
 
   _parseCookieRows() {
-    if (_.isEmpty(this.cookieRows)) {
+    if (isEmpty(this.cookieRows)) {
       return
     }
 
     // eslint-disable-next-line max-statements
-    this.cookies = _.map(this.cookieRows, cookiesRow => {
+    this.cookies = this.cookieRows.map((cookiesRow) => {
       // eslint-disable-next-line no-unused-vars
-      let [unused, values] = utils.splitByDelimiter(cookiesRow, ':')
+      const [unused, values] = splitByDelimiter(cookiesRow, ':')
       if (!values) {
         return {}
       }
-      let params = _.split(values, ';')
-      let paramWithName = _.head(params)
-      let otherParams = _.tail(params)
+      const params = values.split(';')
+      const paramWithName = head(params)
+      const otherParams = tail(params)
 
-      let [name, value] = _.split(paramWithName, '=')
-      name = _.trim(name)
-      value = _.trim(value)
+      let [name, value] = paramWithName.split('=')
+      name = name.trim()
+      value = value.trim()
       if (!name) {
         throw HttpZError.get('Incorrect set-cookie pair format, expected: Name1=Value1;...', values)
       }
 
-      let cookie = {
-        name
+      const cookie = {
+        name,
       }
       if (value) {
         cookie.value = value
       }
       if (otherParams.length > 0) {
-        cookie.params = _.map(otherParams, p => _.trim(p))
+        cookie.params = otherParams.map((param) => param.trim())
       }
 
       return cookie
@@ -78,12 +77,12 @@ class HttpZResponseParser extends Base {
   }
 
   _generateModel() {
-    let model = {
+    const model = {
       protocolVersion: this.protocolVersion,
       statusCode: this.statusCode,
       statusMessage: this.statusMessage,
       headersSize: this.headersSize,
-      bodySize: this.bodySize
+      bodySize: this.bodySize,
     }
     if (this.headers) {
       model.headers = this.headers

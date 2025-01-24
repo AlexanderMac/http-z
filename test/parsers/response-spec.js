@@ -20,12 +20,12 @@ describe('parsers / response', () => {
     })
 
     it('should create instance of ResponseParser and call instance.parse', () => {
-      let params = 'raw'
-      let expected = 'ok'
+      const params = 'raw'
+      const expected = 'ok'
 
       ResponseParser.prototype.parse.returns('ok')
 
-      let actual = ResponseParser.parse(params)
+      const actual = ResponseParser.parse(params)
       nassert.assert(actual, expected)
 
       nassert.assertFn({ inst: ResponseParser.prototype, fnName: 'parse', expectedArgs: '_without-args_' })
@@ -34,7 +34,7 @@ describe('parsers / response', () => {
 
   describe('parse', () => {
     it('should call related methods and return response model', () => {
-      let parser = getParserInstance('rawResponse')
+      const parser = getParserInstance('rawResponse')
       sinon.stub(parser, '_parseMessageForRows')
       sinon.stub(parser, '_parseStartRow')
       sinon.stub(parser, '_parseHeaderRows')
@@ -42,8 +42,8 @@ describe('parsers / response', () => {
       sinon.stub(parser, '_parseBodyRows')
       sinon.stub(parser, '_generateModel').returns('responseModel')
 
-      let expected = 'responseModel'
-      let actual = parser.parse()
+      const expected = 'responseModel'
+      const actual = parser.parse()
       should(actual).eql(expected)
 
       nassert.assertFn({ inst: parser, fnName: '_parseMessageForRows', expectedArgs: '_without-args_' })
@@ -57,9 +57,9 @@ describe('parsers / response', () => {
 
   describe('_parseMessageForRows', () => {
     it('should parse message for rows when message is without Set-Cookie and Body rows', () => {
-      let rawResponse = ['start-line', 'header1', 'header2', 'header3', '', ''].join(HttpZConsts.EOL)
+      const rawResponse = ['start-line', 'header1', 'header2', 'header3', '', ''].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(rawResponse)
+      const parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -69,11 +69,11 @@ describe('parsers / response', () => {
     })
 
     it('should parse message for rows when message contains Set-Cookie rows', () => {
-      let rawResponse = ['start-line', 'header1', 'header2', 'header3', 'set-cookie', 'set-cookie', '', ''].join(
-        HttpZConsts.EOL
+      const rawResponse = ['start-line', 'header1', 'header2', 'header3', 'set-cookie', 'set-cookie', '', ''].join(
+        HttpZConsts.EOL,
       )
 
-      let parser = getParserInstance(rawResponse)
+      const parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -83,9 +83,9 @@ describe('parsers / response', () => {
     })
 
     it('should parse message for rows when message contains Body rows', () => {
-      let rawResponse = ['start-line', 'header1', 'header2', 'header3', '', 'body'].join(HttpZConsts.EOL)
+      const rawResponse = ['start-line', 'header1', 'header2', 'header3', '', 'body'].join(HttpZConsts.EOL)
 
-      let parser = getParserInstance(rawResponse)
+      const parser = getParserInstance(rawResponse)
       parser._parseMessageForRows()
 
       should(parser.startRow).eql('start-line')
@@ -97,17 +97,17 @@ describe('parsers / response', () => {
 
   describe('_parseStartRow', () => {
     it('should throw error when startRow has invalid format', () => {
-      let parser = getParserInstance()
+      const parser = getParserInstance()
       parser.startRow = 'Invalid response startRow'
 
       should(parser._parseStartRow.bind(parser)).throw(HttpZError, {
         message: 'Incorrect startRow format, expected: HTTP-Version status-code reason-phrase',
-        details: 'Invalid response startRow'
+        details: 'Invalid response startRow',
       })
     })
 
     it('should set instance fields when startRow has valid format (reason is empty)', () => {
-      let parser = getParserInstance()
+      const parser = getParserInstance()
       parser.startRow = 'HTTP/2 204 '
 
       parser._parseStartRow()
@@ -117,7 +117,7 @@ describe('parsers / response', () => {
     })
 
     it('should set instance fields when startRow has valid format (reason is not empty)', () => {
-      let parser = getParserInstance()
+      const parser = getParserInstance()
       parser.startRow = 'HTTP/1.1 201 Created'
 
       parser._parseStartRow()
@@ -133,38 +133,38 @@ describe('parsers / response', () => {
         'Set-Cookie: csrftoken=123abc',
         'Set-Cookie: ',
         'Set-Cookie: sessionid=; Domain=example.com; Path=/',
-        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
+        'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
       ]
     }
 
     it('should throw error when some of cookieRows has invalid format (empty cookie name)', () => {
-      let parser = getParserInstance()
+      const parser = getParserInstance()
       parser.cookieRows = getDefaultCookies()
       parser.cookieRows[1] = 'Set-cookie:  =456def;  Domain=example.com;'
 
       should(parser._parseCookieRows.bind(parser)).throw(HttpZError, {
         message: 'Incorrect set-cookie pair format, expected: Name1=Value1;...',
-        details: '=456def;  Domain=example.com;'
+        details: '=456def;  Domain=example.com;',
       })
     })
 
     it('should set instance.cookies to undefined when cookieRows is an empty array', () => {
-      let parser = getParserInstance()
+      const parser = getParserInstance()
       parser.cookieRows = []
-      let expected
+      const expected = undefined
 
       parser._parseCookieRows()
       should(parser.cookies).eql(expected)
     })
 
     it('should set instance.cookies when cookieRows is valid and not an empty array', () => {
-      let parser = getParserInstance()
+      const parser = getParserInstance()
       parser.cookieRows = getDefaultCookies()
-      let expected = [
+      const expected = [
         { name: 'csrftoken', value: '123abc' },
         {},
         { name: 'sessionid', params: ['Domain=example.com', 'Path=/'] },
-        { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
+        { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] },
       ]
 
       parser._parseCookieRows()
@@ -174,26 +174,26 @@ describe('parsers / response', () => {
 
   describe('_generateModel', () => {
     it('should generate response model using instance fields when some fields are undefined', () => {
-      let parser = getParserInstance()
+      const parser = getParserInstance()
       parser.headersSize = 25
       parser.bodySize = 0
       parser.protocolVersion = 'protocolVersion'
       parser.statusCode = 'statusCode'
       parser.statusMessage = 'statusMessage'
 
-      let expected = {
+      const expected = {
         protocolVersion: 'protocolVersion',
         statusCode: 'statusCode',
         statusMessage: 'statusMessage',
         headersSize: 25,
-        bodySize: 0
+        bodySize: 0,
       }
-      let actual = parser._generateModel()
+      const actual = parser._generateModel()
       should(actual).eql(expected)
     })
 
     it('should generate response model using instance fields', () => {
-      let parser = getParserInstance()
+      const parser = getParserInstance()
       parser.headersSize = 55
       parser.bodySize = 4
       parser.protocolVersion = 'protocolVersion'
@@ -203,7 +203,7 @@ describe('parsers / response', () => {
       parser.cookies = 'cookies'
       parser.body = 'body'
 
-      let expected = {
+      const expected = {
         protocolVersion: 'protocolVersion',
         statusCode: 'statusCode',
         statusMessage: 'statusMessage',
@@ -211,75 +211,75 @@ describe('parsers / response', () => {
         cookies: 'cookies',
         body: 'body',
         headersSize: 55,
-        bodySize: 4
+        bodySize: 4,
       }
-      let actual = parser._generateModel()
+      const actual = parser._generateModel()
       should(actual).eql(expected)
     })
   })
 
   describe('functional tests', () => {
     it('should parse response without headers and body', () => {
-      let rawResponse = ['HTTP/1.1 204 No content', '', ''].join(HttpZConsts.EOL)
+      const rawResponse = ['HTTP/1.1 204 No content', '', ''].join(HttpZConsts.EOL)
 
-      let responseModel = {
+      const responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 204,
         statusMessage: 'No content',
         headers: [],
         headersSize: 27,
-        bodySize: 0
+        bodySize: 0,
       }
 
-      let parser = getParserInstance(rawResponse)
-      let actual = parser.parse()
+      const parser = getParserInstance(rawResponse)
+      const actual = parser.parse()
       should(actual).eql(responseModel)
     })
 
     it('should parse response without body (header names in lower case)', () => {
-      let rawResponse = [
+      const rawResponse = [
         'HTTP/1.1 201 Created',
         'connection: ',
         'cache-Control: no-cache',
         'Content-type: text/plain; charset=UTF-8',
         'content-encoding: gzip,deflate',
         '',
-        ''
+        '',
       ].join(HttpZConsts.EOL)
 
-      let responseModel = {
+      const responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 201,
         statusMessage: 'Created',
         headers: [
           {
             name: 'Connection',
-            value: ''
+            value: '',
           },
           {
             name: 'Cache-Control',
-            value: 'no-cache'
+            value: 'no-cache',
           },
           {
             name: 'Content-Type',
-            value: 'text/plain; charset=UTF-8'
+            value: 'text/plain; charset=UTF-8',
           },
           {
             name: 'Content-Encoding',
-            value: 'gzip,deflate'
-          }
+            value: 'gzip,deflate',
+          },
         ],
         headersSize: 136,
-        bodySize: 0
+        bodySize: 0,
       }
 
-      let parser = getParserInstance(rawResponse)
-      let actual = parser.parse()
+      const parser = getParserInstance(rawResponse)
+      const actual = parser.parse()
       should(actual).eql(responseModel)
     })
 
     it('should parse response without cookies and body', () => {
-      let rawResponse = [
+      const rawResponse = [
         'HTTP/1.1 201 Created',
         'Connection: ',
         'Cache-Control: no-cache',
@@ -289,59 +289,59 @@ describe('parsers / response', () => {
         'Set-Cookie: sessionid=456def; Domain=example.com; Path=/',
         'Set-Cookie: username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
         '',
-        ''
+        '',
       ].join(HttpZConsts.EOL)
 
-      let responseModel = {
+      const responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 201,
         statusMessage: 'Created',
         headers: [
           {
             name: 'Connection',
-            value: ''
+            value: '',
           },
           {
             name: 'Cache-Control',
-            value: 'no-cache'
+            value: 'no-cache',
           },
           {
             name: 'Content-Type',
-            value: 'text/plain; charset=UTF-8'
+            value: 'text/plain; charset=UTF-8',
           },
           {
             name: 'Content-Encoding',
-            value: 'gzip,deflate'
+            value: 'gzip,deflate',
           },
           {
             name: 'Set-Cookie',
-            value: 'csrftoken=123abc'
+            value: 'csrftoken=123abc',
           },
           {
             name: 'Set-Cookie',
-            value: 'sessionid=456def; Domain=example.com; Path=/'
+            value: 'sessionid=456def; Domain=example.com; Path=/',
           },
           {
             name: 'Set-Cookie',
-            value: 'username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly'
-          }
+            value: 'username=smith; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly',
+          },
         ],
         cookies: [
           { name: 'csrftoken', value: '123abc' },
           { name: 'sessionid', value: '456def', params: ['Domain=example.com', 'Path=/'] },
-          { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] }
+          { name: 'username', value: 'smith', params: ['Expires=Wed, 21 Oct 2015 07:28:00 GMT', 'Secure', 'HttpOnly'] },
         ],
         headersSize: 309,
-        bodySize: 0
+        bodySize: 0,
       }
 
-      let parser = getParserInstance(rawResponse)
-      let actual = parser.parse()
+      const parser = getParserInstance(rawResponse)
+      const actual = parser.parse()
       should(actual).eql(responseModel)
     })
 
     it('should parse response with body of contentType=text/plain', () => {
-      let rawResponse = [
+      const rawResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -349,50 +349,50 @@ describe('parsers / response', () => {
         'Content-Encoding: gzip,deflate',
         'Content-Length: 301',
         '',
-        'Text data'
+        'Text data',
       ].join(HttpZConsts.EOL)
 
-      let responseModel = {
+      const responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
         statusMessage: 'Ok',
         headers: [
           {
             name: 'Connection',
-            value: 'keep-alive'
+            value: 'keep-alive',
           },
           {
             name: 'Cache-Control',
-            value: 'no-cache'
+            value: 'no-cache',
           },
           {
             name: 'Content-Type',
-            value: 'text/plain; charset=UTF-8'
+            value: 'text/plain; charset=UTF-8',
           },
           {
             name: 'Content-Encoding',
-            value: 'gzip,deflate'
+            value: 'gzip,deflate',
           },
           {
             name: 'Content-Length',
-            value: '301'
-          }
+            value: '301',
+          },
         ],
         body: {
           contentType: 'text/plain',
-          text: 'Text data'
+          text: 'Text data',
         },
         headersSize: 162,
-        bodySize: 9
+        bodySize: 9,
       }
 
-      let parser = getParserInstance(rawResponse)
-      let actual = parser.parse()
+      const parser = getParserInstance(rawResponse)
+      const actual = parser.parse()
       should(actual).eql(responseModel)
     })
 
     it('should parse response with body of contentType=text/plain and transfer-encoding=chunked', () => {
-      let rawResponse = [
+      const rawResponse = [
         'HTTP/1.1 200 Ok',
         'Connection: keep-alive',
         'Cache-Control: no-cache',
@@ -409,45 +409,45 @@ describe('parsers / response', () => {
         '19',
         'transfer the payload body',
         'C',
-        ' to the user'
+        ' to the user',
       ].join(HttpZConsts.EOL)
 
-      let responseModel = {
+      const responseModel = {
         protocolVersion: 'HTTP/1.1',
         statusCode: 200,
         statusMessage: 'Ok',
         headers: [
           {
             name: 'Connection',
-            value: 'keep-alive'
+            value: 'keep-alive',
           },
           {
             name: 'Cache-Control',
-            value: 'no-cache'
+            value: 'no-cache',
           },
           {
             name: 'Content-Type',
-            value: 'text/plain; charset=UTF-8'
+            value: 'text/plain; charset=UTF-8',
           },
           {
             name: 'Content-Encoding',
-            value: 'gzip,deflate'
+            value: 'gzip,deflate',
           },
           {
             name: 'Transfer-Encoding',
-            value: 'chunked'
-          }
+            value: 'chunked',
+          },
         ],
         body: {
           contentType: 'text/plain',
-          text: 'The Transfer-Encoding header specifies the form of encoding used to safely transfer the payload body to the user'
+          text: 'The Transfer-Encoding header specifies the form of encoding used to safely transfer the payload body to the user',
         },
         headersSize: 169,
-        bodySize: 139
+        bodySize: 139,
       }
 
-      let parser = getParserInstance(rawResponse)
-      let actual = parser.parse()
+      const parser = getParserInstance(rawResponse)
+      const actual = parser.parse()
       should(actual).eql(responseModel)
     })
   })

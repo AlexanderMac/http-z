@@ -1,8 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('lodash')) :
-	typeof define === 'function' && define.amd ? define(['lodash'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.httpZ = factory(global._));
-})(this, (function (require$$0) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.httpZ = factory());
+})(this, (function () { 'use strict';
 
 	function getDefaultExportFromCjs (x) {
 		return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
@@ -32,7 +32,7 @@
 		regexps.boundary = /(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}/;
 		regexps.contentDisposition = new RegExp(
 		  `^Content-Disposition: *(form-data|inline|attachment)${BASIC_LATIN}*${EOL}`,
-		  'i'
+		  'i',
 		);
 		regexps.contentType = new RegExp(`^Content-Type:[\\S ]*${EOL}`, 'i');
 		regexps.contentDispositionType = /(?<=Content-Disposition:) *(form-data|inline|attachment)/;
@@ -44,13 +44,13 @@
 
 		http.protocols = {
 		  http: 'HTTP',
-		  https: 'HTTPS'
+		  https: 'HTTPS',
 		};
 
 		http.protocolVersions = {
 		  http10: 'HTTP/1.0',
 		  http11: 'HTTP/1.1',
-		  http20: 'HTTP/2.0'
+		  http20: 'HTTP/2.0',
 		};
 
 		http.methods = {
@@ -62,7 +62,7 @@
 		  post: 'POST',
 		  put: 'PUT',
 		  patch: 'PATCH',
-		  delete: 'DELETE'
+		  delete: 'DELETE',
 		};
 
 		http.postMethods = [http.methods.post, http.methods.put, http.methods.patch];
@@ -75,7 +75,7 @@
 		    html: 'text/html',
 		    javascript: 'text/javascript',
 		    plain: 'text/plain',
-		    xml: 'text/xml'
+		    xml: 'text/xml',
 		  },
 		  application: {
 		    any: 'application/',
@@ -88,14 +88,14 @@
 		    xml: 'application/xml',
 		    xShockwaveFlash: 'application/x-shockwave-flash',
 		    xWwwFormUrlencoded: 'application/x-www-form-urlencoded',
-		    zip: 'application/zip'
+		    zip: 'application/zip',
 		  },
 		  multipart: {
 		    any: 'multipart/',
 		    alternative: 'multipart/alternative',
 		    formData: 'multipart/form-data',
 		    mixed: 'multipart/mixed',
-		    related: 'multipart/related'
+		    related: 'multipart/related',
 		  },
 		  image: {
 		    any: 'image/',
@@ -103,17 +103,17 @@
 		    jpeg: 'image/jpeg',
 		    png: 'image/png',
 		    tiff: 'image/tiff',
-		    icon: 'image/x-icon'
+		    icon: 'image/x-icon',
 		  },
 		  audio: {
-		    any: 'audio/'
+		    any: 'audio/',
 		  },
 		  video: {
-		    any: 'audio/'
+		    any: 'audio/',
 		  },
 		  font: {
-		    any: 'font/'
-		  }
+		    any: 'font/',
+		  },
 		};
 
 		http.headers = {
@@ -122,14 +122,14 @@
 		  contentLength: 'Content-Length',
 		  userAgent: 'User-Agent',
 		  setCookie: 'Set-Cookie',
-		  transferEncoding: 'Transfer-Encoding'
+		  transferEncoding: 'Transfer-Encoding',
 		};
 
 		consts = {
 		  EOL,
 		  EOL2X,
 		  regexps,
-		  http
+		  http,
 		};
 		return consts;
 	}
@@ -161,88 +161,34 @@
 
 	var utils = {};
 
-	var validators = {};
-
-	var hasRequiredValidators;
-
-	function requireValidators () {
-		if (hasRequiredValidators) return validators;
-		hasRequiredValidators = 1;
-		(function (exports) {
-			const _ = require$$0;
-			const HttpZError = requireError();
-
-			exports.validateRequired = (val, field, details) => {
-			  if (_.isNil(val)) {
-			    throw HttpZError.get(`${field} is required`, details)
-			  }
-			};
-
-			exports.validateString = (val, field, details) => {
-			  exports.validateRequired(val, field, details);
-			  if (!_.isString(val)) {
-			    throw HttpZError.get(`${field} must be a string`, details)
-			  }
-			};
-
-			exports.validateNotEmptyString = (val, field, details) => {
-			  exports.validateString(val, field, details);
-			  if (_.isEmpty(val)) {
-			    throw HttpZError.get(`${field} must be not empty string`, details)
-			  }
-			};
-
-			exports.validateNumber = (val, field, details) => {
-			  exports.validateRequired(val, field, details);
-			  if (!_.isNumber(val)) {
-			    throw HttpZError.get(`${field} must be a number`, details)
-			  }
-			};
-
-			exports.validatePositiveNumber = (val, field, details) => {
-			  exports.validateNumber(val, field, details);
-			  if (val <= 0) {
-			    throw HttpZError.get(`${field} must be a positive number`, details)
-			  }
-			};
-
-			exports.validateArray = (val, field, details) => {
-			  exports.validateRequired(val, field, details);
-			  if (!_.isArray(val)) {
-			    throw HttpZError.get(`${field} must be an array`, details)
-			  }
-			}; 
-		} (validators));
-		return validators;
-	}
-
 	var hasRequiredUtils;
 
 	function requireUtils () {
 		if (hasRequiredUtils) return utils;
 		hasRequiredUtils = 1;
 		(function (exports) {
-			const _ = require$$0;
-			const validators = requireValidators();
+			exports.getLibVersion = () => {
+			  return '8.0.0-dev'
+			};
 
 			exports.splitByDelimiter = (str, delimiter) => {
-			  if (_.isEmpty(str)) {
+			  if (exports.isEmpty(str)) {
 			    return []
 			  }
 
-			  let delimiterIndex = str.indexOf(delimiter);
+			  const delimiterIndex = str.indexOf(delimiter);
 			  if (delimiterIndex === -1) {
 			    return []
 			  }
 
-			  let res = [str.slice(0, delimiterIndex), str.slice(delimiterIndex + delimiter.length)];
-			  res[0] = _.trim(res[0], ' ');
-			  res[1] = _.trim(res[1], ' ');
+			  const result = [str.slice(0, delimiterIndex), str.slice(delimiterIndex + delimiter.length)];
+			  result[0] = result[0].trim(' ');
+			  result[1] = result[1].trim(' ');
 
-			  return res
+			  return result
 			};
 
-			exports.isAbsoluteUrl = url => {
+			exports.isAbsoluteUrl = (url) => {
 			  // Don't match Windows paths `c:\`
 			  if (/^[a-zA-Z]:\\/.test(url)) {
 			    return false
@@ -259,75 +205,199 @@
 			    url = null;
 			  }
 			  const supportedProtocols = ['http', 'https'];
-			  if (!_.find(supportedProtocols, known => _.startsWith(host, known + '://'))) {
+			  if (!supportedProtocols.some((known) => host.startsWith(known + '://'))) {
 			    host = 'http://' + host;
 			  }
 
-			  let parsedUrl = url ? new URL(url, host) : new URL(host);
-			  let protocol = parsedUrl.protocol.replace(':', '').toUpperCase();
-			  let params = [];
+			  const parsedUrl = url ? new URL(url, host) : new URL(host);
+			  const protocol = parsedUrl.protocol.replace(':', '').toUpperCase();
+			  const params = [];
 			  parsedUrl.searchParams.forEach((value, name) => params.push({ name, value }));
 
 			  return {
 			    protocol,
 			    host: parsedUrl.host,
 			    path: parsedUrl.pathname,
-			    params
+			    params,
 			  }
 			};
 
-			// eslint-disable-next-line max-params
-			exports.generateUrl = (protocol, host, port, path, params) => {
-			  let result = '';
-			  if (host) {
-			    result += protocol.toLowerCase() + '://' + host;
-			    if (port && !host.includes(':')) {
-			      result += ':' + port;
-			    }
-			  }
-			  let pathWithParams = exports.generatePath(path, params);
-			  result += pathWithParams;
-
-			  return result
+			exports.convertParamsArrayToPairs = (params) => {
+			  return params.map(({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
 			};
 
-			exports.generatePath = (path, params) => {
-			  if (_.isEmpty(params)) {
-			    return path
-			  }
-			  let paramPairs = exports.convertParamsArrayToPairs(params);
-
-			  return path + '?' + new URLSearchParams(paramPairs).toString()
+			exports.prettifyHeaderName = (name) => {
+			  return (name ?? '').toString().split('-').map(exports.capitalize).join('-')
 			};
 
-			exports.convertParamsArrayToPairs = params => {
-			  validators.validateArray(params, 'params');
-
-			  return _.map(params, ({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
-			};
-
-			exports.prettifyHeaderName = name => {
-			  return _.chain(name).split('-').map(_.capitalize).join('-').value()
-			};
-
-			exports.getEmptyStringForUndefined = val => {
-			  if (_.isUndefined(val)) {
+			exports.getEmptyStringForUndefined = (val) => {
+			  if (exports.isUndefined(val)) {
 			    return ''
 			  }
 			  return val
 			};
 
 			exports.extendIfNotUndefined = (obj, fieldName, fieldValue) => {
-			  if (!_.isUndefined(fieldValue)) {
+			  if (!exports.isUndefined(fieldValue)) {
 			    obj[fieldName] = fieldValue;
 			  }
 			};
 
-			exports.getLibVersion = () => {
-			  return '7.1.3'
+			// **********************
+			// Lodash native replaces
+			exports.isUndefined = (value) => {
+			  return value === undefined
+			};
+
+			exports.isNil = (value) => {
+			  return value == null
+			};
+
+			exports.isEmpty = (value) => {
+			  if (value?.length || value?.size) {
+			    return false
+			  }
+			  if (typeof value !== 'object') {
+			    return true
+			  }
+			  for (const key in value) {
+			    if (Object.hasOwn(value, key)) {
+			      return false
+			    }
+			  }
+			  return true
+			};
+
+			exports.isString = (value) => {
+			  return typeof value === 'string'
+			};
+
+			exports.isNumber = (value) => {
+			  return typeof value === 'number'
+			};
+
+			exports.isArray = (value) => {
+			  return Array.isArray(value)
+			};
+
+			exports.isError = value => {
+			  return value instanceof Error
+			};
+
+			exports.isPlainObject = (value) => {
+			  if (typeof value !== 'object' || value === null) {
+			    return false
+			  }
+			  if (Object.prototype.toString.call(value) !== '[object Object]') {
+			    return false
+			  }
+			  const proto = Object.getPrototypeOf(value);
+			  if (proto === null) {
+			    return true
+			  }
+
+			  const Ctor = Object.prototype.hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+			  return (
+			    typeof Ctor === 'function' &&
+			    Ctor instanceof Ctor &&
+			    Function.prototype.call(Ctor) === Function.prototype.call(value)
+			  )
+			};
+
+			exports.capitalize = (value) => {
+			  return value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : ''
+			};
+
+			exports.head = (value) => {
+			  // eslint-disable-next-line no-unused-vars
+			  const [head, ...tail] = value;
+			  return head
+			};
+
+			exports.tail = (value) => {
+			  // eslint-disable-next-line no-unused-vars
+			  const [head, ...tail] = value;
+			  return tail
+			};
+
+			exports.trim = (value, chars = undefined) => {
+			  if (exports.isNil(value)) {
+			    return value
+			  }
+			  value = value.toString();
+			  if (chars === undefined || chars === '\\s') {
+			    return value.trim()
+			  }
+			  return value.replace(new RegExp(`^([${chars}]*)(.*?)([${chars}]*)$`), '$2')
+			};
+
+			exports.trimEnd = (value, chars = undefined) =>{
+			  if (exports.isNil(value)) {
+			    return value
+			  }
+			  value = value.toString();
+			  if (chars === undefined || chars === '\\s') {
+			    return value.trimEnd()
+			  }
+			  return value.replace(new RegExp(`^(.*?)([${chars}]*)$`), '$1')
 			}; 
 		} (utils));
 		return utils;
+	}
+
+	var validators = {};
+
+	var hasRequiredValidators;
+
+	function requireValidators () {
+		if (hasRequiredValidators) return validators;
+		hasRequiredValidators = 1;
+		(function (exports) {
+			const { isNil, isString, isEmpty, isNumber, isArray } = requireUtils();
+			const HttpZError = requireError();
+
+			exports.validateRequired = (val, field, details) => {
+			  if (isNil(val)) {
+			    throw HttpZError.get(`${field} is required`, details)
+			  }
+			};
+
+			exports.validateString = (val, field, details) => {
+			  exports.validateRequired(val, field, details);
+			  if (!isString(val)) {
+			    throw HttpZError.get(`${field} must be a string`, details)
+			  }
+			};
+
+			exports.validateNotEmptyString = (val, field, details) => {
+			  exports.validateString(val, field, details);
+			  if (isEmpty(val)) {
+			    throw HttpZError.get(`${field} must be not empty string`, details)
+			  }
+			};
+
+			exports.validateNumber = (val, field, details) => {
+			  exports.validateRequired(val, field, details);
+			  if (!isNumber(val)) {
+			    throw HttpZError.get(`${field} must be a number`, details)
+			  }
+			};
+
+			exports.validatePositiveNumber = (val, field, details) => {
+			  exports.validateNumber(val, field, details);
+			  if (val <= 0) {
+			    throw HttpZError.get(`${field} must be a positive number`, details)
+			  }
+			};
+
+			exports.validateArray = (val, field, details) => {
+			  exports.validateRequired(val, field, details);
+			  if (!isArray(val)) {
+			    throw HttpZError.get(`${field} must be an array`, details)
+			  }
+			}; 
+		} (validators));
+		return validators;
 	}
 
 	var formDataParamParser;
@@ -336,15 +406,14 @@
 	function requireFormDataParamParser () {
 		if (hasRequiredFormDataParamParser) return formDataParamParser;
 		hasRequiredFormDataParamParser = 1;
-		const _ = require$$0;
 		const consts = requireConsts();
-		const utils = requireUtils();
+		const { extendIfNotUndefined, trim, trimEnd } = requireUtils();
 		const HttpZError = requireError();
 
 		class FormDataParamParser {
 		  // TODO: test it
 		  static parse(...params) {
-		    let instance = new FormDataParamParser(...params);
+		    const instance = new FormDataParamParser(...params);
 		    return instance.parse()
 		  }
 
@@ -356,87 +425,81 @@
 		  parse() {
 		    this.paramGroup = this.paramGroup.replace(consts.regexps.startNl, '').replace(consts.regexps.endNl, '');
 
-		    let contentDispositionHeader = this._getContentDisposition();
-		    let contentType = this._getContentType();
-		    let dispositionType = this._getDispositionType(contentDispositionHeader);
-		    let name = dispositionType === 'form-data' ? this._getParamName(contentDispositionHeader) : undefined;
-		    let fileName = this._getFileName(contentDispositionHeader);
-		    let value = this._getParamValue();
+		    const contentDispositionHeader = this._getContentDisposition();
+		    const contentType = this._getContentType();
+		    const dispositionType = this._getDispositionType(contentDispositionHeader);
+		    const name = dispositionType === 'form-data' ? this._getParamName(contentDispositionHeader) : undefined;
+		    const fileName = this._getFileName(contentDispositionHeader);
+		    const value = this._getParamValue();
 
-		    let param = {
-		      value
+		    const param = {
+		      value,
 		    };
 		    if (dispositionType !== 'form-data') {
 		      param.type = dispositionType;
 		    }
-		    utils.extendIfNotUndefined(param, 'contentType', contentType);
-		    utils.extendIfNotUndefined(param, 'name', name);
-		    utils.extendIfNotUndefined(param, 'fileName', fileName);
+		    extendIfNotUndefined(param, 'contentType', contentType);
+		    extendIfNotUndefined(param, 'name', name);
+		    extendIfNotUndefined(param, 'fileName', fileName);
 
 		    return param
 		  }
 
 		  // TODO: test it
 		  _getContentDisposition() {
-		    let contentDisposition = this.paramGroup.match(consts.regexps.contentDisposition);
+		    const contentDisposition = this.paramGroup.match(consts.regexps.contentDisposition);
 		    if (!contentDisposition) {
 		      throw HttpZError.get('Incorrect Content-Disposition', this.paramGroup)
 		    }
 		    this.paramGroup = this.paramGroup.replace(contentDisposition[0], '');
-		    contentDisposition = _.trimEnd(contentDisposition[0], consts.EOL);
-		    return contentDisposition
+		    return trimEnd(contentDisposition[0], consts.EOL)
 		  }
 
 		  // TODO: test it
 		  _getContentType() {
-		    let contentType = this.paramGroup.match(consts.regexps.contentType);
+		    const contentType = this.paramGroup.match(consts.regexps.contentType);
 		    if (contentType) {
 		      this.paramGroup = this.paramGroup.replace(contentType[0], '');
-		      return _.chain(contentType)
-		        .toLower()
+		      return contentType
+		        .toString()
+		        .toLowerCase()
 		        .replace(/^content-type: */, '')
 		        .trimEnd(consts.EOL)
-		        .value()
 		    }
 		  }
 
 		  // TODO: test it
 		  _getDispositionType(contentDisposition) {
-		    let dispositionType = contentDisposition.match(consts.regexps.contentDispositionType);
+		    const dispositionType = contentDisposition.match(consts.regexps.contentDispositionType);
 		    if (!dispositionType) {
 		      throw HttpZError.get('Incorrect Content-Disposition type', contentDisposition)
 		    }
-		    dispositionType = _.chain(dispositionType[0]).trim().toLower().value();
-		    return dispositionType
+		    return dispositionType[0].trim().toLowerCase()
 		  }
 
 		  // TODO: test it
 		  _getParamName(contentDisposition) {
-		    let paramName = contentDisposition.match(consts.regexps.dispositionName);
+		    const paramName = contentDisposition.match(consts.regexps.dispositionName);
 		    if (!paramName) {
 		      throw HttpZError.get('Incorrect Content-Disposition, expected param name', contentDisposition)
 		    }
-		    paramName = _.trim(paramName, '"');
-		    return paramName
+		    return trim(paramName, '"')
 		  }
 
 		  // TODO: test it
 		  _getFileName(contentDisposition) {
-		    let fileName = contentDisposition.match(consts.regexps.dispositionFileName);
+		    const fileName = contentDisposition.match(consts.regexps.dispositionFileName);
 		    if (fileName) {
-		      return _.trim(fileName, '"')
+		      return trim(fileName, '"')
 		    }
 		  }
 
 		  // TODO: test it
 		  _getParamValue() {
-		    let value;
 		    if (this.paramGroup.match(consts.regexps.startNl)) {
-		      value = this.paramGroup.replace(consts.regexps.startNl, '');
-		    } else {
-		      throw HttpZError.get('Incorrect form-data parameter', this.paramGroup)
+		      return this.paramGroup.replace(consts.regexps.startNl, '')
 		    }
-		    return value
+		    throw HttpZError.get('Incorrect form-data parameter', this.paramGroup)
 		  }
 		}
 
@@ -450,10 +513,10 @@
 	function requireBase$1 () {
 		if (hasRequiredBase$1) return base$1;
 		hasRequiredBase$1 = 1;
-		const _ = require$$0;
 		const consts = requireConsts();
 		const HttpZError = requireError();
-		const utils = requireUtils();
+		const { isNil, trim } = requireUtils();
+		const { splitByDelimiter, prettifyHeaderName, head, tail } = requireUtils();
 		const formDataParamParser = requireFormDataParamParser();
 
 		class HttpZBaseParser {
@@ -462,40 +525,40 @@
 		  }
 
 		  _parseMessageForRows() {
-		    let [headers, body] = utils.splitByDelimiter(this.rawMessage, consts.EOL2X);
-		    if (_.isNil(headers) || _.isNil(body)) {
+		    const [headers, body] = splitByDelimiter(this.rawMessage, consts.EOL2X);
+		    if (isNil(headers) || isNil(body)) {
 		      throw HttpZError.get(
-		        'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]'
+		        'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]',
 		      )
 		    }
 
 		    this._calcSizes(headers, body);
-		    let headerRows = _.split(headers, consts.EOL);
+		    const headerRows = headers.split(consts.EOL);
 
 		    return {
-		      startRow: _.head(headerRows),
-		      headerRows: _.tail(headerRows),
-		      bodyRows: body
+		      startRow: head(headerRows),
+		      headerRows: tail(headerRows),
+		      bodyRows: body,
 		    }
 		  }
 
 		  _parseHeaderRows() {
-		    this.headers = _.map(this.headerRows, hRow => {
-		      let [name, value] = utils.splitByDelimiter(hRow, ':');
+		    this.headers = this.headerRows.map((hRow) => {
+		      let [name, value] = splitByDelimiter(hRow, ':');
 		      if (!name) {
 		        throw HttpZError.get('Incorrect header row format, expected: Name: Value', hRow)
 		      }
 
 		      // quoted string must be parsed as a single value (https://tools.ietf.org/html/rfc7230#section-3.2.6)
-		      if (_.isNil(value)) {
+		      if (isNil(value)) {
 		        value = '';
 		      } else if (consts.regexps.quoutedHeaderValue.test(value)) {
-		        value = _.trim(value, '"');
+		        value = trim(value, '"');
 		      }
 
 		      return {
-		        name: utils.prettifyHeaderName(name),
-		        value
+		        name: prettifyHeaderName(name),
+		        value,
 		      }
 		    });
 		  }
@@ -508,7 +571,7 @@
 		    this._processTransferEncodingChunked();
 
 		    this.body = {};
-		    let contentTypeHeader = this._getContentTypeValue();
+		    const contentTypeHeader = this._getContentTypeValue();
 		    if (contentTypeHeader) {
 		      this.body.contentType = contentTypeHeader.toLowerCase().split(';')[0];
 		    }
@@ -531,7 +594,7 @@
 		  // eslint-disable-next-line max-statements
 		  _processTransferEncodingChunked() {
 		    const isChunked = this.headers.find(
-		      h => h.name === consts.http.headers.transferEncoding && h.value.includes('chunked')
+		      (h) => h.name === consts.http.headers.transferEncoding && h.value.includes('chunked'),
 		    );
 		    if (!isChunked) {
 		      return
@@ -557,16 +620,15 @@
 
 		  _parseFormDataBody() {
 		    this.body.boundary = this._getBoundary();
-		    this.body.params = _.chain(this.bodyRows)
+		    this.body.params = this.bodyRows
 		      .split(`--${this.body.boundary}`)
 		      // skip first and last items, which contains boundary
 		      .filter((unused, index, params) => index > 0 && index < params.length - 1)
-		      .map(paramGroup => formDataParamParser.parse(paramGroup))
-		      .value();
+		      .map((paramGroup) => formDataParamParser.parse(paramGroup));
 		  }
 
 		  _parseUrlencodedBody() {
-		    let params = new URLSearchParams(this.bodyRows);
+		    const params = new URLSearchParams(this.bodyRows);
 		    this.body.params = [];
 		    params.forEach((value, name) => {
 		      this.body.params.push({ name, value });
@@ -583,7 +645,7 @@
 		  }
 
 		  _getContentTypeValue() {
-		    let contentTypeHeader = _.find(this.headers, { name: consts.http.headers.contentType });
+		    const contentTypeHeader = (this.headers ?? []).find((h) => h.name === consts.http.headers.contentType);
 		    if (!contentTypeHeader) {
 		      return
 		    }
@@ -594,21 +656,21 @@
 		  }
 
 		  _getBoundary() {
-		    let contentTypeValue = this._getContentTypeValue();
+		    const contentTypeValue = this._getContentTypeValue();
 		    if (!contentTypeValue) {
 		      throw HttpZError.get('Message with multipart/form-data body must have Content-Type header with boundary')
 		    }
 
-		    let params = contentTypeValue.split(';')[1];
+		    const params = contentTypeValue.split(';')[1];
 		    if (!params) {
 		      throw HttpZError.get('Message with multipart/form-data body must have Content-Type header with boundary')
 		    }
 
-		    let boundary = params.match(consts.regexps.boundary);
+		    const boundary = params.match(consts.regexps.boundary);
 		    if (!boundary) {
 		      throw HttpZError.get('Incorrect boundary, expected: boundary=value', params)
 		    }
-		    return _.trim(boundary[0], '"')
+		    return trim(boundary[0], '"')
 		  }
 		}
 
@@ -622,18 +684,17 @@
 	function requireRequest$1 () {
 		if (hasRequiredRequest$1) return request$1;
 		hasRequiredRequest$1 = 1;
-		const _ = require$$0;
 		const consts = requireConsts();
 		const HttpZError = requireError();
-		const utils = requireUtils();
-		const validators = requireValidators();
+		const { splitByDelimiter, parseUrl } = requireUtils();
+		const { validateNotEmptyString } = requireValidators();
 		const Base = requireBase$1();
 
 		const SUPER_RANDOM_HOST = 'superrandomhost28476561927456.com';
 
 		class HttpZRequestParser extends Base {
 		  static parse(...params) {
-		    let instance = new HttpZRequestParser(...params);
+		    const instance = new HttpZRequestParser(...params);
 		    return instance.parse()
 		  }
 
@@ -654,41 +715,47 @@
 		  }
 
 		  _parseMessageForRows() {
-		    let { startRow, headerRows, bodyRows } = super._parseMessageForRows();
+		    const { startRow, headerRows, bodyRows } = super._parseMessageForRows();
 
 		    this.startRow = startRow;
-		    this.hostRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('host:').value());
+		    this.hostRow = headerRows.find((row) => row.toLowerCase().startsWith('host:'));
 		    this.headerRows = headerRows;
-		    this.cookiesRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('cookie:').value());
+		    this.cookiesRow = headerRows.find((row) => row.toLowerCase().startsWith('cookie:'));
 		    this.bodyRows = bodyRows;
 		  }
 
 		  _parseHostRow() {
 		    if (this.opts.mandatoryHost) {
-		      validators.validateNotEmptyString(this.hostRow, 'host header');
+		      validateNotEmptyString(this.hostRow, 'host header');
 		    }
 		    // eslint-disable-next-line no-unused-vars
-		    let [unused, value] = utils.splitByDelimiter(this.hostRow || '', ':');
+		    const [unused, value] = splitByDelimiter(this.hostRow || '', ':');
 		    if (this.opts.mandatoryHost) {
-		      validators.validateNotEmptyString(value, 'host header value');
+		      validateNotEmptyString(value, 'host header value');
 		    }
 
 		    this.host = value;
 		  }
 
+		  // eslint-disable-next-line max-statements
 		  _parseStartRow() {
 		    if (!consts.regexps.requestStartRow.test(this.startRow)) {
 		      throw HttpZError.get('Incorrect startRow format, expected: Method request-target HTTP-Version', this.startRow)
 		    }
 
-		    let rowElems = this.startRow.split(' ');
+		    const rowElems = this.startRow.split(' ');
 		    this.method = rowElems[0].toUpperCase();
 		    this.protocolVersion = rowElems[2].toUpperCase();
 		    this.target = rowElems[1];
 
-		    let parsedUrl = _.attempt(utils.parseUrl.bind(null, this.target, SUPER_RANDOM_HOST));
-		    if (_.isError(parsedUrl)) {
-		      throw HttpZError.get('Invalid target', this.target)
+		    let parsedUrl;
+		    try {
+		      parsedUrl = parseUrl(this.target, SUPER_RANDOM_HOST);
+		    } catch (err) {
+		      if (err.code === 'ERR_INVALID_URL') {
+		        throw HttpZError.get('Invalid target', this.target)
+		      }
+		      throw err
 		    }
 
 		    if (!this.host) {
@@ -703,7 +770,7 @@
 		      return
 		    }
 
-		    let [cookieHeaderName, values] = utils.splitByDelimiter(this.cookiesRow, ':');
+		    const [cookieHeaderName, values] = splitByDelimiter(this.cookiesRow, ':');
 		    if (!cookieHeaderName) {
 		      throw HttpZError.get('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow)
 		    }
@@ -711,33 +778,30 @@
 		      this.cookies = [];
 		      return
 		    }
-		    this.cookies = _.chain(values)
-		      .split(';')
-		      .map(pair => {
-		        let [name, value] = utils.splitByDelimiter(pair, '=');
-		        let cookie = {
-		          name
-		        };
-		        if (value) {
-		          cookie.value = value;
-		        }
-		        if (!cookie.name) {
-		          throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values)
-		        }
-		        return cookie
-		      })
-		      .value();
+		    this.cookies = values.split(';').map((pair) => {
+		      const [name, value] = splitByDelimiter(pair, '=');
+		      const cookie = {
+		        name,
+		      };
+		      if (value) {
+		        cookie.value = value;
+		      }
+		      if (!cookie.name) {
+		        throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values)
+		      }
+		      return cookie
+		    });
 		  }
 
 		  _generateModel() {
-		    let model = {
+		    const model = {
 		      method: this.method,
 		      protocolVersion: this.protocolVersion,
 		      target: this.target,
 		      host: this.host,
 		      path: this.path,
 		      headersSize: this.headersSize,
-		      bodySize: this.bodySize
+		      bodySize: this.bodySize,
 		    };
 		    if (this.queryParams) {
 		      model.queryParams = this.queryParams;
@@ -766,15 +830,14 @@
 	function requireResponse$1 () {
 		if (hasRequiredResponse$1) return response$1;
 		hasRequiredResponse$1 = 1;
-		const _ = require$$0;
 		const consts = requireConsts();
 		const HttpZError = requireError();
-		const utils = requireUtils();
+		const { splitByDelimiter, head, tail, isEmpty } = requireUtils();
 		const Base = requireBase$1();
 
 		class HttpZResponseParser extends Base {
 		  static parse(...params) {
-		    let instance = new HttpZResponseParser(...params);
+		    const instance = new HttpZResponseParser(...params);
 		    return instance.parse()
 		  }
 
@@ -789,11 +852,11 @@
 		  }
 
 		  _parseMessageForRows() {
-		    let { startRow, headerRows, bodyRows } = super._parseMessageForRows();
+		    const { startRow, headerRows, bodyRows } = super._parseMessageForRows();
 
 		    this.startRow = startRow;
 		    this.headerRows = headerRows;
-		    this.cookieRows = _.filter(headerRows, row => _.chain(row).toLower().startsWith('set-cookie').value());
+		    this.cookieRows = headerRows.filter((row) => row.toLowerCase().startsWith('set-cookie'));
 		    this.bodyRows = bodyRows;
 		  }
 
@@ -802,43 +865,43 @@
 		      throw HttpZError.get('Incorrect startRow format, expected: HTTP-Version status-code reason-phrase', this.startRow)
 		    }
 
-		    let rowElems = this.startRow.split(' ');
+		    const rowElems = this.startRow.split(' ');
 		    this.protocolVersion = rowElems[0].toUpperCase();
 		    this.statusCode = +rowElems[1];
 		    this.statusMessage = rowElems.splice(2).join(' ');
 		  }
 
 		  _parseCookieRows() {
-		    if (_.isEmpty(this.cookieRows)) {
+		    if (isEmpty(this.cookieRows)) {
 		      return
 		    }
 
 		    // eslint-disable-next-line max-statements
-		    this.cookies = _.map(this.cookieRows, cookiesRow => {
+		    this.cookies = this.cookieRows.map((cookiesRow) => {
 		      // eslint-disable-next-line no-unused-vars
-		      let [unused, values] = utils.splitByDelimiter(cookiesRow, ':');
+		      const [unused, values] = splitByDelimiter(cookiesRow, ':');
 		      if (!values) {
 		        return {}
 		      }
-		      let params = _.split(values, ';');
-		      let paramWithName = _.head(params);
-		      let otherParams = _.tail(params);
+		      const params = values.split(';');
+		      const paramWithName = head(params);
+		      const otherParams = tail(params);
 
-		      let [name, value] = _.split(paramWithName, '=');
-		      name = _.trim(name);
-		      value = _.trim(value);
+		      let [name, value] = paramWithName.split('=');
+		      name = name.trim();
+		      value = value.trim();
 		      if (!name) {
 		        throw HttpZError.get('Incorrect set-cookie pair format, expected: Name1=Value1;...', values)
 		      }
 
-		      let cookie = {
-		        name
+		      const cookie = {
+		        name,
 		      };
 		      if (value) {
 		        cookie.value = value;
 		      }
 		      if (otherParams.length > 0) {
-		        cookie.params = _.map(otherParams, p => _.trim(p));
+		        cookie.params = otherParams.map((param) => param.trim());
 		      }
 
 		      return cookie
@@ -846,12 +909,12 @@
 		  }
 
 		  _generateModel() {
-		    let model = {
+		    const model = {
 		      protocolVersion: this.protocolVersion,
 		      statusCode: this.statusCode,
 		      statusMessage: this.statusMessage,
 		      headersSize: this.headersSize,
-		      bodySize: this.bodySize
+		      bodySize: this.bodySize,
 		    };
 		    if (this.headers) {
 		      model.headers = this.headers;
@@ -877,21 +940,21 @@
 	function requireParsers () {
 		if (hasRequiredParsers) return parsers;
 		hasRequiredParsers = 1;
-		const _ = require$$0;
 		const consts = requireConsts();
+		const { head, isNil, isString } = requireUtils();
 		const HttpZError = requireError();
 		const RequestParser = requireRequest$1();
 		const ResponseParser = requireResponse$1();
 
 		parsers = (rawMessage, opts = {}) => {
-		  if (_.isNil(rawMessage)) {
+		  if (isNil(rawMessage)) {
 		    throw HttpZError.get('rawMessage is required')
 		  }
-		  if (!_.isString(rawMessage)) {
+		  if (!isString(rawMessage)) {
 		    throw HttpZError.get('rawMessage must be a string')
 		  }
 
-		  let firstRow = _.chain(rawMessage).split(consts.EOL).head().value();
+		  const firstRow = head(rawMessage.split(consts.EOL));
 		  if (consts.regexps.requestStartRow.test(firstRow)) {
 		    return RequestParser.parse(rawMessage, opts)
 		  }
@@ -909,10 +972,10 @@
 	function requireBase () {
 		if (hasRequiredBase) return base;
 		hasRequiredBase = 1;
-		const _ = require$$0;
+		const { isEmpty } = requireUtils();
 		const consts = requireConsts();
-		const utils = requireUtils();
-		const validators = requireValidators();
+		const { prettifyHeaderName, getEmptyStringForUndefined, convertParamsArrayToPairs } = requireUtils();
+		const { validateArray, validateNotEmptyString, validateString } = requireValidators();
 
 		class HttpZBaseBuilder {
 		  constructor({ headers, body }) {
@@ -921,30 +984,29 @@
 		  }
 
 		  _generateHeaderRows() {
-		    validators.validateArray(this.headers, 'headers');
+		    validateArray(this.headers, 'headers');
 
-		    if (_.isEmpty(this.headers)) {
+		    if (isEmpty(this.headers)) {
 		      return ''
 		    }
 
-		    let headerRowsStr = _.chain(this.headers)
+		    const headerRowsStr = this.headers
 		      .map((header, index) => {
-		        validators.validateNotEmptyString(header.name, 'header name', `header index: ${index}`);
-		        validators.validateString(header.value, 'header.value', `header index: ${index}`);
+		        validateNotEmptyString(header.name, 'header name', `header index: ${index}`);
+		        validateString(header.value, 'header.value', `header index: ${index}`);
 
-		        let headerName = utils.prettifyHeaderName(header.name);
-		        let headerValue = header.value;
+		        const headerName = prettifyHeaderName(header.name);
+		        const headerValue = header.value;
 
 		        return headerName + ': ' + headerValue
 		      })
-		      .join(consts.EOL)
-		      .value();
+		      .join(consts.EOL);
 
 		    return headerRowsStr + consts.EOL
 		  }
 
 		  _generateBodyRows() {
-		    if (_.isEmpty(this.body)) {
+		    if (isEmpty(this.body)) {
 		      return ''
 		    }
 
@@ -965,13 +1027,13 @@
 
 		  _processTransferEncodingChunked() {
 		    const isChunked = this.headers.find(
-		      h => h.name === consts.http.headers.transferEncoding && h.value.includes('chunked')
+		      (h) => h.name === consts.http.headers.transferEncoding && h.value.includes('chunked'),
 		    );
 		    if (!isChunked) {
 		      return
 		    }
 
-		    const body = utils.getEmptyStringForUndefined(this.body.text);
+		    const body = getEmptyStringForUndefined(this.body.text);
 		    const defChunkLength = 25;
 		    const buffer = [];
 		    let index = 0;
@@ -985,50 +1047,52 @@
 		  }
 
 		  _generateFormDataBody() {
-		    validators.validateArray(this.body.params, 'body.params');
-		    validators.validateNotEmptyString(this.body.boundary, 'body.boundary');
+		    validateArray(this.body.params, 'body.params');
+		    validateNotEmptyString(this.body.boundary, 'body.boundary');
 
-		    if (_.isEmpty(this.body.params)) {
+		    if (isEmpty(this.body.params)) {
 		      return ''
 		    }
 
-		    // eslint-disable-next-line max-statements
-		    let paramsStr = _.map(this.body.params, (param, index) => {
-		      if (!param.type) {
-		        validators.validateNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`);
-		      }
-		      let paramGroupStr = '--' + this.body.boundary;
-		      paramGroupStr += consts.EOL;
-		      paramGroupStr += `Content-Disposition: ${param.type || 'form-data'}`;
-		      if (param.name) {
-		        paramGroupStr += `; name="${param.name}"`;
-		      }
-		      if (param.fileName) {
-		        paramGroupStr += `; filename="${param.fileName}"`;
-		      }
-		      paramGroupStr += consts.EOL;
-		      if (param.contentType) {
-		        paramGroupStr += `Content-Type: ${param.contentType}`;
+		    const paramsStr = this.body.params
+		      // eslint-disable-next-line max-statements
+		      .map((param, index) => {
+		        if (!param.type) {
+		          validateNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`);
+		        }
+		        let paramGroupStr = '--' + this.body.boundary;
 		        paramGroupStr += consts.EOL;
-		      }
-		      paramGroupStr += consts.EOL;
-		      paramGroupStr += utils.getEmptyStringForUndefined(param.value);
-		      paramGroupStr += consts.EOL;
-		      return paramGroupStr
-		    }).join('');
+		        paramGroupStr += `Content-Disposition: ${param.type || 'form-data'}`;
+		        if (param.name) {
+		          paramGroupStr += `; name="${param.name}"`;
+		        }
+		        if (param.fileName) {
+		          paramGroupStr += `; filename="${param.fileName}"`;
+		        }
+		        paramGroupStr += consts.EOL;
+		        if (param.contentType) {
+		          paramGroupStr += `Content-Type: ${param.contentType}`;
+		          paramGroupStr += consts.EOL;
+		        }
+		        paramGroupStr += consts.EOL;
+		        paramGroupStr += getEmptyStringForUndefined(param.value);
+		        paramGroupStr += consts.EOL;
+		        return paramGroupStr
+		      })
+		      .join('');
 
 		    return `${paramsStr}--${this.body.boundary}--`
 		  }
 
 		  _generateUrlencodedBody() {
-		    validators.validateArray(this.body.params, 'body.params');
-		    let paramPairs = utils.convertParamsArrayToPairs(this.body.params);
+		    validateArray(this.body.params, 'body.params');
+		    const paramPairs = convertParamsArrayToPairs(this.body.params);
 
 		    return new URLSearchParams(paramPairs).toString()
 		  }
 
 		  _generateTextBody() {
-		    return utils.getEmptyStringForUndefined(this.body.text)
+		    return getEmptyStringForUndefined(this.body.text)
 		  }
 		}
 
@@ -1042,16 +1106,15 @@
 	function requireRequest () {
 		if (hasRequiredRequest) return request;
 		hasRequiredRequest = 1;
-		const _ = require$$0;
 		const consts = requireConsts();
-		const validators = requireValidators();
-		const utils = requireUtils();
+		const { validateArray, validateNotEmptyString } = requireValidators();
+		const { prettifyHeaderName } = requireUtils();
 		const HttpZError = requireError();
 		const Base = requireBase();
 
 		class HttpZRequestBuilder extends Base {
 		  static build(...params) {
-		    let instance = new HttpZRequestBuilder(...params);
+		    const instance = new HttpZRequestBuilder(...params);
 		    return instance.build()
 		  }
 
@@ -1068,17 +1131,17 @@
 		  }
 
 		  _generateStartRow() {
-		    validators.validateNotEmptyString(this.method, 'method');
-		    validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
-		    validators.validateNotEmptyString(this.target, 'target');
+		    validateNotEmptyString(this.method, 'method');
+		    validateNotEmptyString(this.protocolVersion, 'protocolVersion');
+		    validateNotEmptyString(this.target, 'target');
 
 		    return '' + this.method.toUpperCase() + ' ' + this.target + ' ' + this.protocolVersion.toUpperCase() + consts.EOL
 		  }
 
 		  _generateHeaderRows() {
-		    validators.validateArray(this.headers, 'headers');
+		    validateArray(this.headers, 'headers');
 		    if (this.opts.mandatoryHost) {
-		      let hostHeader = _.find(this.headers, name => utils.prettifyHeaderName(name) === consts.http.headers.host);
+		      const hostHeader = this.headers.find((name) => prettifyHeaderName(name) === consts.http.headers.host);
 		      if (!hostHeader) {
 		        throw HttpZError.get('Host header is required')
 		      }
@@ -1099,12 +1162,12 @@
 		if (hasRequiredResponse) return response;
 		hasRequiredResponse = 1;
 		const consts = requireConsts();
-		const validators = requireValidators();
+		const { validateNotEmptyString, validatePositiveNumber } = requireValidators();
 		const Base = requireBase();
 
 		class HttpZResponseBuilder extends Base {
 		  static build(...params) {
-		    let instance = new HttpZResponseBuilder(...params);
+		    const instance = new HttpZResponseBuilder(...params);
 		    return instance.build()
 		  }
 
@@ -1120,11 +1183,11 @@
 		  }
 
 		  _generateStartRow() {
-		    validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion');
-		    validators.validatePositiveNumber(this.statusCode, 'statusCode');
-		    validators.validateNotEmptyString(this.statusMessage, 'statusMessage');
+		    validateNotEmptyString(this.protocolVersion, 'protocolVersion');
+		    validatePositiveNumber(this.statusCode, 'statusCode');
+		    validateNotEmptyString(this.statusMessage, 'statusMessage');
 
-		    let protocolVersion = this.protocolVersion.toUpperCase();
+		    const protocolVersion = this.protocolVersion.toUpperCase();
 		    return `${protocolVersion} ${this.statusCode} ${this.statusMessage}` + consts.EOL
 		  }
 		}
@@ -1139,16 +1202,16 @@
 	function requireBuilders () {
 		if (hasRequiredBuilders) return builders;
 		hasRequiredBuilders = 1;
-		const _ = require$$0;
+		const { isNil, isPlainObject } = requireUtils();
 		const HttpZError = requireError();
 		const RequestBuilder = requireRequest();
 		const ResponseBuilder = requireResponse();
 
 		builders = (messageModel, opts = {}) => {
-		  if (_.isNil(messageModel)) {
+		  if (isNil(messageModel)) {
 		    throw HttpZError.get('messageModel is required')
 		  }
-		  if (!_.isPlainObject(messageModel)) {
+		  if (!isPlainObject(messageModel)) {
 		    throw HttpZError.get('messageModel must be a plain object')
 		  }
 		  if (messageModel.method) {

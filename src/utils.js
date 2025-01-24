@@ -1,24 +1,25 @@
-const _ = require('lodash')
-const validators = require('./validators')
+exports.getLibVersion = () => {
+  return '8.0.0-dev'
+}
 
 exports.splitByDelimiter = (str, delimiter) => {
-  if (_.isEmpty(str)) {
+  if (exports.isEmpty(str)) {
     return []
   }
 
-  let delimiterIndex = str.indexOf(delimiter)
+  const delimiterIndex = str.indexOf(delimiter)
   if (delimiterIndex === -1) {
     return []
   }
 
-  let res = [str.slice(0, delimiterIndex), str.slice(delimiterIndex + delimiter.length)]
-  res[0] = _.trim(res[0], ' ')
-  res[1] = _.trim(res[1], ' ')
+  const result = [str.slice(0, delimiterIndex), str.slice(delimiterIndex + delimiter.length)]
+  result[0] = result[0].trim(' ')
+  result[1] = result[1].trim(' ')
 
-  return res
+  return result
 }
 
-exports.isAbsoluteUrl = url => {
+exports.isAbsoluteUrl = (url) => {
   // Don't match Windows paths `c:\`
   if (/^[a-zA-Z]:\\/.test(url)) {
     return false
@@ -35,70 +36,139 @@ exports.parseUrl = (url, host) => {
     url = null
   }
   const supportedProtocols = ['http', 'https']
-  if (!_.find(supportedProtocols, known => _.startsWith(host, known + '://'))) {
+  if (!supportedProtocols.some((known) => host.startsWith(known + '://'))) {
     host = 'http://' + host
   }
 
-  let parsedUrl = url ? new URL(url, host) : new URL(host)
-  let protocol = parsedUrl.protocol.replace(':', '').toUpperCase()
-  let params = []
+  const parsedUrl = url ? new URL(url, host) : new URL(host)
+  const protocol = parsedUrl.protocol.replace(':', '').toUpperCase()
+  const params = []
   parsedUrl.searchParams.forEach((value, name) => params.push({ name, value }))
 
   return {
     protocol,
     host: parsedUrl.host,
     path: parsedUrl.pathname,
-    params
+    params,
   }
 }
 
-// eslint-disable-next-line max-params
-exports.generateUrl = (protocol, host, port, path, params) => {
-  let result = ''
-  if (host) {
-    result += protocol.toLowerCase() + '://' + host
-    if (port && !host.includes(':')) {
-      result += ':' + port
-    }
-  }
-  let pathWithParams = exports.generatePath(path, params)
-  result += pathWithParams
-
-  return result
+exports.convertParamsArrayToPairs = (params) => {
+  return params.map(({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
 }
 
-exports.generatePath = (path, params) => {
-  if (_.isEmpty(params)) {
-    return path
-  }
-  let paramPairs = exports.convertParamsArrayToPairs(params)
-
-  return path + '?' + new URLSearchParams(paramPairs).toString()
+exports.prettifyHeaderName = (name) => {
+  return (name ?? '').toString().split('-').map(exports.capitalize).join('-')
 }
 
-exports.convertParamsArrayToPairs = params => {
-  validators.validateArray(params, 'params')
-
-  return _.map(params, ({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
-}
-
-exports.prettifyHeaderName = name => {
-  return _.chain(name).split('-').map(_.capitalize).join('-').value()
-}
-
-exports.getEmptyStringForUndefined = val => {
-  if (_.isUndefined(val)) {
+exports.getEmptyStringForUndefined = (val) => {
+  if (exports.isUndefined(val)) {
     return ''
   }
   return val
 }
 
 exports.extendIfNotUndefined = (obj, fieldName, fieldValue) => {
-  if (!_.isUndefined(fieldValue)) {
+  if (!exports.isUndefined(fieldValue)) {
     obj[fieldName] = fieldValue
   }
 }
 
-exports.getLibVersion = () => {
-  return '7.1.3'
+// **********************
+// Lodash native replaces
+exports.isUndefined = (value) => {
+  return value === undefined
+}
+
+exports.isNil = (value) => {
+  return value == null
+}
+
+exports.isEmpty = (value) => {
+  if (value?.length || value?.size) {
+    return false
+  }
+  if (typeof value !== 'object') {
+    return true
+  }
+  for (const key in value) {
+    if (Object.hasOwn(value, key)) {
+      return false
+    }
+  }
+  return true
+}
+
+exports.isString = (value) => {
+  return typeof value === 'string'
+}
+
+exports.isNumber = (value) => {
+  return typeof value === 'number'
+}
+
+exports.isArray = (value) => {
+  return Array.isArray(value)
+}
+
+exports.isError = (value) => {
+  return value instanceof Error
+}
+
+exports.isPlainObject = (value) => {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+  if (Object.prototype.toString.call(value) !== '[object Object]') {
+    return false
+  }
+  const proto = Object.getPrototypeOf(value)
+  if (proto === null) {
+    return true
+  }
+
+  const Ctor = Object.prototype.hasOwnProperty.call(proto, 'constructor') && proto.constructor
+  return (
+    typeof Ctor === 'function' &&
+    Ctor instanceof Ctor &&
+    Function.prototype.call(Ctor) === Function.prototype.call(value)
+  )
+}
+
+exports.capitalize = (value) => {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : ''
+}
+
+exports.head = (value) => {
+  // eslint-disable-next-line no-unused-vars
+  const [head, ...tail] = value
+  return head
+}
+
+exports.tail = (value) => {
+  // eslint-disable-next-line no-unused-vars
+  const [head, ...tail] = value
+  return tail
+}
+
+exports.trim = (value, chars = undefined) => {
+  if (exports.isNil(value)) {
+    return value
+  }
+  value = value.toString()
+  if (chars === undefined || chars === '\\s') {
+    return value.trim()
+  }
+  return value.replace(new RegExp(`^([${chars}]*)(.*?)([${chars}]*)$`), '$2')
+}
+
+exports.trimEnd = (value, chars = undefined) => {
+  if (exports.isNil(value)) {
+    return value
+  }
+  value = value.toString()
+  if (chars === undefined || chars === '\\s') {
+    return value.trimEnd()
+  }
+  return value.replace(new RegExp(`^(.*?)([${chars}]*)$`), '$1')
 }

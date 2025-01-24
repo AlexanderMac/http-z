@@ -1,15 +1,14 @@
-const _ = require('lodash')
 const consts = require('../consts')
 const HttpZError = require('../error')
-const utils = require('../utils')
-const validators = require('../validators')
+const { splitByDelimiter, parseUrl } = require('../utils')
+const { validateNotEmptyString } = require('../validators')
 const Base = require('./base')
 
 const SUPER_RANDOM_HOST = 'superrandomhost28476561927456.com'
 
 class HttpZRequestParser extends Base {
   static parse(...params) {
-    let instance = new HttpZRequestParser(...params)
+    const instance = new HttpZRequestParser(...params)
     return instance.parse()
   }
 
@@ -30,41 +29,47 @@ class HttpZRequestParser extends Base {
   }
 
   _parseMessageForRows() {
-    let { startRow, headerRows, bodyRows } = super._parseMessageForRows()
+    const { startRow, headerRows, bodyRows } = super._parseMessageForRows()
 
     this.startRow = startRow
-    this.hostRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('host:').value())
+    this.hostRow = headerRows.find((row) => row.toLowerCase().startsWith('host:'))
     this.headerRows = headerRows
-    this.cookiesRow = _.find(headerRows, row => _.chain(row).toLower().startsWith('cookie:').value())
+    this.cookiesRow = headerRows.find((row) => row.toLowerCase().startsWith('cookie:'))
     this.bodyRows = bodyRows
   }
 
   _parseHostRow() {
     if (this.opts.mandatoryHost) {
-      validators.validateNotEmptyString(this.hostRow, 'host header')
+      validateNotEmptyString(this.hostRow, 'host header')
     }
     // eslint-disable-next-line no-unused-vars
-    let [unused, value] = utils.splitByDelimiter(this.hostRow || '', ':')
+    const [unused, value] = splitByDelimiter(this.hostRow || '', ':')
     if (this.opts.mandatoryHost) {
-      validators.validateNotEmptyString(value, 'host header value')
+      validateNotEmptyString(value, 'host header value')
     }
 
     this.host = value
   }
 
+  // eslint-disable-next-line max-statements
   _parseStartRow() {
     if (!consts.regexps.requestStartRow.test(this.startRow)) {
       throw HttpZError.get('Incorrect startRow format, expected: Method request-target HTTP-Version', this.startRow)
     }
 
-    let rowElems = this.startRow.split(' ')
+    const rowElems = this.startRow.split(' ')
     this.method = rowElems[0].toUpperCase()
     this.protocolVersion = rowElems[2].toUpperCase()
     this.target = rowElems[1]
 
-    let parsedUrl = _.attempt(utils.parseUrl.bind(null, this.target, SUPER_RANDOM_HOST))
-    if (_.isError(parsedUrl)) {
-      throw HttpZError.get('Invalid target', this.target)
+    let parsedUrl
+    try {
+      parsedUrl = parseUrl(this.target, SUPER_RANDOM_HOST)
+    } catch (err) {
+      if (err.code === 'ERR_INVALID_URL') {
+        throw HttpZError.get('Invalid target', this.target)
+      }
+      throw err
     }
 
     if (!this.host) {
@@ -79,7 +84,7 @@ class HttpZRequestParser extends Base {
       return
     }
 
-    let [cookieHeaderName, values] = utils.splitByDelimiter(this.cookiesRow, ':')
+    const [cookieHeaderName, values] = splitByDelimiter(this.cookiesRow, ':')
     if (!cookieHeaderName) {
       throw HttpZError.get('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow)
     }
@@ -87,33 +92,30 @@ class HttpZRequestParser extends Base {
       this.cookies = []
       return
     }
-    this.cookies = _.chain(values)
-      .split(';')
-      .map(pair => {
-        let [name, value] = utils.splitByDelimiter(pair, '=')
-        let cookie = {
-          name
-        }
-        if (value) {
-          cookie.value = value
-        }
-        if (!cookie.name) {
-          throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values)
-        }
-        return cookie
-      })
-      .value()
+    this.cookies = values.split(';').map((pair) => {
+      const [name, value] = splitByDelimiter(pair, '=')
+      const cookie = {
+        name,
+      }
+      if (value) {
+        cookie.value = value
+      }
+      if (!cookie.name) {
+        throw HttpZError.get('Incorrect cookie pair format, expected: Name1=Value1;...', values)
+      }
+      return cookie
+    })
   }
 
   _generateModel() {
-    let model = {
+    const model = {
       method: this.method,
       protocolVersion: this.protocolVersion,
       target: this.target,
       host: this.host,
       path: this.path,
       headersSize: this.headersSize,
-      bodySize: this.bodySize
+      bodySize: this.bodySize,
     }
     if (this.queryParams) {
       model.queryParams = this.queryParams

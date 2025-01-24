@@ -94,8 +94,6 @@ export declare namespace utils {
   function splitByDelimiter(str: string, delimiter: string): any;
   function isAbsoluteUrl(url: string): boolean;
   function parseUrl(path?: string, origin?: string): any;
-  function generateUrl(protocol: string, host: string, port: number, path: string, params: HttpZParam[]): string;
-  function generatePath(path: string, params: HttpZParam[]): string;
   function convertParamsArrayToPairs(params: HttpZParam[]): any[];
   function prettifyHeaderName(name: string): string;
   function getEmptyStringForUndefined(val?: string): string;

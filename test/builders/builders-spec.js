@@ -19,7 +19,7 @@ describe('builders / index', () => {
 
   it('should throw error when messageModel is nil', () => {
     const ERR = {
-      message: 'messageModel is required'
+      message: 'messageModel is required',
     }
     should(builder.bind(null, undefined)).throw(HttpZError, ERR)
     should(builder.bind(null, null)).throw(HttpZError, ERR)
@@ -27,7 +27,7 @@ describe('builders / index', () => {
 
   it('should throw error when messageModel is not a plain object', () => {
     const ERR = {
-      message: 'messageModel must be a plain object'
+      message: 'messageModel must be a plain object',
     }
     should(builder.bind(null, 123)).throw(HttpZError, ERR)
     should(builder.bind(null, true)).throw(HttpZError, ERR)
@@ -36,25 +36,25 @@ describe('builders / index', () => {
   })
 
   it('should throw error when model has incorrect format', () => {
-    let messageModel = {
-      data: 'some data'
+    const messageModel = {
+      data: 'some data',
     }
 
     should(builder.bind(null, messageModel)).throw(HttpZError, {
-      message: 'messageModel has incorrect format'
+      message: 'messageModel has incorrect format',
     })
   })
 
   it('should call RequestBuilder.build when messageModel is request', () => {
-    let messageModel = {
-      method: 'GET'
+    const messageModel = {
+      method: 'GET',
     }
-    let expected = 'built-request'
-    let expectedMultipleArgs = [messageModel, {}]
+    const expected = 'built-request'
+    const expectedMultipleArgs = [messageModel, {}]
 
     RequestBuilder.build.returns('built-request')
 
-    let actual = builder(messageModel)
+    const actual = builder(messageModel)
     should(actual).eql(expected)
 
     nassert.assertFn({ inst: RequestBuilder, fnName: 'build', expectedMultipleArgs })
@@ -62,15 +62,15 @@ describe('builders / index', () => {
   })
 
   it('should call ResponseBuilder.build when messageModel is response', () => {
-    let messageModel = {
-      statusCode: 200
+    const messageModel = {
+      statusCode: 200,
     }
-    let expected = 'built-response'
-    let expectedArgs = messageModel
+    const expected = 'built-response'
+    const expectedArgs = messageModel
 
     ResponseBuilder.build.returns('built-response')
 
-    let actual = builder(messageModel)
+    const actual = builder(messageModel)
     should(actual).eql(expected)
 
     nassert.assertFn({ inst: RequestBuilder, fnName: 'build' })

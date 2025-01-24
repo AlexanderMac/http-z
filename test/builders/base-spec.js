@@ -1,7 +1,7 @@
-const _ = require('lodash')
 const sinon = require('sinon')
 const should = require('should')
 const nassert = require('n-assert')
+const { isError } = require('../../src/utils')
 const HttpZConsts = require('../../src/consts')
 const HttpZError = require('../../src/error')
 const BaseBuilder = require('../../src/builders/base')
@@ -16,94 +16,94 @@ describe('builders / base', () => {
       return [
         {
           name: 'Connection',
-          value: ''
+          value: '',
         },
         {
           name: 'Accept',
-          value: '*/*, text/plain'
+          value: '*/*, text/plain',
         },
         {
           name: 'Accept-Encoding',
-          value: 'gzip, deflate'
+          value: 'gzip, deflate',
         },
         {
           name: 'Accept-Language',
-          value: 'en-US;q=0.6, en;q=0.4'
-        }
+          value: 'en-US;q=0.6, en;q=0.4',
+        },
       ]
     }
 
     it('should throw error when instance.headers is undefined', () => {
-      let expected = HttpZError.get('headers is required')
+      const expected = HttpZError.get('headers is required')
 
-      let builder = getBuilderInstance({})
+      const builder = getBuilderInstance({})
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.headers is not array', () => {
-      let expected = HttpZError.get('headers must be an array')
+      const expected = HttpZError.get('headers must be an array')
 
-      let builder = getBuilderInstance({ headers: 'headers' })
+      const builder = getBuilderInstance({ headers: 'headers' })
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.headers contains header without name', () => {
-      let headers = getDefaultHeaders()
+      const headers = getDefaultHeaders()
       headers[1].name = undefined
-      let expected = HttpZError.get('header name is required', 'header index: 1')
+      const expected = HttpZError.get('header name is required', 'header index: 1')
 
-      let builder = getBuilderInstance({ headers })
+      const builder = getBuilderInstance({ headers })
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.headers contains header with empty name', () => {
-      let headers = getDefaultHeaders()
+      const headers = getDefaultHeaders()
       headers[1].name = undefined
-      let expected = HttpZError.get('header name is required', 'header index: 1')
+      const expected = HttpZError.get('header name is required', 'header index: 1')
 
-      let builder = getBuilderInstance({ headers })
+      const builder = getBuilderInstance({ headers })
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.headers contains header without value', () => {
-      let headers = getDefaultHeaders()
+      const headers = getDefaultHeaders()
       headers[2].value = undefined
-      let expected = HttpZError.get('header.value is required', 'header index: 2')
+      const expected = HttpZError.get('header.value is required', 'header index: 2')
 
-      let builder = getBuilderInstance({ headers })
+      const builder = getBuilderInstance({ headers })
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.headers contains header with value that is not a string', () => {
-      let headers = getDefaultHeaders()
+      const headers = getDefaultHeaders()
       headers[2].value = 25
-      let expected = HttpZError.get('header.value must be a string', 'header index: 2')
+      const expected = HttpZError.get('header.value must be a string', 'header index: 2')
 
-      let builder = getBuilderInstance({ headers })
+      const builder = getBuilderInstance({ headers })
       should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should return empty string when instance.headers is empty array', () => {
-      let headers = []
-      let expected = ''
+      const headers = []
+      const expected = ''
 
-      let builder = getBuilderInstance({ headers })
-      let actual = builder._generateHeaderRows()
+      const builder = getBuilderInstance({ headers })
+      const actual = builder._generateHeaderRows()
       should(actual).eql(expected)
     })
 
     it('should return headerRows when instance.headers is valid', () => {
-      let headers = getDefaultHeaders()
-      let expected = [
+      const headers = getDefaultHeaders()
+      const expected = [
         'Connection: ',
         'Accept: */*, text/plain',
         'Accept-Encoding: gzip, deflate',
         'Accept-Language: en-US;q=0.6, en;q=0.4',
-        ''
+        '',
       ].join(HttpZConsts.EOL)
 
-      let builder = getBuilderInstance({ headers })
-      let actual = builder._generateHeaderRows()
+      const builder = getBuilderInstance({ headers })
+      const actual = builder._generateHeaderRows()
       should(actual).eql(expected)
     })
   })
@@ -111,101 +111,105 @@ describe('builders / base', () => {
   describe('_generateBodyRows', () => {
     // eslint-disable-next-line object-curly-spacing
     function test({ body, expected, expectedFnArgs = {} }) {
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       sinon.stub(builder, '_processTransferEncodingChunked')
       sinon.stub(builder, '_generateFormDataBody').returns('FormDataBody')
       sinon.stub(builder, '_generateUrlencodedBody').returns('UrlencodedBody')
       sinon.stub(builder, '_generateTextBody').returns('TextBody')
 
-      if (!_.isError(expected)) {
-        let actual = builder._generateBodyRows()
+      if (!isError(expected)) {
+        const actual = builder._generateBodyRows()
         should(actual).eql(expected)
       } else {
         should(builder._generateBodyRows.bind(builder)).throw(HttpZError, expected)
       }
 
-      nassert.assertFn({ inst: builder, fnName: '_generateFormDataBody', expectedArgs: expectedFnArgs.genFormDataBody })
+      nassert.assertFn({
+        inst: builder,
+        fnName: '_generateFormDataBody',
+        expectedArgs: expectedFnArgs.genFormDataBody,
+      })
       nassert.assertFn({
         inst: builder,
         fnName: '_generateUrlencodedBody',
-        expectedArgs: expectedFnArgs.genUrlencodedBody
+        expectedArgs: expectedFnArgs.genUrlencodedBody,
       })
       nassert.assertFn({ inst: builder, fnName: '_generateTextBody', expectedArgs: expectedFnArgs.genTextBody })
     }
 
     it('should return empty string when instance.body is nil', () => {
-      let body
-      let expected = ''
+      const body = null
+      const expected = ''
 
       test({ body, expected })
     })
 
     it('should return FormDataBody when instance.body is not nil and contentType is multipart/form-data', () => {
-      let body = {
-        contentType: 'multipart/form-data'
+      const body = {
+        contentType: 'multipart/form-data',
       }
-      let expected = 'FormDataBody'
-      let expectedFnArgs = { genFormDataBody: '_without-args_' }
+      const expected = 'FormDataBody'
+      const expectedFnArgs = { genFormDataBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
     })
 
     it('should return FormDataBody when instance.body is not nil and contentType is multipart/alternative', () => {
-      let body = {
-        contentType: 'multipart/alternative'
+      const body = {
+        contentType: 'multipart/alternative',
       }
-      let expected = 'FormDataBody'
-      let expectedFnArgs = { genFormDataBody: '_without-args_' }
+      const expected = 'FormDataBody'
+      const expectedFnArgs = { genFormDataBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
     })
 
     it('should return FormDataBody when instance.body is not nil and contentType is multipart/mixed', () => {
-      let body = {
-        contentType: 'multipart/mixed'
+      const body = {
+        contentType: 'multipart/mixed',
       }
-      let expected = 'FormDataBody'
-      let expectedFnArgs = { genFormDataBody: '_without-args_' }
+      const expected = 'FormDataBody'
+      const expectedFnArgs = { genFormDataBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
     })
 
     it('should return FormDataBody when instance.body is not nil and contentType is multipart/related', () => {
-      let body = {
-        contentType: 'multipart/related'
+      const body = {
+        contentType: 'multipart/related',
       }
-      let expected = 'FormDataBody'
-      let expectedFnArgs = { genFormDataBody: '_without-args_' }
+      const expected = 'FormDataBody'
+      const expectedFnArgs = { genFormDataBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
     })
 
     it('should return UrlencodedBody when instance.body is not nil and contentType is application/x-www-form-urlencoded', () => {
-      let body = {
-        contentType: 'application/x-www-form-urlencoded'
+      const body = {
+        contentType: 'application/x-www-form-urlencoded',
       }
-      let expected = 'UrlencodedBody'
-      let expectedFnArgs = { genUrlencodedBody: '_without-args_' }
+      const expected = 'UrlencodedBody'
+      const expectedFnArgs = { genUrlencodedBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
     })
 
     it('should return TextBody when instance.body is not nil and contentType is text/plain', () => {
-      let body = {
-        contentType: 'text/plain'
+      const body = {
+        contentType: 'text/plain',
       }
-      let expected = 'TextBody'
-      let expectedFnArgs = { genTextBody: '_without-args_' }
+      const expected = 'TextBody'
+      const expectedFnArgs = { genTextBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
     })
 
     it('should return TextBody when instance.body is not nil and contentType is unknown', () => {
-      let body = {
-        contentType: 'unknown'
+      const body = {
+        contentType: 'unknown',
       }
-      let expected = 'TextBody'
-      let expectedFnArgs = { genTextBody: '_without-args_' }
+      const expected = 'TextBody'
+      const expectedFnArgs = { genTextBody: '_without-args_' }
 
       test({ body, expected, expectedFnArgs })
     })
@@ -214,15 +218,15 @@ describe('builders / base', () => {
   describe('_processTransferEncodingChunked', () => {
     function getDefaultBody() {
       return {
-        text: 'This is a long string\r\n11\r\n with new lines and numbers'
+        text: 'This is a long string\r\n11\r\n with new lines and numbers',
       }
     }
 
     it("should don't body when transfer-encoding is not chunked", () => {
-      let headers = []
-      let body = getDefaultBody()
+      const headers = []
+      const body = getDefaultBody()
 
-      let builder = getBuilderInstance({ headers, body })
+      const builder = getBuilderInstance({ headers, body })
       builder._processTransferEncodingChunked()
 
       const expected = body.text
@@ -230,19 +234,19 @@ describe('builders / base', () => {
     })
 
     it('should change body when transfer-encoding is chunked', () => {
-      let headers = [
+      const headers = [
         {
           name: 'Transfer-Encoding',
-          value: 'chunked'
-        }
+          value: 'chunked',
+        },
       ]
-      let body = getDefaultBody()
+      const body = getDefaultBody()
 
-      let builder = getBuilderInstance({ headers, body })
+      const builder = getBuilderInstance({ headers, body })
       builder._processTransferEncodingChunked()
 
       const expected = ['19', 'This is a long string', '11', '19', '', ' with new lines and num', '4', 'bers'].join(
-        HttpZConsts.EOL
+        HttpZConsts.EOL,
       )
       should(builder.body.text).equal(expected)
     })
@@ -254,88 +258,88 @@ describe('builders / base', () => {
         params: [
           { name: 'firstName', value: 'John' },
           { name: 'lastName', value: 'Smith' },
-          { name: 'age', value: '' }
+          { name: 'age', value: '' },
         ],
-        boundary: '11136253119209'
+        boundary: '11136253119209',
       }
     }
 
     it('should throw error when instance.body.params is nil', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.params = undefined
-      let expected = HttpZError.get('body.params is required')
+      const expected = HttpZError.get('body.params is required')
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.body.params is not array', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.params = 'params'
-      let expected = HttpZError.get('body.params must be an array')
+      const expected = HttpZError.get('body.params must be an array')
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.body.boundary is nil', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.boundary = undefined
-      let expected = HttpZError.get('body.boundary is required')
+      const expected = HttpZError.get('body.boundary is required')
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.body.boundary is not a string', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.boundary = 12345
-      let expected = HttpZError.get('body.boundary must be a string')
+      const expected = HttpZError.get('body.boundary must be a string')
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.body.boundary is empty string', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.boundary = ''
-      let expected = HttpZError.get('body.boundary must be not empty string')
+      const expected = HttpZError.get('body.boundary must be not empty string')
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.body.params contains param with empty name', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.params[0].name = ''
-      let expected = HttpZError.get('body.params[index].name must be not empty string', 'param index: 0')
+      const expected = HttpZError.get('body.params[index].name must be not empty string', 'param index: 0')
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should not throw error when instance.body.params contains param with empty name and type is not form-data', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.params[0].type = 'inline'
       body.params[0].name = ''
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateFormDataBody.bind(builder)).not.throw(HttpZError)
     })
 
     it('should return empty string when instance.body.params is empty array', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.params = []
-      let expected = ''
+      const expected = ''
 
-      let builder = getBuilderInstance({ body })
-      let actual = builder._generateFormDataBody()
+      const builder = getBuilderInstance({ body })
+      const actual = builder._generateFormDataBody()
       should(actual).eql(expected)
     })
 
     it('should return BodyRows with params when instance.body.params is not empty array', () => {
-      let body = getDefaultBody()
-      let expected = [
+      const body = getDefaultBody()
+      const expected = [
         '--11136253119209',
         'Content-Disposition: form-data; name="firstName"',
         '',
@@ -348,11 +352,11 @@ describe('builders / base', () => {
         'Content-Disposition: form-data; name="age"',
         '',
         '',
-        '--11136253119209--'
+        '--11136253119209--',
       ].join(HttpZConsts.EOL)
 
-      let builder = getBuilderInstance({ body })
-      let actual = builder._generateFormDataBody()
+      const builder = getBuilderInstance({ body })
+      const actual = builder._generateFormDataBody()
       should(actual).eql(expected)
     })
   })
@@ -360,70 +364,70 @@ describe('builders / base', () => {
   describe('_generateUrlencodedBody', () => {
     function getDefaultBody(params) {
       return {
-        params
+        params,
       }
     }
 
     it('should throw error when instance.body.params is undefined', () => {
-      let body = getDefaultBody()
-      let expected = HttpZError.get('body.params is required')
+      const body = getDefaultBody()
+      const expected = HttpZError.get('body.params is required')
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateUrlencodedBody.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should throw error when instance.body.params is not array', () => {
-      let body = getDefaultBody('params')
-      let expected = HttpZError.get('body.params must be an array')
+      const body = getDefaultBody('params')
+      const expected = HttpZError.get('body.params must be an array')
 
-      let builder = getBuilderInstance({ body })
+      const builder = getBuilderInstance({ body })
       should(builder._generateUrlencodedBody.bind(builder)).throw(HttpZError, expected)
     })
 
     it('should return empty string when instance.body.params is empty', () => {
-      let body = getDefaultBody([])
-      let expected = ''
+      const body = getDefaultBody([])
+      const expected = ''
 
-      let builder = getBuilderInstance({ body })
-      let actual = builder._generateUrlencodedBody()
+      const builder = getBuilderInstance({ body })
+      const actual = builder._generateUrlencodedBody()
       should(actual).eql(expected)
     })
 
     it('should return BodyRows when instance.body.params has two simple parameters', () => {
-      let body = getDefaultBody([
+      const body = getDefaultBody([
         { name: 'p1', value: 'v1' },
-        { name: 'p2>', value: 'v2;' }
+        { name: 'p2>', value: 'v2;' },
       ])
-      let expected = 'p1=v1&p2%3E=v2%3B'
+      const expected = 'p1=v1&p2%3E=v2%3B'
 
-      let builder = getBuilderInstance({ body })
-      let actual = builder._generateUrlencodedBody()
+      const builder = getBuilderInstance({ body })
+      const actual = builder._generateUrlencodedBody()
       should(actual).eql(expected)
     })
 
     it('should return BodyRows when instance.body.params has object parameters', () => {
-      let body = getDefaultBody([
+      const body = getDefaultBody([
         { name: 'p1[x]', value: 'v1' },
         { name: 'p1[y]', value: 'v2' },
-        { name: 'p2>', value: 'v2;' }
+        { name: 'p2>', value: 'v2;' },
       ])
-      let expected = 'p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v2%3B'
+      const expected = 'p1%5Bx%5D=v1&p1%5By%5D=v2&p2%3E=v2%3B'
 
-      let builder = getBuilderInstance({ body })
-      let actual = builder._generateUrlencodedBody()
+      const builder = getBuilderInstance({ body })
+      const actual = builder._generateUrlencodedBody()
       should(actual).eql(expected)
     })
 
     it('should return BodyRows when instance.body.params has array parameters', () => {
-      let body = getDefaultBody([
+      const body = getDefaultBody([
         { name: 'p1[]', value: 'v1' },
         { name: 'p1[]', value: 'v2' },
-        { name: 'p2>', value: 'v2;' }
+        { name: 'p2>', value: 'v2;' },
       ])
-      let expected = 'p1%5B%5D=v1&p1%5B%5D=v2&p2%3E=v2%3B'
+      const expected = 'p1%5B%5D=v1&p1%5B%5D=v2&p2%3E=v2%3B'
 
-      let builder = getBuilderInstance({ body })
-      let actual = builder._generateUrlencodedBody()
+      const builder = getBuilderInstance({ body })
+      const actual = builder._generateUrlencodedBody()
       should(actual).eql(expected)
     })
   })
@@ -431,26 +435,26 @@ describe('builders / base', () => {
   describe('_generateTextBody', () => {
     function getDefaultBody() {
       return {
-        text: 'text data'
+        text: 'text data',
       }
     }
 
     it('should return empty string when instance.body.text is empty', () => {
-      let body = getDefaultBody()
+      const body = getDefaultBody()
       body.text = ''
-      let expected = ''
+      const expected = ''
 
-      let builder = getBuilderInstance({ body })
-      let actual = builder._generateTextBody()
+      const builder = getBuilderInstance({ body })
+      const actual = builder._generateTextBody()
       should(actual).eql(expected)
     })
 
     it('should return Body when instance.body.text is not empty', () => {
-      let body = getDefaultBody()
-      let expected = 'text data'
+      const body = getDefaultBody()
+      const expected = 'text data'
 
-      let builder = getBuilderInstance({ body })
-      let actual = builder._generateTextBody()
+      const builder = getBuilderInstance({ body })
+      const actual = builder._generateTextBody()
       should(actual).eql(expected)
     })
   })

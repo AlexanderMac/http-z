@@ -1,10 +1,10 @@
 const consts = require('../consts')
-const validators = require('../validators')
+const { validateNotEmptyString, validatePositiveNumber } = require('../validators')
 const Base = require('./base')
 
 class HttpZResponseBuilder extends Base {
   static build(...params) {
-    let instance = new HttpZResponseBuilder(...params)
+    const instance = new HttpZResponseBuilder(...params)
     return instance.build()
   }
 
@@ -20,11 +20,11 @@ class HttpZResponseBuilder extends Base {
   }
 
   _generateStartRow() {
-    validators.validateNotEmptyString(this.protocolVersion, 'protocolVersion')
-    validators.validatePositiveNumber(this.statusCode, 'statusCode')
-    validators.validateNotEmptyString(this.statusMessage, 'statusMessage')
+    validateNotEmptyString(this.protocolVersion, 'protocolVersion')
+    validatePositiveNumber(this.statusCode, 'statusCode')
+    validateNotEmptyString(this.statusMessage, 'statusMessage')
 
-    let protocolVersion = this.protocolVersion.toUpperCase()
+    const protocolVersion = this.protocolVersion.toUpperCase()
     return `${protocolVersion} ${this.statusCode} ${this.statusMessage}` + consts.EOL
   }
 }
