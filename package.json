@@ -11,7 +11,7 @@
     "ng": "ng",
     "generate": "ng generate",
     "build": "ng build --configuration development",
-    "build:prod": "ng build --base-href /http-z/",
+    "build:prod": "ng build --base-href /http-z/ && mv docs/browser/* docs",
     "start": "ng serve",
     "lint": "ng lint --fix",
     "prettify": "prettier --write \"src/**/*.ts\"",
