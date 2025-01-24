@@ -1,5 +1,5 @@
 const consts = require('../consts')
-const { validateArray, validateNotEmptyString } = require('../validators')
+const { assertArray, assertNotEmptyString } = require('../assertions')
 const { prettifyHeaderName } = require('../utils')
 const HttpZError = require('../error')
 const Base = require('./base')
@@ -23,15 +23,15 @@ class HttpZRequestBuilder extends Base {
   }
 
   _generateStartRow() {
-    validateNotEmptyString(this.method, 'method')
-    validateNotEmptyString(this.protocolVersion, 'protocolVersion')
-    validateNotEmptyString(this.target, 'target')
+    assertNotEmptyString(this.method, 'method')
+    assertNotEmptyString(this.protocolVersion, 'protocolVersion')
+    assertNotEmptyString(this.target, 'target')
 
     return '' + this.method.toUpperCase() + ' ' + this.target + ' ' + this.protocolVersion.toUpperCase() + consts.EOL
   }
 
   _generateHeaderRows() {
-    validateArray(this.headers, 'headers')
+    assertArray(this.headers, 'headers')
     if (this.opts.mandatoryHost) {
       const hostHeader = this.headers.find((name) => prettifyHeaderName(name) === consts.http.headers.host)
       if (!hostHeader) {

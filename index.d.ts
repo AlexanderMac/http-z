@@ -91,10 +91,10 @@ export declare namespace consts {
 export class HttpZError extends Error { }
 
 export declare namespace utils {
-  function splitByDelimiter(str: string, delimiter: string): any;
+  function splitBy(str: string, delimiter: string): any;
   function isAbsoluteUrl(url: string): boolean;
   function parseUrl(path?: string, origin?: string): any;
-  function convertParamsArrayToPairs(params: HttpZParam[]): any[];
+  function arrayToPairs(params: HttpZParam[]): any[];
   function prettifyHeaderName(name: string): string;
   function getEmptyStringForUndefined(val?: string): string;
   function extendIfNotUndefined(obj: any, fieldName: string, fieldValue?: any): any;

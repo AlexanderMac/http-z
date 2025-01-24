@@ -1,7 +1,7 @@
 const consts = require('../consts')
 const HttpZError = require('../error')
 const { isNil, trim } = require('../utils')
-const { splitByDelimiter, prettifyHeaderName, head, tail } = require('../utils')
+const { splitBy, prettifyHeaderName, head, tail } = require('../utils')
 const formDataParamParser = require('./form-data-param-parser')
 
 class HttpZBaseParser {
@@ -10,7 +10,7 @@ class HttpZBaseParser {
   }
 
   _parseMessageForRows() {
-    const [headers, body] = splitByDelimiter(this.rawMessage, consts.EOL2X)
+    const [headers, body] = splitBy(this.rawMessage, consts.EOL2X)
     if (isNil(headers) || isNil(body)) {
       throw HttpZError.get(
         'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]',
@@ -29,7 +29,7 @@ class HttpZBaseParser {
 
   _parseHeaderRows() {
     this.headers = this.headerRows.map((hRow) => {
-      let [name, value] = splitByDelimiter(hRow, ':')
+      let [name, value] = splitBy(hRow, ':')
       if (!name) {
         throw HttpZError.get('Incorrect header row format, expected: Name: Value', hRow)
       }

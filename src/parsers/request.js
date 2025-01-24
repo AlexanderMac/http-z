@@ -1,7 +1,7 @@
 const consts = require('../consts')
 const HttpZError = require('../error')
-const { splitByDelimiter, parseUrl } = require('../utils')
-const { validateNotEmptyString } = require('../validators')
+const { splitBy, parseUrl } = require('../utils')
+const { assertNotEmptyString } = require('../assertions')
 const Base = require('./base')
 
 const SUPER_RANDOM_HOST = 'superrandomhost28476561927456.com'
@@ -40,12 +40,12 @@ class HttpZRequestParser extends Base {
 
   _parseHostRow() {
     if (this.opts.mandatoryHost) {
-      validateNotEmptyString(this.hostRow, 'host header')
+      assertNotEmptyString(this.hostRow, 'host header')
     }
     // eslint-disable-next-line no-unused-vars
-    const [unused, value] = splitByDelimiter(this.hostRow || '', ':')
+    const [unused, value] = splitBy(this.hostRow || '', ':')
     if (this.opts.mandatoryHost) {
-      validateNotEmptyString(value, 'host header value')
+      assertNotEmptyString(value, 'host header value')
     }
 
     this.host = value
@@ -84,7 +84,7 @@ class HttpZRequestParser extends Base {
       return
     }
 
-    const [cookieHeaderName, values] = splitByDelimiter(this.cookiesRow, ':')
+    const [cookieHeaderName, values] = splitBy(this.cookiesRow, ':')
     if (!cookieHeaderName) {
       throw HttpZError.get('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow)
     }
@@ -93,7 +93,7 @@ class HttpZRequestParser extends Base {
       return
     }
     this.cookies = values.split(';').map((pair) => {
-      const [name, value] = splitByDelimiter(pair, '=')
+      const [name, value] = splitBy(pair, '=')
       const cookie = {
         name,
       }

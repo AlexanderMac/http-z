@@ -2,7 +2,7 @@ exports.getLibVersion = () => {
   return '8.0.0-dev'
 }
 
-exports.splitByDelimiter = (str, delimiter) => {
+exports.splitBy = (str, delimiter) => {
   if (exports.isEmpty(str)) {
     return []
   }
@@ -53,7 +53,7 @@ exports.parseUrl = (url, host) => {
   }
 }
 
-exports.convertParamsArrayToPairs = (params) => {
+exports.arrayToPairs = (params) => {
   return params.map(({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
 }
 

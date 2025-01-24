@@ -1,7 +1,7 @@
 const { isEmpty } = require('../utils')
 const consts = require('../consts')
-const { prettifyHeaderName, getEmptyStringForUndefined, convertParamsArrayToPairs } = require('../utils')
-const { validateArray, validateNotEmptyString, validateString } = require('../validators')
+const { prettifyHeaderName, getEmptyStringForUndefined, arrayToPairs } = require('../utils')
+const { assertArray, assertNotEmptyString, assertString } = require('../assertions')
 
 class HttpZBaseBuilder {
   constructor({ headers, body }) {
@@ -10,7 +10,7 @@ class HttpZBaseBuilder {
   }
 
   _generateHeaderRows() {
-    validateArray(this.headers, 'headers')
+    assertArray(this.headers, 'headers')
 
     if (isEmpty(this.headers)) {
       return ''
@@ -18,8 +18,8 @@ class HttpZBaseBuilder {
 
     const headerRowsStr = this.headers
       .map((header, index) => {
-        validateNotEmptyString(header.name, 'header name', `header index: ${index}`)
-        validateString(header.value, 'header.value', `header index: ${index}`)
+        assertNotEmptyString(header.name, 'header name', `header index: ${index}`)
+        assertString(header.value, 'header.value', `header index: ${index}`)
 
         const headerName = prettifyHeaderName(header.name)
         const headerValue = header.value
@@ -73,8 +73,8 @@ class HttpZBaseBuilder {
   }
 
   _generateFormDataBody() {
-    validateArray(this.body.params, 'body.params')
-    validateNotEmptyString(this.body.boundary, 'body.boundary')
+    assertArray(this.body.params, 'body.params')
+    assertNotEmptyString(this.body.boundary, 'body.boundary')
 
     if (isEmpty(this.body.params)) {
       return ''
@@ -84,7 +84,7 @@ class HttpZBaseBuilder {
       // eslint-disable-next-line max-statements
       .map((param, index) => {
         if (!param.type) {
-          validateNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`)
+          assertNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`)
         }
         let paramGroupStr = '--' + this.body.boundary
         paramGroupStr += consts.EOL
@@ -111,8 +111,8 @@ class HttpZBaseBuilder {
   }
 
   _generateUrlencodedBody() {
-    validateArray(this.body.params, 'body.params')
-    const paramPairs = convertParamsArrayToPairs(this.body.params)
+    assertArray(this.body.params, 'body.params')
+    const paramPairs = arrayToPairs(this.body.params)
 
     return new URLSearchParams(paramPairs).toString()
   }

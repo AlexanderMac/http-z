@@ -1,5 +1,5 @@
 const consts = require('../consts')
-const { validateNotEmptyString, validatePositiveNumber } = require('../validators')
+const { assertNotEmptyString, assertPositiveNumber } = require('../assertions')
 const Base = require('./base')
 
 class HttpZResponseBuilder extends Base {
@@ -20,9 +20,9 @@ class HttpZResponseBuilder extends Base {
   }
 
   _generateStartRow() {
-    validateNotEmptyString(this.protocolVersion, 'protocolVersion')
-    validatePositiveNumber(this.statusCode, 'statusCode')
-    validateNotEmptyString(this.statusMessage, 'statusMessage')
+    assertNotEmptyString(this.protocolVersion, 'protocolVersion')
+    assertPositiveNumber(this.statusCode, 'statusCode')
+    assertNotEmptyString(this.statusMessage, 'statusMessage')
 
     const protocolVersion = this.protocolVersion.toUpperCase()
     return `${protocolVersion} ${this.statusCode} ${this.statusMessage}` + consts.EOL

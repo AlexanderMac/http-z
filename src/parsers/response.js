@@ -1,6 +1,6 @@
 const consts = require('../consts')
 const HttpZError = require('../error')
-const { splitByDelimiter, head, tail, isEmpty } = require('../utils')
+const { splitBy, head, tail, isEmpty } = require('../utils')
 const Base = require('./base')
 
 class HttpZResponseParser extends Base {
@@ -47,7 +47,7 @@ class HttpZResponseParser extends Base {
     // eslint-disable-next-line max-statements
     this.cookies = this.cookieRows.map((cookiesRow) => {
       // eslint-disable-next-line no-unused-vars
-      const [unused, values] = splitByDelimiter(cookiesRow, ':')
+      const [unused, values] = splitBy(cookiesRow, ':')
       if (!values) {
         return {}
       }

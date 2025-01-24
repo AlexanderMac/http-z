@@ -1,9 +1,9 @@
 const should = require('should')
 const HttpZError = require('../src/error')
-const validators = require('../src/validators')
+const assertions = require('../src/assertions')
 
-describe('validators', () => {
-  function validateRequired(fn, name) {
+describe('assertions', () => {
+  function assertRequired(fn, name) {
     it('should throw error when val is nil (undefined, null)', () => {
       const ERR = {
         message: `${name} is required`,
@@ -13,7 +13,7 @@ describe('validators', () => {
     })
   }
 
-  function validateString(fn, name) {
+  function assertString(fn, name) {
     it('should throw error when val is not a string (number, date, object, array)', () => {
       const ERR = {
         message: 'username must be a string',
@@ -25,7 +25,7 @@ describe('validators', () => {
     })
   }
 
-  function validateNumber(fn, name) {
+  function assertNumber(fn, name) {
     it('should throw error when val is not a number (string, date, object, array)', () => {
       const ERR = {
         message: 'age must be a number',
@@ -37,89 +37,89 @@ describe('validators', () => {
     })
   }
 
-  describe('validateRequired', () => {
+  describe('assertRequired', () => {
     const name = 'username'
 
-    validateRequired(validators.validateRequired, name)
+    assertRequired(assertions.assertRequired, name)
 
     it('should not throw error when val is not nil', () => {
-      should(validators.validateRequired.bind(null, 'smith', name)).not.throw(HttpZError)
+      should(assertions.assertRequired.bind(null, 'smith', name)).not.throw(HttpZError)
     })
   })
 
-  describe('validateString', () => {
+  describe('assertString', () => {
     const name = 'username'
 
-    validateRequired(validators.validateString, name)
-    validateString(validators.validateString, name)
+    assertRequired(assertions.assertString, name)
+    assertString(assertions.assertString, name)
   })
 
-  describe('validateNotEmptyString', () => {
+  describe('assertNotEmptyString', () => {
     const name = 'username'
 
-    validateRequired(validators.validateNotEmptyString, name)
-    validateString(validators.validateNotEmptyString, name)
+    assertRequired(assertions.assertNotEmptyString, name)
+    assertString(assertions.assertNotEmptyString, name)
 
     it('should throw error when val is an empty string', () => {
-      should(validators.validateNotEmptyString.bind(null, '', name)).throw(HttpZError, {
+      should(assertions.assertNotEmptyString.bind(null, '', name)).throw(HttpZError, {
         message: 'username must be not empty string',
       })
     })
 
     it('should not throw error when val is not empty string', () => {
-      should(validators.validateNotEmptyString.bind(null, 'smith', name)).not.throw(HttpZError)
+      should(assertions.assertNotEmptyString.bind(null, 'smith', name)).not.throw(HttpZError)
     })
   })
 
-  describe('validateNumber', () => {
+  describe('assertNumber', () => {
     const name = 'age'
 
-    validateRequired(validators.validateNumber, name)
-    validateNumber(validators.validateNumber, name)
+    assertRequired(assertions.assertNumber, name)
+    assertNumber(assertions.assertNumber, name)
 
     it('should not throw error when val is a number', () => {
-      should(validators.validateNumber.bind(null, -10, name)).not.throw(HttpZError)
-      should(validators.validateNumber.bind(null, 25, name)).not.throw(HttpZError)
+      should(assertions.assertNumber.bind(null, -10, name)).not.throw(HttpZError)
+      should(assertions.assertNumber.bind(null, 25, name)).not.throw(HttpZError)
     })
   })
 
-  describe('validatePositiveNumber', () => {
+  describe('assertPositiveNumber', () => {
     const name = 'age'
 
-    validateRequired(validators.validatePositiveNumber, name)
-    validateNumber(validators.validatePositiveNumber, name)
+    assertRequired(assertions.assertPositiveNumber, name)
+    assertNumber(assertions.assertPositiveNumber, name)
 
     it('should throw error when val is less or equal to zero', () => {
-      should(validators.validatePositiveNumber.bind(null, -5, name)).throw(HttpZError, {
+      should(assertions.assertPositiveNumber.bind(null, -5, name)).throw(HttpZError, {
         message: 'age must be a positive number',
       })
-      should(validators.validatePositiveNumber.bind(null, 0, name)).throw(HttpZError, {
+      should(assertions.assertPositiveNumber.bind(null, 0, name)).throw(HttpZError, {
         message: 'age must be a positive number',
       })
     })
 
     it('should not throw error when val is a positive number', () => {
-      should(validators.validatePositiveNumber.bind(null, 25, name)).not.throw(HttpZError)
+      should(assertions.assertPositiveNumber.bind(null, 25, name)).not.throw(HttpZError)
     })
   })
 
-  describe('validateArray', () => {
+  describe('assertArray', () => {
     const name = 'cookies'
 
-    validateRequired(validators.validateArray, name)
+    assertRequired(assertions.assertArray, name)
 
     it('should throw error when val is not an array (string, number, date, object)', () => {
       const ERR = {
         message: 'cookies must be an array',
       }
-      should(validators.validateArray.bind(null, '10', name)).throw(HttpZError, ERR)
-      should(validators.validateArray.bind(null, 10, name)).throw(HttpZError, ERR)
-      should(validators.validateArray.bind(null, new Date(), name)).throw(HttpZError, ERR)
-      should(validators.validateArray.bind(null, { val: 10 }, name)).throw(HttpZError, ERR)
+      should(assertions.assertArray.bind(null, '10', name)).throw(HttpZError, ERR)
+      should(assertions.assertArray.bind(null, 10, name)).throw(HttpZError, ERR)
+      should(assertions.assertArray.bind(null, new Date(), name)).throw(HttpZError, ERR)
+      should(assertions.assertArray.bind(null, { val: 10 }, name)).throw(HttpZError, ERR)
     })
 
     it('should not throw error when val is an array', () => {
-      should(validators.validateArray.bind(null, ['c1', 'c2'], name)).not.throw(HttpZError)
+      should(assertions.assertArray.bind(null, ['c1', 'c2'], name)).not.throw(HttpZError)
     })
   })
 })

@@ -171,7 +171,7 @@
 			  return '8.0.0-dev'
 			};
 
-			exports.splitByDelimiter = (str, delimiter) => {
+			exports.splitBy = (str, delimiter) => {
 			  if (exports.isEmpty(str)) {
 			    return []
 			  }
@@ -222,7 +222,7 @@
 			  }
 			};
 
-			exports.convertParamsArrayToPairs = (params) => {
+			exports.arrayToPairs = (params) => {
 			  return params.map(({ name, value }) => [name, exports.getEmptyStringForUndefined(value)])
 			};
 
@@ -280,7 +280,7 @@
 			  return Array.isArray(value)
 			};
 
-			exports.isError = value => {
+			exports.isError = (value) => {
 			  return value instanceof Error
 			};
 
@@ -331,7 +331,7 @@
 			  return value.replace(new RegExp(`^([${chars}]*)(.*?)([${chars}]*)$`), '$2')
 			};
 
-			exports.trimEnd = (value, chars = undefined) =>{
+			exports.trimEnd = (value, chars = undefined) => {
 			  if (exports.isNil(value)) {
 			    return value
 			  }
@@ -345,59 +345,59 @@
 		return utils;
 	}
 
-	var validators = {};
+	var assertions = {};
 
-	var hasRequiredValidators;
+	var hasRequiredAssertions;
 
-	function requireValidators () {
-		if (hasRequiredValidators) return validators;
-		hasRequiredValidators = 1;
+	function requireAssertions () {
+		if (hasRequiredAssertions) return assertions;
+		hasRequiredAssertions = 1;
 		(function (exports) {
 			const { isNil, isString, isEmpty, isNumber, isArray } = requireUtils();
 			const HttpZError = requireError();
 
-			exports.validateRequired = (val, field, details) => {
+			exports.assertRequired = (val, field, details) => {
 			  if (isNil(val)) {
 			    throw HttpZError.get(`${field} is required`, details)
 			  }
 			};
 
-			exports.validateString = (val, field, details) => {
-			  exports.validateRequired(val, field, details);
+			exports.assertString = (val, field, details) => {
+			  exports.assertRequired(val, field, details);
 			  if (!isString(val)) {
 			    throw HttpZError.get(`${field} must be a string`, details)
 			  }
 			};
 
-			exports.validateNotEmptyString = (val, field, details) => {
-			  exports.validateString(val, field, details);
+			exports.assertNotEmptyString = (val, field, details) => {
+			  exports.assertString(val, field, details);
 			  if (isEmpty(val)) {
 			    throw HttpZError.get(`${field} must be not empty string`, details)
 			  }
 			};
 
-			exports.validateNumber = (val, field, details) => {
-			  exports.validateRequired(val, field, details);
+			exports.assertNumber = (val, field, details) => {
+			  exports.assertRequired(val, field, details);
 			  if (!isNumber(val)) {
 			    throw HttpZError.get(`${field} must be a number`, details)
 			  }
 			};
 
-			exports.validatePositiveNumber = (val, field, details) => {
-			  exports.validateNumber(val, field, details);
+			exports.assertPositiveNumber = (val, field, details) => {
+			  exports.assertNumber(val, field, details);
 			  if (val <= 0) {
 			    throw HttpZError.get(`${field} must be a positive number`, details)
 			  }
 			};
 
-			exports.validateArray = (val, field, details) => {
-			  exports.validateRequired(val, field, details);
+			exports.assertArray = (val, field, details) => {
+			  exports.assertRequired(val, field, details);
 			  if (!isArray(val)) {
 			    throw HttpZError.get(`${field} must be an array`, details)
 			  }
 			}; 
-		} (validators));
-		return validators;
+		} (assertions));
+		return assertions;
 	}
 
 	var formDataParamParser;
@@ -516,7 +516,7 @@
 		const consts = requireConsts();
 		const HttpZError = requireError();
 		const { isNil, trim } = requireUtils();
-		const { splitByDelimiter, prettifyHeaderName, head, tail } = requireUtils();
+		const { splitBy, prettifyHeaderName, head, tail } = requireUtils();
 		const formDataParamParser = requireFormDataParamParser();
 
 		class HttpZBaseParser {
@@ -525,7 +525,7 @@
 		  }
 
 		  _parseMessageForRows() {
-		    const [headers, body] = splitByDelimiter(this.rawMessage, consts.EOL2X);
+		    const [headers, body] = splitBy(this.rawMessage, consts.EOL2X);
 		    if (isNil(headers) || isNil(body)) {
 		      throw HttpZError.get(
 		        'Incorrect message format, expected: start-line CRLF *(header-field CRLF) CRLF [message-body]',
@@ -544,7 +544,7 @@
 
 		  _parseHeaderRows() {
 		    this.headers = this.headerRows.map((hRow) => {
-		      let [name, value] = splitByDelimiter(hRow, ':');
+		      let [name, value] = splitBy(hRow, ':');
 		      if (!name) {
 		        throw HttpZError.get('Incorrect header row format, expected: Name: Value', hRow)
 		      }
@@ -686,8 +686,8 @@
 		hasRequiredRequest$1 = 1;
 		const consts = requireConsts();
 		const HttpZError = requireError();
-		const { splitByDelimiter, parseUrl } = requireUtils();
-		const { validateNotEmptyString } = requireValidators();
+		const { splitBy, parseUrl } = requireUtils();
+		const { assertNotEmptyString } = requireAssertions();
 		const Base = requireBase$1();
 
 		const SUPER_RANDOM_HOST = 'superrandomhost28476561927456.com';
@@ -726,12 +726,12 @@
 
 		  _parseHostRow() {
 		    if (this.opts.mandatoryHost) {
-		      validateNotEmptyString(this.hostRow, 'host header');
+		      assertNotEmptyString(this.hostRow, 'host header');
 		    }
 		    // eslint-disable-next-line no-unused-vars
-		    const [unused, value] = splitByDelimiter(this.hostRow || '', ':');
+		    const [unused, value] = splitBy(this.hostRow || '', ':');
 		    if (this.opts.mandatoryHost) {
-		      validateNotEmptyString(value, 'host header value');
+		      assertNotEmptyString(value, 'host header value');
 		    }
 
 		    this.host = value;
@@ -770,7 +770,7 @@
 		      return
 		    }
 
-		    const [cookieHeaderName, values] = splitByDelimiter(this.cookiesRow, ':');
+		    const [cookieHeaderName, values] = splitBy(this.cookiesRow, ':');
 		    if (!cookieHeaderName) {
 		      throw HttpZError.get('Incorrect cookie row format, expected: Cookie: Name1=Value1;...', this.cookiesRow)
 		    }
@@ -779,7 +779,7 @@
 		      return
 		    }
 		    this.cookies = values.split(';').map((pair) => {
-		      const [name, value] = splitByDelimiter(pair, '=');
+		      const [name, value] = splitBy(pair, '=');
 		      const cookie = {
 		        name,
 		      };
@@ -832,7 +832,7 @@
 		hasRequiredResponse$1 = 1;
 		const consts = requireConsts();
 		const HttpZError = requireError();
-		const { splitByDelimiter, head, tail, isEmpty } = requireUtils();
+		const { splitBy, head, tail, isEmpty } = requireUtils();
 		const Base = requireBase$1();
 
 		class HttpZResponseParser extends Base {
@@ -879,7 +879,7 @@
 		    // eslint-disable-next-line max-statements
 		    this.cookies = this.cookieRows.map((cookiesRow) => {
 		      // eslint-disable-next-line no-unused-vars
-		      const [unused, values] = splitByDelimiter(cookiesRow, ':');
+		      const [unused, values] = splitBy(cookiesRow, ':');
 		      if (!values) {
 		        return {}
 		      }
@@ -974,8 +974,8 @@
 		hasRequiredBase = 1;
 		const { isEmpty } = requireUtils();
 		const consts = requireConsts();
-		const { prettifyHeaderName, getEmptyStringForUndefined, convertParamsArrayToPairs } = requireUtils();
-		const { validateArray, validateNotEmptyString, validateString } = requireValidators();
+		const { prettifyHeaderName, getEmptyStringForUndefined, arrayToPairs } = requireUtils();
+		const { assertArray, assertNotEmptyString, assertString } = requireAssertions();
 
 		class HttpZBaseBuilder {
 		  constructor({ headers, body }) {
@@ -984,7 +984,7 @@
 		  }
 
 		  _generateHeaderRows() {
-		    validateArray(this.headers, 'headers');
+		    assertArray(this.headers, 'headers');
 
 		    if (isEmpty(this.headers)) {
 		      return ''
@@ -992,8 +992,8 @@
 
 		    const headerRowsStr = this.headers
 		      .map((header, index) => {
-		        validateNotEmptyString(header.name, 'header name', `header index: ${index}`);
-		        validateString(header.value, 'header.value', `header index: ${index}`);
+		        assertNotEmptyString(header.name, 'header name', `header index: ${index}`);
+		        assertString(header.value, 'header.value', `header index: ${index}`);
 
 		        const headerName = prettifyHeaderName(header.name);
 		        const headerValue = header.value;
@@ -1047,8 +1047,8 @@
 		  }
 
 		  _generateFormDataBody() {
-		    validateArray(this.body.params, 'body.params');
-		    validateNotEmptyString(this.body.boundary, 'body.boundary');
+		    assertArray(this.body.params, 'body.params');
+		    assertNotEmptyString(this.body.boundary, 'body.boundary');
 
 		    if (isEmpty(this.body.params)) {
 		      return ''
@@ -1058,7 +1058,7 @@
 		      // eslint-disable-next-line max-statements
 		      .map((param, index) => {
 		        if (!param.type) {
-		          validateNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`);
+		          assertNotEmptyString(param.name, 'body.params[index].name', `param index: ${index}`);
 		        }
 		        let paramGroupStr = '--' + this.body.boundary;
 		        paramGroupStr += consts.EOL;
@@ -1085,8 +1085,8 @@
 		  }
 
 		  _generateUrlencodedBody() {
-		    validateArray(this.body.params, 'body.params');
-		    const paramPairs = convertParamsArrayToPairs(this.body.params);
+		    assertArray(this.body.params, 'body.params');
+		    const paramPairs = arrayToPairs(this.body.params);
 
 		    return new URLSearchParams(paramPairs).toString()
 		  }
@@ -1107,7 +1107,7 @@
 		if (hasRequiredRequest) return request;
 		hasRequiredRequest = 1;
 		const consts = requireConsts();
-		const { validateArray, validateNotEmptyString } = requireValidators();
+		const { assertArray, assertNotEmptyString } = requireAssertions();
 		const { prettifyHeaderName } = requireUtils();
 		const HttpZError = requireError();
 		const Base = requireBase();
@@ -1131,15 +1131,15 @@
 		  }
 
 		  _generateStartRow() {
-		    validateNotEmptyString(this.method, 'method');
-		    validateNotEmptyString(this.protocolVersion, 'protocolVersion');
-		    validateNotEmptyString(this.target, 'target');
+		    assertNotEmptyString(this.method, 'method');
+		    assertNotEmptyString(this.protocolVersion, 'protocolVersion');
+		    assertNotEmptyString(this.target, 'target');
 
 		    return '' + this.method.toUpperCase() + ' ' + this.target + ' ' + this.protocolVersion.toUpperCase() + consts.EOL
 		  }
 
 		  _generateHeaderRows() {
-		    validateArray(this.headers, 'headers');
+		    assertArray(this.headers, 'headers');
 		    if (this.opts.mandatoryHost) {
 		      const hostHeader = this.headers.find((name) => prettifyHeaderName(name) === consts.http.headers.host);
 		      if (!hostHeader) {
@@ -1162,7 +1162,7 @@
 		if (hasRequiredResponse) return response;
 		hasRequiredResponse = 1;
 		const consts = requireConsts();
-		const { validateNotEmptyString, validatePositiveNumber } = requireValidators();
+		const { assertNotEmptyString, assertPositiveNumber } = requireAssertions();
 		const Base = requireBase();
 
 		class HttpZResponseBuilder extends Base {
@@ -1183,9 +1183,9 @@
 		  }
 
 		  _generateStartRow() {
-		    validateNotEmptyString(this.protocolVersion, 'protocolVersion');
-		    validatePositiveNumber(this.statusCode, 'statusCode');
-		    validateNotEmptyString(this.statusMessage, 'statusMessage');
+		    assertNotEmptyString(this.protocolVersion, 'protocolVersion');
+		    assertPositiveNumber(this.statusCode, 'statusCode');
+		    assertNotEmptyString(this.statusMessage, 'statusMessage');
 
 		    const protocolVersion = this.protocolVersion.toUpperCase();
 		    return `${protocolVersion} ${this.statusCode} ${this.statusMessage}` + consts.EOL
