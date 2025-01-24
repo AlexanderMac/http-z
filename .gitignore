@@ -26,4 +26,3 @@ node_modules
 .jsbeautifyrc
 tsd.json
 typings
-.nvmrc
