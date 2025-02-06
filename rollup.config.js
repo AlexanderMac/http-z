@@ -8,15 +8,9 @@ module.exports = [
       dir: "dist",
       name: 'httpZ',
       format: 'umd',
-      globals: {
-        'lodash': '_',
-      },
     },
     plugins: [
       typescript(),
-    ],
-    external: [
-      'lodash',
     ],
   },
   {
