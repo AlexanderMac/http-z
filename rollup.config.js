@@ -1,18 +1,31 @@
-const resolve = require('@rollup/plugin-node-resolve')
-const commonjs = require('@rollup/plugin-commonjs')
-const pkg = require('./package.json')
+const typescript = require('@rollup/plugin-typescript')
+const dts = require('rollup-plugin-dts')
 
 module.exports = [
   {
-    input: 'index.js',
+    input: 'src/index.ts',
     output: {
+      dir: "dist",
       name: 'httpZ',
-      file: pkg.browser,
-      format: 'umd'
+      format: 'umd',
+      globals: {
+        'lodash': '_',
+      },
     },
     plugins: [
-      resolve(),
-      commonjs()
-    ]
+      typescript(),
+    ],
+    external: [
+      'lodash',
+    ],
+  },
+  {
+    input: 'src/index.ts',
+    output: {
+      dir: "dist",
+    },
+    plugins: [
+      dts.dts(),
+    ],
   }
 ]

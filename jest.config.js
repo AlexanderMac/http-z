@@ -1,7 +1,7 @@
 module.exports = {
   testEnvironment: "node",
   testMatch: [
-    "**/test/**/*.ts"
+    "**/test/**/*-spec.ts"
   ],
   transform: {
     "^.+.ts$": ["ts-jest", {}],
