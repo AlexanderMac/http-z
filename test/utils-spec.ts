@@ -1,53 +1,53 @@
-const should = require('should')
-const utils = require('../src/utils')
+import { HttpZParam } from '../src/types'
+import * as utils from '../src/utils'
 
 describe('utils', () => {
   describe('splitBy', () => {
     const delimiter = ';'
 
     it('should return empty array when str is nil or empty', () => {
-      let actual = utils.splitBy(undefined, delimiter)
-      should(actual).eql([])
+      let actual = utils.splitBy(undefined as any, delimiter)
+      expect(actual).toEqual([])
 
-      actual = utils.splitBy(null, delimiter)
-      should(actual).eql([])
+      actual = utils.splitBy(null as any, delimiter)
+      expect(actual).toEqual([])
 
       actual = utils.splitBy('', delimiter)
-      should(actual).eql([])
+      expect(actual).toEqual([])
     })
 
     it('should return empty array when str does not contain delimiter', () => {
       let actual = utils.splitBy('somestring', delimiter)
-      should(actual).eql([])
+      expect(actual).toEqual([])
 
       actual = utils.splitBy('1234567890', delimiter)
-      should(actual).eql([])
+      expect(actual).toEqual([])
     })
 
     it('should return empty array with one empty element when str does not contain two parts', () => {
       let actual = utils.splitBy('somestring  ;  ', delimiter)
-      should(actual).eql(['somestring', ''])
+      expect(actual).toEqual(['somestring', ''])
 
       actual = utils.splitBy('  ;  somestring', delimiter)
-      should(actual).eql(['', 'somestring'])
+      expect(actual).toEqual(['', 'somestring'])
     })
 
     it('should return array of two elements when str contains two parts', () => {
       let actual = utils.splitBy('partOne; partTwo', delimiter)
-      should(actual).eql(['partOne', 'partTwo'])
+      expect(actual).toEqual(['partOne', 'partTwo'])
 
       actual = utils.splitBy('partOne  ;  partTwo   ', delimiter)
-      should(actual).eql(['partOne', 'partTwo'])
+      expect(actual).toEqual(['partOne', 'partTwo'])
 
       actual = utils.splitBy('partOne; partTwo partThree', delimiter)
-      should(actual).eql(['partOne', 'partTwo partThree'])
+      expect(actual).toEqual(['partOne', 'partTwo partThree'])
     })
   })
 
   describe('isAbsoluteUrl', () => {
-    function test(url, expected) {
+    function test(url: string, expected: unknown): void {
       const actual = utils.isAbsoluteUrl(url)
-      should(actual).eql(expected)
+      expect(actual).toEqual(expected)
     }
 
     it('should return false when url is in origin-form', () => {
@@ -64,7 +64,7 @@ describe('utils', () => {
   })
 
   describe('parseUrl', () => {
-    function getDefParsedUrl(ex) {
+    function getDefParsedUrl(ex = {}): object {
       return {
         protocol: 'HTTP',
         host: 'example.com',
@@ -74,76 +74,48 @@ describe('utils', () => {
       }
     }
 
-    function test(url, host, expected) {
+    function test(url: string, host: string, expected: unknown): void {
       const actual = utils.parseUrl(url, host)
-      should(actual).eql(expected)
+      expect(actual).toEqual(expected)
     }
 
-    describe('call with one parameter', () => {
-      it('should parse url started with http', () => {
-        test('http://example.com', undefined, getDefParsedUrl())
-      })
-
-      it('should parse url started with https', () => {
-        test('https://example.com', undefined, getDefParsedUrl({ protocol: 'HTTPS' }))
-      })
-
-      it('should add `http` when url is without protocol', () => {
-        test('example.com', undefined, getDefParsedUrl({ protocol: 'HTTP' }))
-      })
-
-      it('should parse url with path', () => {
-        test('http://example.com/home', undefined, getDefParsedUrl({ path: '/home' }))
-      })
-
-      it('should parse url with path and params', () => {
-        test(
-          'http://example.com/home?p1=v1',
-          undefined,
-          getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }),
-        )
-      })
+    it('should parse url started with http', () => {
+      test('/', 'http://example.com', getDefParsedUrl())
     })
 
-    describe('call with two parameters', () => {
-      it('should parse url started with http', () => {
-        test('/', 'http://example.com', getDefParsedUrl())
-      })
+    it('should parse url started with https', () => {
+      test('/', 'https://example.com', getDefParsedUrl({ protocol: 'HTTPS' }))
+    })
 
-      it('should parse url started with https', () => {
-        test('/', 'https://example.com', getDefParsedUrl({ protocol: 'HTTPS' }))
-      })
+    it('should add `http` when url is without protocol', () => {
+      test('/', 'example.com', getDefParsedUrl({ protocol: 'HTTP' }))
+    })
 
-      it('should add `http` when url is without protocol', () => {
-        test('/', 'example.com', getDefParsedUrl({ protocol: 'HTTP' }))
-      })
+    it('should parse url with path', () => {
+      test('/home', 'http://example.com', getDefParsedUrl({ path: '/home' }))
+    })
 
-      it('should parse url with path', () => {
-        test('/home', 'http://example.com', getDefParsedUrl({ path: '/home' }))
-      })
-
-      it('should parse url with path and params', () => {
-        test(
-          '/home?p1=v1',
-          'http://example.com',
-          getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }),
-        )
-      })
+    it('should parse url with path and params', () => {
+      test(
+        '/home?p1=v1',
+        'http://example.com',
+        getDefParsedUrl({ path: '/home', params: [{ name: 'p1', value: 'v1' }] }),
+      )
     })
   })
 
   describe('arrayToPairs', () => {
-    function test(params, expected) {
+    function test(params: HttpZParam[], expected: unknown): void {
       const actual = utils.arrayToPairs(params)
-      should(actual).eql(expected)
+      expect(actual).toEqual(expected)
     }
 
     it('should return param pairs', () => {
       test(
-        [{ name: 'p1', value: 'v1' }, { name: 'p2', value: null }, { name: 'p3' }],
+        [{ name: 'p1', value: 'v1' }, { name: 'p2', value: undefined }, { name: 'p3' }],
         [
           ['p1', 'v1'],
-          ['p2', null],
+          ['p2', ''],
           ['p3', ''],
         ],
       )
@@ -151,9 +123,9 @@ describe('utils', () => {
   })
 
   describe('prettifyHeaderName', () => {
-    function test(name, expected) {
+    function test(name: string | null | undefined, expected: unknown): void {
       const actual = utils.prettifyHeaderName(name)
-      should(actual).eql(expected)
+      expect(actual).toEqual(expected)
     }
 
     it('should return empty string when name is nil', () => {
@@ -179,9 +151,9 @@ describe('utils', () => {
   })
 
   describe('getEmptyStringForUndefined', () => {
-    function test(val, expected) {
+    function test(val: string | undefined, expected: unknown): void {
       const actual = utils.getEmptyStringForUndefined(val)
-      should(actual).eql(expected)
+      expect(actual).toEqual(expected)
     }
 
     it('should return empty string when val is undefined', () => {
@@ -194,17 +166,17 @@ describe('utils', () => {
   })
 
   describe('extendIfNotUndefined', () => {
-    function getDefObject(ex) {
+    function getDefObject(ex = {}): object {
       return {
         name: 'John',
         ...ex,
       }
     }
 
-    function test(fieldName, fieldValue, expected) {
+    function test(fieldName: string, fieldValue: string | undefined, expected: unknown): void {
       const obj = getDefObject()
       utils.extendIfNotUndefined(obj, fieldName, fieldValue)
-      should(obj).eql(expected)
+      expect(obj).toEqual(expected)
     }
 
     it('should not extend object by new field when fieldValue is undefined', () => {

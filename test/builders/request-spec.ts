@@ -1,118 +1,126 @@
-const sinon = require('sinon')
-const should = require('should')
-const nassert = require('n-assert')
-const HttpZConsts = require('../../src/consts')
-const HttpZError = require('../../src/error')
-const RequestBuilder = require('../../src/builders/request')
+import { HttpZRequestBuilder } from '../../src/builders/request'
+import { HttpZBuilderRequestModel } from '../../src/builders/types'
+import { EOL, HttpMethod, HttpProtocolVersion } from '../../src/constants'
+import { HttpZError } from '../../src/error'
 
 describe('builders / request', () => {
-  function getBuilderInstance(exRequestModel, opts = {}) {
-    const requestModel = {
-      method: 'get',
-      protocolVersion: 'http/1.1',
+  function getBuilderInstance(ex: Partial<HttpZBuilderRequestModel> = {}, opts = {}): HttpZRequestBuilder {
+    const requestModel: HttpZBuilderRequestModel = {
+      protocolVersion: HttpProtocolVersion.http11,
+      method: HttpMethod.get,
       target: '/',
-      ...exRequestModel,
+      headers: [],
+      ...ex,
     }
-    return new RequestBuilder(requestModel, opts)
+    return new HttpZRequestBuilder(requestModel, opts)
   }
 
   describe('static build', () => {
-    beforeEach(() => {
-      sinon.stub(RequestBuilder.prototype, 'build')
+    let _buildRequestSpy: jest.SpyInstance
+
+    beforeAll(() => {
+      _buildRequestSpy = jest.spyOn(HttpZRequestBuilder, 'build')
     })
 
     afterEach(() => {
-      RequestBuilder.prototype.build.restore()
+      _buildRequestSpy.mockReset()
     })
 
-    it('should create instance of RequestBuilder and call instance.build', () => {
-      const model = {}
+    afterAll(() => {
+      _buildRequestSpy.mockRestore()
+    })
+
+    it('should create instance of HttpZRequestBuilder and call instance.build', () => {
+      const requestModel = {} as HttpZBuilderRequestModel
       const expected = 'ok'
+      const expectedArgs = [requestModel, {}]
 
-      RequestBuilder.prototype.build.returns('ok')
+      _buildRequestSpy.mockReturnValue('ok')
 
-      const actual = RequestBuilder.build(model)
-      nassert.assert(actual, expected)
+      const actual = HttpZRequestBuilder.build(requestModel, {})
+      expect(actual).toEqual(expected)
 
-      nassert.assertFn({ inst: RequestBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' })
+      expect(_buildRequestSpy).toHaveBeenCalledTimes(1)
+      expect(_buildRequestSpy).toHaveBeenCalledWith(...expectedArgs)
     })
   })
 
   describe('build', () => {
     it('should call related methods and return request message', () => {
       const builder = getBuilderInstance()
-      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL)
-      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
-      sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
+      builder['_generateStartRow'] = jest.fn(() => 'startRow' + EOL)
+      builder['_generateHeaderRows'] = jest.fn(() => 'headerRows' + EOL)
+      builder['_generateBodyRows'] = jest.fn(() => 'bodyRows')
 
-      const expected = ['startRow', 'headerRows', '', 'bodyRows'].join(HttpZConsts.EOL)
+      const expected = ['startRow', 'headerRows', '', 'bodyRows'].join(EOL)
       const actual = builder.build()
-      should(actual).eql(expected)
+      expect(actual).toEqual(expected)
 
-      nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' })
-      nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
-      nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' })
+      expect(builder['_generateStartRow']).toHaveBeenCalledTimes(1)
+      expect(builder['_generateStartRow']).toHaveBeenCalledWith()
+      expect(builder['_generateHeaderRows']).toHaveBeenCalledTimes(1)
+      expect(builder['_generateHeaderRows']).toHaveBeenCalledWith()
+      expect(builder['_generateBodyRows']).toHaveBeenCalledTimes(1)
+      expect(builder['_generateBodyRows']).toHaveBeenCalledWith()
     })
   })
 
   describe('_generateStartRow', () => {
     it('should throw error when method is undefined', () => {
-      const builder = getBuilderInstance({ method: undefined })
+      const err = new HttpZError('method is required')
 
-      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'method is required',
-      })
+      const builder = getBuilderInstance({ method: undefined })
+      expect(builder['_generateStartRow'].bind(builder)).toThrow(err)
     })
 
     it('should throw error when protocolVersion is undefined', () => {
-      const builder = getBuilderInstance({ protocolVersion: undefined })
+      const err = new HttpZError('protocolVersion is required')
 
-      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'protocolVersion is required',
-      })
+      const builder = getBuilderInstance({ protocolVersion: undefined })
+      expect(builder['_generateStartRow'].bind(builder)).toThrow(err)
     })
 
     it('should throw error when target is undefined', () => {
-      const builder = getBuilderInstance({ target: undefined })
+      const err = new HttpZError('target is required')
 
-      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'target is required',
-      })
+      const builder = getBuilderInstance({ target: undefined })
+      expect(builder['_generateStartRow'].bind(builder)).toThrow(err)
     })
 
     it('should build startRow when all params are valid', () => {
-      const builder = getBuilderInstance()
+      const expected = 'GET / HTTP/1.1' + EOL
 
-      const expected = 'GET / HTTP/1.1' + HttpZConsts.EOL
-      const actual = builder._generateStartRow()
-      should(actual).eql(expected)
+      const builder = getBuilderInstance()
+      const actual = builder['_generateStartRow']()
+      expect(actual).toEqual(expected)
     })
   })
 
   describe('_generateHeaderRows', () => {
     it('should throw error when opts.mandatoryHost is true and host header is missing', () => {
+      const err = new HttpZError('Host header is required')
+
       const builder = getBuilderInstance(
         { headers: [{ name: 'Some-Header', value: 'SomeValue' }] },
         { mandatoryHost: true },
       )
-
-      should(builder._generateHeaderRows.bind(builder)).throw(HttpZError, {
-        message: 'Host header is required',
-      })
+      expect(builder['_generateHeaderRows'].bind(builder)).toThrow(err)
     })
 
     it('should build headerRows when opts.mandatoryHost is false and host header is missing', () => {
+      const expected = 'Some-Header: SomeValue' + EOL
+
       const builder = getBuilderInstance(
         { headers: [{ name: 'Some-Header', value: 'SomeValue' }] },
         { mandatoryHost: false },
       )
-
-      const expected = 'Some-Header: SomeValue' + HttpZConsts.EOL
-      const actual = builder._generateHeaderRows()
-      should(actual).eql(expected)
+      const actual = builder['_generateHeaderRows']()
+      expect(actual).toEqual(expected)
     })
 
     it('should build headerRows when opts.mandatoryHost is true and host header is present', () => {
+      const expected = 'Host: SomeHost' + EOL + 'Some-Header: SomeValue' + EOL
+
       const builder = getBuilderInstance(
         {
           headers: [
@@ -122,33 +130,31 @@ describe('builders / request', () => {
         },
         { mandatoryHost: false },
       )
-
-      const expected = 'Host: SomeHost' + HttpZConsts.EOL + 'Some-Header: SomeValue' + HttpZConsts.EOL
-      const actual = builder._generateHeaderRows()
-      should(actual).eql(expected)
+      const actual = builder['_generateHeaderRows']()
+      expect(actual).toEqual(expected)
     })
   })
 
   describe('functional tests', () => {
     it('should build request without headers and body', () => {
-      const requestModel = {
-        method: 'GET',
-        protocolVersion: 'HTTP/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.get,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features?p1=v1%3B&p2=',
         headers: [{ name: 'Host', value: 'example.com' }],
       }
 
-      const rawRequest = ['GET /features?p1=v1%3B&p2= HTTP/1.1', 'Host: example.com', '', ''].join(HttpZConsts.EOL)
+      const rawRequest = ['GET /features?p1=v1%3B&p2= HTTP/1.1', 'Host: example.com', '', ''].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
 
     it('should build request without body (header names in lower case)', () => {
-      const requestModel = {
-        method: 'get',
-        protocolVersion: 'http/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.get,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features',
         headers: [
           {
@@ -183,17 +189,17 @@ describe('builders / request', () => {
         'Content-Encoding: gzip, deflate',
         '',
         '',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
 
     it('should build request with cookies, but without body', () => {
-      const requestModel = {
-        method: 'GET',
-        protocolVersion: 'HTTP/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.get,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features',
         headers: [
           {
@@ -233,17 +239,17 @@ describe('builders / request', () => {
         'Cookie: csrftoken=123abc; sessionid=456def%3B; username=',
         '',
         '',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
 
     it('should build request with body of contentType=text/plain', () => {
-      const requestModel = {
-        method: 'POST',
-        protocolVersion: 'HTTP/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.post,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features',
         headers: [
           {
@@ -297,17 +303,17 @@ describe('builders / request', () => {
         'Content-Length: 301',
         '',
         'Text data',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
 
     it('should build request with body of contentType=application/x-www-form-urlencoded', () => {
-      const requestModel = {
-        method: 'POST',
-        protocolVersion: 'HTTP/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.post,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features',
         headers: [
           {
@@ -361,17 +367,17 @@ describe('builders / request', () => {
         'Content-Length: 301',
         '',
         'firstName=John&lastName=&age=25%3B',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
 
     it('should build request with body of contentType=multipart/form-data', () => {
-      const requestModel = {
-        method: 'POST',
-        protocolVersion: 'HTTP/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.post,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features',
         headers: [
           {
@@ -455,17 +461,17 @@ describe('builders / request', () => {
         'more info',
         '',
         '--111362:53119209--',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
 
     it('should build request with body of contentType=multipart/alternative (inline)', () => {
-      const requestModel = {
-        method: 'POST',
-        protocolVersion: 'HTTP/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.post,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features',
         headers: [
           {
@@ -503,8 +509,6 @@ describe('builders / request', () => {
             },
           ],
         },
-        headersSize: 243,
-        bodySize: 84,
       }
       const rawRequest = [
         'POST /features HTTP/1.1',
@@ -520,17 +524,17 @@ describe('builders / request', () => {
         '',
         '<base64-data>',
         '--111362-53119209--',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
 
     it('should build request with body of contentType=multipart/mixed (attachment)', () => {
-      const requestModel = {
-        method: 'POST',
-        protocolVersion: 'HTTP/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.post,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features',
         headers: [
           {
@@ -570,8 +574,6 @@ describe('builders / request', () => {
             },
           ],
         },
-        headersSize: 236,
-        bodySize: 149,
       }
       const rawRequest = [
         'POST /features HTTP/1.1',
@@ -588,17 +590,17 @@ describe('builders / request', () => {
         '',
         '<binary-data>',
         '--11136253119209--',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
 
     it('should build request with body of contentType=text/plain and transfer-encoding=chunked', () => {
-      const requestModel = {
-        method: 'POST',
-        protocolVersion: 'HTTP/1.1',
+      const requestModel: HttpZBuilderRequestModel = {
+        method: HttpMethod.post,
+        protocolVersion: HttpProtocolVersion.http11,
         target: '/features',
         headers: [
           {
@@ -661,11 +663,11 @@ describe('builders / request', () => {
         'transfer the payload body',
         'C',
         ' to the user',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(requestModel)
       const actual = builder.build()
-      should(actual).eql(rawRequest)
+      expect(actual).toEqual(rawRequest)
     })
   })
 })

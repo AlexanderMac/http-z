@@ -1,98 +1,104 @@
-const sinon = require('sinon')
-const should = require('should')
-const nassert = require('n-assert')
-const HttpZConsts = require('../../src/consts')
-const HttpZError = require('../../src/error')
-const ResponseBuilder = require('../../src/builders/response')
+import { HttpZResponseBuilder } from '../../src/builders/response'
+import { HttpZBuilderResponseModel } from '../../src/builders/types'
+import { EOL, HttpProtocolVersion } from '../../src/constants'
+import { HttpZError } from '../../src/error'
 
 describe('builders / response', () => {
-  function getBuilderInstance(exResponseModel) {
-    const responseModel = {
-      protocolVersion: 'HTTP/1.1',
+  function getBuilderInstance(ex: Partial<HttpZBuilderResponseModel> = {}): HttpZResponseBuilder {
+    const responseModel: HttpZBuilderResponseModel = {
+      protocolVersion: HttpProtocolVersion.http11,
       statusCode: 200,
       statusMessage: 'Ok',
-      ...exResponseModel,
+      headers: [],
+      ...ex,
     }
-    return new ResponseBuilder(responseModel)
+    return new HttpZResponseBuilder(responseModel)
   }
 
   describe('static build', () => {
-    beforeEach(() => {
-      sinon.stub(ResponseBuilder.prototype, 'build')
+    let _buildResponseSpy: jest.SpyInstance
+
+    beforeAll(() => {
+      _buildResponseSpy = jest.spyOn(HttpZResponseBuilder, 'build')
     })
 
     afterEach(() => {
-      ResponseBuilder.prototype.build.restore()
+      _buildResponseSpy.mockReset()
     })
 
-    it('should create instance of ResponseBuilder and call instance.build', () => {
-      const model = {}
+    afterAll(() => {
+      _buildResponseSpy.mockRestore()
+    })
+
+    it('should create instance of HttpZResponseBuilder and call instance.build', () => {
+      const responseModel = {} as HttpZBuilderResponseModel
       const expected = 'ok'
 
-      ResponseBuilder.prototype.build.returns('ok')
+      _buildResponseSpy.mockReturnValue('ok')
 
-      const actual = ResponseBuilder.build(model)
-      nassert.assert(actual, expected)
+      const actual = HttpZResponseBuilder.build(responseModel)
+      expect(actual).toEqual(expected)
 
-      nassert.assertFn({ inst: ResponseBuilder.prototype, fnName: 'build', expectedArgs: '_without-args_' })
+      expect(_buildResponseSpy).toHaveBeenCalledTimes(1)
+      expect(_buildResponseSpy).toHaveBeenCalledWith({})
     })
   })
 
   describe('build', () => {
     it('should call related methods and return response message', () => {
       const builder = getBuilderInstance()
-      sinon.stub(builder, '_generateStartRow').returns('startRow' + HttpZConsts.EOL)
-      sinon.stub(builder, '_generateHeaderRows').returns('headerRows' + HttpZConsts.EOL)
-      sinon.stub(builder, '_generateBodyRows').returns('bodyRows')
+      builder['_generateStartRow'] = jest.fn(() => 'startRow' + EOL)
+      builder['_generateHeaderRows'] = jest.fn(() => 'headerRows' + EOL)
+      builder['_generateBodyRows'] = jest.fn(() => 'bodyRows')
 
-      const expected = ['startRow', 'headerRows', '', 'bodyRows'].join(HttpZConsts.EOL)
+      const expected = ['startRow', 'headerRows', '', 'bodyRows'].join(EOL)
       const actual = builder.build()
-      should(actual).eql(expected)
+      expect(actual).toEqual(expected)
 
-      nassert.assertFn({ inst: builder, fnName: '_generateStartRow', expectedArgs: '_without-args_' })
-      nassert.assertFn({ inst: builder, fnName: '_generateHeaderRows', expectedArgs: '_without-args_' })
-      nassert.assertFn({ inst: builder, fnName: '_generateBodyRows', expectedArgs: '_without-args_' })
+      expect(builder['_generateStartRow']).toHaveBeenCalledTimes(1)
+      expect(builder['_generateStartRow']).toHaveBeenCalledWith()
+      expect(builder['_generateHeaderRows']).toHaveBeenCalledTimes(1)
+      expect(builder['_generateHeaderRows']).toHaveBeenCalledWith()
+      expect(builder['_generateBodyRows']).toHaveBeenCalledTimes(1)
+      expect(builder['_generateBodyRows']).toHaveBeenCalledWith()
     })
   })
 
   describe('_generateStartRow', () => {
     it('should throw error when protocolVersion is undefined', () => {
-      const builder = getBuilderInstance({ protocolVersion: undefined })
+      const err = new HttpZError('protocolVersion is required')
 
-      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'protocolVersion is required',
-      })
+      const builder = getBuilderInstance({ protocolVersion: undefined })
+      expect(builder['_generateStartRow'].bind(builder)).toThrow(err)
     })
 
     it('should throw error when statusCode is undefined', () => {
-      const builder = getBuilderInstance({ statusCode: undefined })
+      const err = new HttpZError('statusCode is required')
 
-      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'statusCode is required',
-      })
+      const builder = getBuilderInstance({ statusCode: undefined })
+      expect(builder['_generateStartRow'].bind(builder)).toThrow(err)
     })
 
     it('should throw error when statusMessage is undefined', () => {
-      const builder = getBuilderInstance({ statusMessage: undefined })
+      const err = new HttpZError('statusMessage is required')
 
-      should(builder._generateStartRow.bind(builder)).throw(HttpZError, {
-        message: 'statusMessage is required',
-      })
+      const builder = getBuilderInstance({ statusMessage: undefined })
+      expect(builder['_generateStartRow'].bind(builder)).toThrow(err)
     })
 
     it('should build startRow when all params are valid', () => {
-      const builder = getBuilderInstance()
+      const expected = 'HTTP/1.1 200 Ok' + EOL
 
-      const expected = 'HTTP/1.1 200 Ok' + HttpZConsts.EOL
-      const actual = builder._generateStartRow()
-      should(actual).eql(expected)
+      const builder = getBuilderInstance()
+      const actual = builder['_generateStartRow']()
+      expect(actual).toEqual(expected)
     })
   })
 
   describe('functional tests', () => {
     it('should build response without body (header names in lower case)', () => {
-      const responseModel = {
-        protocolVersion: 'HTTP/1.1',
+      const responseModel: HttpZBuilderResponseModel = {
+        protocolVersion: HttpProtocolVersion.http11,
         statusCode: 201,
         statusMessage: 'Created',
         headers: [
@@ -123,16 +129,16 @@ describe('builders / response', () => {
         'Content-Encoding: gzip, deflate',
         '',
         '',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(responseModel)
       const actual = builder.build()
-      should(actual).eql(rawResponse)
+      expect(actual).toEqual(rawResponse)
     })
 
     it('should build response with cookies, but without body', () => {
-      const responseModel = {
-        protocolVersion: 'HTTP/1.1',
+      const responseModel: HttpZBuilderResponseModel = {
+        protocolVersion: HttpProtocolVersion.http11,
         statusCode: 201,
         statusMessage: 'Created',
         headers: [
@@ -173,16 +179,16 @@ describe('builders / response', () => {
         'Set-Cookie: sessionid=456def; Domain=example.com; Path=/',
         '',
         '',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(responseModel)
       const actual = builder.build()
-      should(actual).eql(rawResponse)
+      expect(actual).toEqual(rawResponse)
     })
 
     it('should build response with body of contentType=text/plain', () => {
-      const responseModel = {
-        protocolVersion: 'HTTP/1.1',
+      const responseModel: HttpZBuilderResponseModel = {
+        protocolVersion: HttpProtocolVersion.http11,
         statusCode: 200,
         statusMessage: 'Ok',
         headers: [
@@ -222,16 +228,16 @@ describe('builders / response', () => {
         'Content-Length: 301',
         '',
         'Text data',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(responseModel)
       const actual = builder.build()
-      should(actual).eql(rawResponse)
+      expect(actual).toEqual(rawResponse)
     })
 
     it('should build response with body of contentType=text/plain and transfer-encoding=chunked', () => {
-      const responseModel = {
-        protocolVersion: 'HTTP/1.1',
+      const responseModel: HttpZBuilderResponseModel = {
+        protocolVersion: HttpProtocolVersion.http11,
         statusCode: 200,
         statusMessage: 'Ok',
         headers: [
@@ -280,11 +286,11 @@ describe('builders / response', () => {
         'transfer the payload body',
         'C',
         ' to the user',
-      ].join(HttpZConsts.EOL)
+      ].join(EOL)
 
       const builder = getBuilderInstance(responseModel)
       const actual = builder.build()
-      should(actual).eql(rawResponse)
+      expect(actual).toEqual(rawResponse)
     })
   })
 })

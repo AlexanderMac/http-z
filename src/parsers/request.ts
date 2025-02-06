@@ -1,48 +1,60 @@
-const consts = require('../consts')
-const HttpZError = require('../error')
-const { splitBy, parseUrl } = require('../utils')
-const { assertNotEmptyString } = require('../assertions')
-const Base = require('./base')
+import { assertNotEmptyString } from '../assertions'
+import { HttpMethod, HttpProtocolVersion, regexps } from '../constants'
+import { HttpZError } from '../error'
+import { HttpZCookieParam, HttpZParam } from '../types'
+import { splitBy, parseUrl } from '../utils'
+import { HttpZBaseParser } from './base'
+import { HttpZParserOptions, HttpZParserRequestModel } from './types'
 
 const SUPER_RANDOM_HOST = 'superrandomhost28476561927456.com'
 
-class HttpZRequestParser extends Base {
-  static parse(...params) {
+export class HttpZRequestParser extends HttpZBaseParser {
+  static parse(...params: ConstructorParameters<typeof HttpZRequestParser>): HttpZParserRequestModel {
     const instance = new HttpZRequestParser(...params)
     return instance.parse()
   }
 
-  constructor(rawMessage, opts) {
+  private method!: HttpMethod
+  private target!: string
+  private host!: string
+  private path!: string
+  private protocolVersion!: HttpProtocolVersion
+  private hostRow: string | undefined
+  private cookiesRow: string | undefined
+
+  private queryParams: HttpZParam[] | undefined
+  private cookies: HttpZCookieParam[] | undefined
+
+  constructor(
+    rawMessage: string,
+    private readonly opts: HttpZParserOptions,
+  ) {
     super(rawMessage)
-    this.opts = opts
   }
 
-  parse() {
+  parse(): HttpZParserRequestModel {
     this._parseMessageForRows()
     this._parseHostRow()
     this._parseStartRow()
     this._parseHeaderRows()
-    this._parseCookiesRow()
+    this._parseCookieRows()
     this._parseBodyRows()
 
     return this._generateModel()
   }
 
-  _parseMessageForRows() {
-    const { startRow, headerRows, bodyRows } = super._parseMessageForRows()
+  protected override _parseMessageForRows(): void {
+    super._parseMessageForRows()
 
-    this.startRow = startRow
-    this.hostRow = headerRows.find((row) => row.toLowerCase().startsWith('host:'))
-    this.headerRows = headerRows
-    this.cookiesRow = headerRows.find((row) => row.toLowerCase().startsWith('cookie:'))
-    this.bodyRows = bodyRows
+    this.hostRow = this.headerRows.find(row => row.toLowerCase().startsWith('host:'))
+    this.cookiesRow = this.headerRows.find(row => row.toLowerCase().startsWith('cookie:'))
   }
 
-  _parseHostRow() {
+  private _parseHostRow(): void {
     if (this.opts.mandatoryHost) {
       assertNotEmptyString(this.hostRow, 'host header')
     }
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [unused, value] = splitBy(this.hostRow || '', ':')
     if (this.opts.mandatoryHost) {
       assertNotEmptyString(value, 'host header value')
@@ -52,21 +64,21 @@ class HttpZRequestParser extends Base {
   }
 
   // eslint-disable-next-line max-statements
-  _parseStartRow() {
-    if (!consts.regexps.requestStartRow.test(this.startRow)) {
+  private _parseStartRow(): void {
+    if (!regexps.requestStartRow.test(this.startRow)) {
       throw HttpZError.get('Incorrect startRow format, expected: Method request-target HTTP-Version', this.startRow)
     }
 
-    const rowElems = this.startRow.split(' ')
-    this.method = rowElems[0].toUpperCase()
-    this.protocolVersion = rowElems[2].toUpperCase()
-    this.target = rowElems[1]
+    const rowParts = this.startRow.split(' ')
+    this.method = rowParts[0].toUpperCase() as HttpMethod
+    this.protocolVersion = rowParts[2].toUpperCase() as HttpProtocolVersion
+    this.target = rowParts[1]
 
     let parsedUrl
     try {
       parsedUrl = parseUrl(this.target, SUPER_RANDOM_HOST)
     } catch (err) {
-      if (err.code === 'ERR_INVALID_URL') {
+      if ((err as { code: string }).code === 'ERR_INVALID_URL') {
         throw HttpZError.get('Invalid target', this.target)
       }
       throw err
@@ -79,7 +91,7 @@ class HttpZRequestParser extends Base {
     this.queryParams = parsedUrl.params
   }
 
-  _parseCookiesRow() {
+  private _parseCookieRows(): void {
     if (!this.cookiesRow) {
       return
     }
@@ -92,9 +104,10 @@ class HttpZRequestParser extends Base {
       this.cookies = []
       return
     }
-    this.cookies = values.split(';').map((pair) => {
+
+    this.cookies = values.split(';').map(pair => {
       const [name, value] = splitBy(pair, '=')
-      const cookie = {
+      const cookie: HttpZCookieParam = {
         name,
       }
       if (value) {
@@ -107,21 +120,19 @@ class HttpZRequestParser extends Base {
     })
   }
 
-  _generateModel() {
-    const model = {
+  private _generateModel(): HttpZParserRequestModel {
+    const model: HttpZParserRequestModel = {
       method: this.method,
       protocolVersion: this.protocolVersion,
       target: this.target,
       host: this.host,
       path: this.path,
+      headers: this.headers,
       headersSize: this.headersSize,
       bodySize: this.bodySize,
     }
     if (this.queryParams) {
       model.queryParams = this.queryParams
-    }
-    if (this.headers) {
-      model.headers = this.headers
     }
     if (this.cookies) {
       model.cookies = this.cookies
@@ -133,5 +144,3 @@ class HttpZRequestParser extends Base {
     return model
   }
 }
-
-module.exports = HttpZRequestParser
