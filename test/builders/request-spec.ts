@@ -128,7 +128,7 @@ describe('builders / request', () => {
             { name: 'Some-Header', value: 'SomeValue' },
           ],
         },
-        { mandatoryHost: false },
+        { mandatoryHost: true },
       )
       const actual = builder['_generateHeaderRows']()
       expect(actual).toEqual(expected)

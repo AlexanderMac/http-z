@@ -41,7 +41,6 @@ export class HttpZRequestBuilder extends HttpZBaseBuilder {
     assertArray(this.headers, 'headers')
 
     if (this.opts.mandatoryHost) {
-      // TODO: ts-refactor name instead of h
       const hostHeader = this.headers.find(
         (h: HttpZHeader) => prettifyHeaderName(h.name) === HttpHeader.host.toString(),
       )

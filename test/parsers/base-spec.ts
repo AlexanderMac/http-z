@@ -123,10 +123,23 @@ describe('parsers / base', () => {
       parser['_parseBodyRows']()
       expect(parser['body']).toEqual(expected)
 
-      testSpiedFn(parser['_processTransferEncodingChunked'], '_processTransferEncodingChunked', expectedFnArgs)
-      testSpiedFn(parser['_parseFormDataBody'], '_parseFormDataBody', expectedFnArgs)
-      testSpiedFn(parser['_parseUrlencodedBody'], '_parseUrlencodedBody', expectedFnArgs)
-      testSpiedFn(parser['_parseTextBody'], '_parseTextBody', expectedFnArgs)
+      const spiedFnNames: SpiedFn[] = [
+        '_processTransferEncodingChunked',
+        '_parseFormDataBody',
+        '_parseUrlencodedBody',
+        '_parseTextBody',
+      ];
+      spiedFnNames.forEach(fnName => {
+        if (!expectedFnArgs) {
+          expect(parser[fnName]).toHaveBeenCalledTimes(0)
+        } else if (fnName === '_processTransferEncodingChunked') {
+          expect(parser[fnName]).toHaveBeenCalledTimes(1)
+        } else if (fnName === expectedFnArgs.calledFnName) {
+          testSpiedFn(parser[expectedFnArgs.calledFnName], expectedFnArgs.calledTimes, expectedFnArgs.calledWith)
+        } else {
+          expect(parser[fnName]).toHaveBeenCalledTimes(0)
+        }
+      })
     }
 
     it('should set instance.body to undefined when bodyRows is empty', () => {

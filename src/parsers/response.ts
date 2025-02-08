@@ -55,7 +55,7 @@ export class HttpZResponseParser extends HttpZBaseParser {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [unused, values] = splitBy(cookiesRow, ':')
       if (!values) {
-        return <HttpZCookieParam>{} // TODO: ts-refactor, do we really need to return empty object?
+        return <HttpZCookieParam>{}
       }
 
       const params = values.split(';')

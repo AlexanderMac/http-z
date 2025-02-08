@@ -1,21 +1,20 @@
+import { isUndefined } from "../src/utils"
+
 export type ExpectedSpiedFnArgs<TFnName extends string> = {
   calledFnName: TFnName
   calledWith?: unknown
   calledTimes: number
 }
 
-// TODO: ts-refactor => improve
-export function testSpiedFn<TFnName extends string>(
+export function testSpiedFn(
   spyFn: () => void,
-  spyFnName: TFnName,
-  expectedFnArgs: ExpectedSpiedFnArgs<TFnName> | undefined = undefined,
+  calledTimes: number,
+  calledWith: unknown
 ): void {
-  if (spyFnName === expectedFnArgs?.calledFnName) {
-    expect(spyFn).toHaveBeenCalledTimes(expectedFnArgs.calledTimes)
-    if ('calledWith' in expectedFnArgs) {
-      expect(spyFn).toHaveBeenCalledWith(expectedFnArgs.calledWith)
-    } else {
-      expect(spyFn).toHaveBeenCalledWith()
-    }
+  expect(spyFn).toHaveBeenCalledTimes(calledTimes)
+  if (!isUndefined(calledWith)) {
+    expect(spyFn).toHaveBeenCalledWith(calledWith)
+  } else {
+    expect(spyFn).toHaveBeenCalledWith()
   }
 }

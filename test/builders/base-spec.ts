@@ -128,10 +128,23 @@ describe('builders / base', () => {
         expect(builder['_generateBodyRows'].bind(builder)).toThrow(<Error>expected)
       }
 
-      testSpiedFn(builder['_processTransferEncodingChunked'], '_processTransferEncodingChunked', expectedFnArgs)
-      testSpiedFn(builder['_processTransferEncodingChunked'], '_generateFormDataBody', expectedFnArgs)
-      testSpiedFn(builder['_processTransferEncodingChunked'], '_generateUrlencodedBody', expectedFnArgs)
-      testSpiedFn(builder['_processTransferEncodingChunked'], '_generateTextBody', expectedFnArgs)
+      const spiedFnNames: SpiedFn[] = [
+        '_processTransferEncodingChunked',
+        '_generateFormDataBody',
+        '_generateUrlencodedBody',
+        '_generateTextBody',
+      ];
+      spiedFnNames.forEach(fnName => {
+        if (!expectedFnArgs) {
+          expect(builder[fnName]).toHaveBeenCalledTimes(0)
+        } else if (fnName === '_processTransferEncodingChunked') {
+          expect(builder[fnName]).toHaveBeenCalledTimes(1)
+        } else if (fnName === expectedFnArgs.calledFnName) {
+          testSpiedFn(builder[expectedFnArgs.calledFnName], expectedFnArgs.calledTimes, expectedFnArgs.calledWith)
+        } else {
+          expect(builder[fnName]).toHaveBeenCalledTimes(0)
+        }
+      })
     }
 
     it('should return empty string when instance.body is null', () => {
