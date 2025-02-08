@@ -151,7 +151,7 @@ type HttpZBuilderModel = {
     body?: HttpZBody;
 };
 
-declare function export_default$1(messageModel: HttpZBuilderModel, opts?: HttpZBuilderOptions): string | never;
+declare function build(messageModel: HttpZBuilderModel, opts?: HttpZBuilderOptions): string | never;
 
 declare class HttpZError extends Error {
     static get(...params: ConstructorParameters<typeof HttpZError>): HttpZError;
@@ -169,7 +169,7 @@ type HttpZParserModel = {
     bodySize?: number;
 };
 
-declare function export_default(rawMessage: string, opts?: HttpZParserOptions): HttpZParserModel | never;
+declare function parse(rawMessage: string, opts?: HttpZParserOptions): HttpZParserModel | never;
 
 type ParsedUrl = {
     protocol: string;
@@ -225,12 +225,4 @@ declare namespace utils {
   export { type utils_ParsedUrl as ParsedUrl, utils_arrayToPairs as arrayToPairs, utils_capitalize as capitalize, utils_extendIfNotUndefined as extendIfNotUndefined, utils_getEmptyStringForUndefined as getEmptyStringForUndefined, utils_getLibVersion as getLibVersion, utils_head as head, utils_isAbsoluteUrl as isAbsoluteUrl, utils_isArray as isArray, utils_isEmpty as isEmpty, utils_isError as isError, utils_isNil as isNil, utils_isNumber as isNumber, utils_isPlainObject as isPlainObject, utils_isString as isString, utils_isUndefined as isUndefined, utils_parseUrl as parseUrl, utils_prettifyHeaderName as prettifyHeaderName, utils_splitBy as splitBy, utils_tail as tail, utils_trim as trim, utils_trimEnd as trimEnd };
 }
 
-declare const _default: {
-    consts: typeof constants;
-    HttpZError: typeof HttpZError;
-    utils: typeof utils;
-    parse: typeof export_default;
-    build: typeof export_default$1;
-};
-
-export { _default as default };
+export { HttpZError, build, constants as consts, parse, utils };

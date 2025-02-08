@@ -1,7 +1,7 @@
-import build from '../src/builders/index'
+import { build } from '../src/builders/index'
 import { HttpZError } from '../src/error'
-import httpZ from '../src/index'
-import parse from '../src/parsers/index'
+import * as httpZ from '../src/index'
+import { parse } from '../src/parsers/index'
 
 describe('httpz', () => {
   it('should httpz.consts be defined', () => {

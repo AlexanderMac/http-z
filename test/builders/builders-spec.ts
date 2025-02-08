@@ -1,4 +1,4 @@
-import builder from '../../src/builders/index'
+import { build } from '../../src/builders/index'
 import { HttpZRequestBuilder } from '../../src/builders/request'
 import { HttpZResponseBuilder } from '../../src/builders/response'
 import { HttpZError } from '../../src/error'
@@ -25,16 +25,16 @@ describe('builders / index', () => {
   it('should throw error when messageModel is nil', () => {
     const err = new HttpZError('messageModel is required')
 
-    expect(builder.bind(null, undefined as any)).toThrow(err)
-    expect(builder.bind(null, null as any)).toThrow(err)
+    expect(build.bind(null, undefined as any)).toThrow(err)
+    expect(build.bind(null, null as any)).toThrow(err)
   })
 
   it('should throw error when messageModel is not a plain object', () => {
     const err = new HttpZError('messageModel must be a plain object')
-    expect(builder.bind(null, 123 as any)).toThrow(err)
-    expect(builder.bind(null, true as any)).toThrow(err)
-    expect(builder.bind(null, 'message' as any)).toThrow(err)
-    expect(builder.bind(null, ['message'] as any)).toThrow(err)
+    expect(build.bind(null, 123 as any)).toThrow(err)
+    expect(build.bind(null, true as any)).toThrow(err)
+    expect(build.bind(null, 'message' as any)).toThrow(err)
+    expect(build.bind(null, ['message'] as any)).toThrow(err)
   })
 
   it('should throw error when model has incorrect format', () => {
@@ -43,7 +43,7 @@ describe('builders / index', () => {
     }
     const err = new HttpZError('messageModel has incorrect format')
 
-    expect(builder.bind(null, messageModel as any)).toThrow(err)
+    expect(build.bind(null, messageModel as any)).toThrow(err)
   })
 
   it('should call HttpZRequestBuilder.build when messageModel is request', () => {
@@ -55,7 +55,7 @@ describe('builders / index', () => {
 
     _buildRequestSpy.mockReturnValue('built-request')
 
-    const actual = builder(messageModel as any)
+    const actual = build(messageModel as any)
     expect(actual).toEqual(expected)
 
     expect(_buildRequestSpy).toHaveBeenCalledTimes(1)
@@ -71,7 +71,7 @@ describe('builders / index', () => {
 
     _buildResponseSpy.mockReturnValue('built-response')
 
-    const actual = builder(messageModel as any)
+    const actual = build(messageModel as any)
     expect(actual).toEqual(expected)
 
     expect(_buildResponseSpy).toHaveBeenCalledTimes(1)

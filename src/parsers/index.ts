@@ -5,7 +5,7 @@ import { HttpZRequestParser } from './request'
 import { HttpZResponseParser } from './response'
 import { HttpZParserModel, HttpZParserOptions } from './types'
 
-export default function (rawMessage: string, opts: HttpZParserOptions = {}): HttpZParserModel | never {
+export function parse(rawMessage: string, opts: HttpZParserOptions = {}): HttpZParserModel | never {
   if (isNil(rawMessage)) {
     throw HttpZError.get('rawMessage is required')
   }

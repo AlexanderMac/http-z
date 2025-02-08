@@ -4,7 +4,7 @@ import { HttpZRequestBuilder } from './request'
 import { HttpZResponseBuilder } from './response'
 import { HttpZBuilderModel, HttpZBuilderRequestModel, HttpZBuilderResponseModel, HttpZBuilderOptions } from './types'
 
-export default function (messageModel: HttpZBuilderModel, opts: HttpZBuilderOptions = {}): string | never {
+export function build(messageModel: HttpZBuilderModel, opts: HttpZBuilderOptions = {}): string | never {
   if (isNil(messageModel)) {
     throw HttpZError.get('messageModel is required')
   }

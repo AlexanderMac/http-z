@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.httpZ = factory());
-})(this, (function () { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+    typeof define === 'function' && define.amd ? define(['exports'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.httpZ = {}));
+})(this, (function (exports) { 'use strict';
 
     class HttpZError extends Error {
         static get(...params) {
@@ -506,7 +506,7 @@
         }
     }
 
-    function build (messageModel, opts = {}) {
+    function build(messageModel, opts = {}) {
         if (isNil(messageModel)) {
             throw HttpZError.get('messageModel is required');
         }
@@ -929,7 +929,7 @@
         }
     }
 
-    function parse (rawMessage, opts = {}) {
+    function parse(rawMessage, opts = {}) {
         if (isNil(rawMessage)) {
             throw HttpZError.get('rawMessage is required');
         }
@@ -946,14 +946,10 @@
         throw HttpZError.get('rawMessage has incorrect format');
     }
 
-    var index = {
-        consts: constants,
-        HttpZError,
-        utils,
-        parse,
-        build,
-    };
-
-    return index;
+    exports.HttpZError = HttpZError;
+    exports.build = build;
+    exports.consts = constants;
+    exports.parse = parse;
+    exports.utils = utils;
 
 }));
