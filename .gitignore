@@ -13,7 +13,6 @@ coverage
 
 # Compiled
 build/Release
-dist
 
 # Dependency directory
 node_modules
