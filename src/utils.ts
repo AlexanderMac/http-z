@@ -8,7 +8,7 @@ export type ParsedUrl = {
 }
 
 export const getLibVersion = (): string => {
-  return '8.0.0-dev'
+  return '8.0.0-alpha'
 }
 
 export const splitBy = (str: string, delimiter: string): string[] => {

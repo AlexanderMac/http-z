@@ -18,7 +18,7 @@
     }
 
     const getLibVersion = () => {
-        return '8.0.0-dev';
+        return '8.0.0-alpha';
     };
     const splitBy = (str, delimiter) => {
         if (isEmpty(str)) {
