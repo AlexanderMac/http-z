@@ -12,7 +12,7 @@
 
   "plugins": ["@trivago/prettier-plugin-sort-imports"],
   "importOrderParserPlugins" : ["typescript", "decorators-legacy"],
-  "importOrder": ["^[./]"],
+  "importOrder": ["^@app/(.*)$", "^[./]"],
   "importOrderCaseInsensitive": true,
   "importOrderSeparation": true
 }
