@@ -12,7 +12,7 @@ coverage
 .angular
 
 # Compiled
-build/Release
+build
 
 # Dependency directory
 node_modules

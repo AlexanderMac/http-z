@@ -11,7 +11,7 @@ export default [
       'coverage/**',
       'build/**',
       'dist/**',
-      'demo/**',
+      'docs-src/**',
       'docs/**',
       'tmp/**',
       "**/*.mjs",

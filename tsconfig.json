@@ -17,6 +17,7 @@
     "test/**/*.ts"
   ],
   "exclude": [
-    "demo"
+    "docs",
+    "docs-src"
   ]
 }
