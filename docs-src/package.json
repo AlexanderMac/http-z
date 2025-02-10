@@ -44,6 +44,7 @@
     "@angular/compiler-cli": "^19.1.4",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/lodash": "^4.17.15",
+    "@typescript-eslint/eslint-plugin": "^8.23.0",
     "eslint": "^9.19.0",
     "prettier": "^3.4.2",
     "tslib": "^2.8.1",
