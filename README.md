@@ -11,16 +11,23 @@
   <h3 align="center"><a href="https://alexandermac.github.io/http-z">Demo</a></h3>
 </p>
 
-### Install
+# Contents
+- [Contents](#contents)
+- [Install](#install)
+- [Usage](#usage)
+- [API](#api)
+- [References](#references)
+- [License](#license)
+
+# Install
 
 ```bash
 $ pnpm i http-z
 ```
 
-### Usage
-
-```js
-const httpZ = require('http-z')
+# Usage
+```ts
+import { parse, build } from 'http-z'
 
 const plainMessage = [
   'GET /features?p1=v1 HTTP/1.1',
@@ -32,18 +39,16 @@ const plainMessage = [
   ''
 ].join('\r\n')
 
-const messageModel = httpZ.parse(plainMessage)
-console.log(JSON.stringify(messageModel, null, 2))
+const messageModel = parse(plainMessage)
+console.log(messageModel)
 
 /* output:
 {
-  "protocolVersion": "HTTP/1.1",
   "method": "GET",
-  "target": "/features?p1=v1",
+  "protocolVersion": "HTTP/1.1",
   "host": "example.com",
+  "target": "/features?p1=v1",
   "path": "/features",
-  "headersSize": 135,
-  "bodySize": 0,
   "queryParams": [
     { "name": "p1", "value": "v1" }
   ],
@@ -52,11 +57,13 @@ console.log(JSON.stringify(messageModel, null, 2))
     { "name": "Accept", value": "*" },
     { "name": "Accept-Encoding", "value": "gzip,deflate" },
     { "name": "Accept-Language", "value": "en-US;q=0.6, en;q=0.4" }
-  ]
+  ],
+  "headersSize": 135,
+  "bodySize": 0
 }
 */
 
-const plainMessageParsed = httpZ.build(messageModel)
+const plainMessageParsed = build(messageModel)
 console.log(plainMessageParsed)
 
 /* output:
@@ -70,27 +77,38 @@ Accept-Language: en-US;q=0.6, en;q=0.4
 */
 ```
 
-### API
-
-##### parse(rawMessage, opts)
+# API
+### function parse(rawMessage: string, opts: HttpZParserOptions = {}): HttpZParserModel | never
 Parses HTTP request/response raw message and returns a model.
+- `rawMessage: string` - HTTP raw message.
+- `opts: HttpZParserOptions` - options, optional.
 
-- `rawMessage` is HTTP raw message.
-- `opts` - options object, can be skipped.
+```ts
+const messageModel = parse(plainMessage)
+```
 
-##### build(messageModel, opts)
+### function build(messageModel: HttpZBuilderModel, opts?: HttpZBuilderOptions): string | never
 Builds HTTP request/response raw message from the model.
+- `messageModel: HttpZBuilderModel` - HTTP message model.
+- `opts: HttpZBuilderOptions` - options, optional.
 
-- `messageModel` is HTTP message model.
-- `opts` - options object, can be skipped.
+```ts
+const plainMessageParsed = build(messageModel)
+```
 
-### References
+### utils: object
+Different utils used by the library. Can be used externally.
+
+### consts: object
+Different HTTP constants (methods, headers, etc.)
+
+# References
 - [RFC 7230: Hypertext Transfer Protocol (HTTP/1.1)](https://tools.ietf.org/html/rfc7230)
 - [RFC 7578: Returning Values from Forms: multipart/form-data](https://tools.ietf.org/html/rfc7578)
 - [RFC 2046: Multipurpose Internet Mail Extensions](https://tools.ietf.org/html/rfc2046)
 
-### License
+# License
 Licensed under the MIT license.
 
-### Author
+# Author
 Alexander Mac
