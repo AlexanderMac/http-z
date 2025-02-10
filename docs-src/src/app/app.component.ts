@@ -24,7 +24,7 @@ export class AppComponent implements AfterViewInit {
   cmOutputEditor!: EditorView
   inputSuccess = ''
   inputError = ''
-  libVersion = (httpZ.utils as any).getLibVersion()
+  libVersion = httpZ.getLibVersion()
 
   @ViewChild('input', { static: false }) input: any
   @ViewChild('output', { static: false }) output: any

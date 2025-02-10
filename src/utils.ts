@@ -7,10 +7,6 @@ export type ParsedUrl = {
   params: HttpZParam[]
 }
 
-export const getLibVersion = (): string => {
-  return '8.0.0-alpha'
-}
-
 export const splitBy = (str: string, delimiter: string): string[] => {
   if (isEmpty(str)) {
     return []

@@ -17,9 +17,6 @@
         }
     }
 
-    const getLibVersion = () => {
-        return '8.0.0-alpha';
-    };
     const splitBy = (str, delimiter) => {
         if (isEmpty(str)) {
             return [];
@@ -161,7 +158,6 @@
         capitalize: capitalize,
         extendIfNotUndefined: extendIfNotUndefined,
         getEmptyStringForUndefined: getEmptyStringForUndefined,
-        getLibVersion: getLibVersion,
         head: head,
         isAbsoluteUrl: isAbsoluteUrl,
         isArray: isArray,
@@ -946,9 +942,14 @@
         throw HttpZError.get('rawMessage has incorrect format');
     }
 
+    const getLibVersion = () => {
+        return '8.0.0-alpha';
+    };
+
     exports.HttpZError = HttpZError;
     exports.build = build;
     exports.consts = constants;
+    exports.getLibVersion = getLibVersion;
     exports.parse = parse;
     exports.utils = utils;
 

@@ -177,7 +177,6 @@ type ParsedUrl = {
     path: string;
     params: HttpZParam[];
 };
-declare const getLibVersion: () => string;
 declare const splitBy: (str: string, delimiter: string) => string[];
 declare const isAbsoluteUrl: (url: string) => boolean;
 declare const parseUrl: (url: string, host: string) => ParsedUrl;
@@ -204,7 +203,6 @@ declare const utils_arrayToPairs: typeof arrayToPairs;
 declare const utils_capitalize: typeof capitalize;
 declare const utils_extendIfNotUndefined: typeof extendIfNotUndefined;
 declare const utils_getEmptyStringForUndefined: typeof getEmptyStringForUndefined;
-declare const utils_getLibVersion: typeof getLibVersion;
 declare const utils_head: typeof head;
 declare const utils_isAbsoluteUrl: typeof isAbsoluteUrl;
 declare const utils_isArray: typeof isArray;
@@ -222,7 +220,9 @@ declare const utils_tail: typeof tail;
 declare const utils_trim: typeof trim;
 declare const utils_trimEnd: typeof trimEnd;
 declare namespace utils {
-  export { type utils_ParsedUrl as ParsedUrl, utils_arrayToPairs as arrayToPairs, utils_capitalize as capitalize, utils_extendIfNotUndefined as extendIfNotUndefined, utils_getEmptyStringForUndefined as getEmptyStringForUndefined, utils_getLibVersion as getLibVersion, utils_head as head, utils_isAbsoluteUrl as isAbsoluteUrl, utils_isArray as isArray, utils_isEmpty as isEmpty, utils_isError as isError, utils_isNil as isNil, utils_isNumber as isNumber, utils_isPlainObject as isPlainObject, utils_isString as isString, utils_isUndefined as isUndefined, utils_parseUrl as parseUrl, utils_prettifyHeaderName as prettifyHeaderName, utils_splitBy as splitBy, utils_tail as tail, utils_trim as trim, utils_trimEnd as trimEnd };
+  export { type utils_ParsedUrl as ParsedUrl, utils_arrayToPairs as arrayToPairs, utils_capitalize as capitalize, utils_extendIfNotUndefined as extendIfNotUndefined, utils_getEmptyStringForUndefined as getEmptyStringForUndefined, utils_head as head, utils_isAbsoluteUrl as isAbsoluteUrl, utils_isArray as isArray, utils_isEmpty as isEmpty, utils_isError as isError, utils_isNil as isNil, utils_isNumber as isNumber, utils_isPlainObject as isPlainObject, utils_isString as isString, utils_isUndefined as isUndefined, utils_parseUrl as parseUrl, utils_prettifyHeaderName as prettifyHeaderName, utils_splitBy as splitBy, utils_tail as tail, utils_trim as trim, utils_trimEnd as trimEnd };
 }
 
-export { HttpZError, build, constants as consts, parse, utils };
+declare const getLibVersion: () => string;
+
+export { HttpZError, build, constants as consts, getLibVersion, parse, utils };
