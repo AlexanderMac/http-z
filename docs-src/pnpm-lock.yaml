@@ -49,7 +49,7 @@ importers:
         version: 6.0.1
       http-z:
         specifier: github:AlexanderMac/http-z
-        version: https://codeload.github.com/AlexanderMac/http-z/tar.gz/778eff2d1d52b7ce85e6f4115b955a882fa39a92
+        version: https://codeload.github.com/AlexanderMac/http-z/tar.gz/52b466de1219d859ea076c5fe0581e2d3a5c19d0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -2762,10 +2762,10 @@ packages:
     resolution: {integrity: sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==}
     engines: {node: '>=8.0.0'}
 
-  http-z@https://codeload.github.com/AlexanderMac/http-z/tar.gz/778eff2d1d52b7ce85e6f4115b955a882fa39a92:
-    resolution: {tarball: https://codeload.github.com/AlexanderMac/http-z/tar.gz/778eff2d1d52b7ce85e6f4115b955a882fa39a92}
-    version: 8.0.0-dev
-    engines: {node: '>=18', pnpm: '>=9'}
+  http-z@https://codeload.github.com/AlexanderMac/http-z/tar.gz/52b466de1219d859ea076c5fe0581e2d3a5c19d0:
+    resolution: {tarball: https://codeload.github.com/AlexanderMac/http-z/tar.gz/52b466de1219d859ea076c5fe0581e2d3a5c19d0}
+    version: 8.0.0-alpha
+    engines: {node: '>=18'}
 
   https-proxy-agent@7.0.6:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
@@ -7292,7 +7292,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  http-z@https://codeload.github.com/AlexanderMac/http-z/tar.gz/778eff2d1d52b7ce85e6f4115b955a882fa39a92: {}
+  http-z@https://codeload.github.com/AlexanderMac/http-z/tar.gz/52b466de1219d859ea076c5fe0581e2d3a5c19d0: {}
 
   https-proxy-agent@7.0.6:
     dependencies:
