@@ -133,7 +133,7 @@ describe('builders / base', () => {
         '_generateFormDataBody',
         '_generateUrlencodedBody',
         '_generateTextBody',
-      ];
+      ]
       spiedFnNames.forEach(fnName => {
         if (!expectedFnArgs) {
           expect(builder[fnName]).toHaveBeenCalledTimes(0)

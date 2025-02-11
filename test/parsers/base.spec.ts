@@ -128,7 +128,7 @@ describe('parsers / base', () => {
         '_parseFormDataBody',
         '_parseUrlencodedBody',
         '_parseTextBody',
-      ];
+      ]
       spiedFnNames.forEach(fnName => {
         if (!expectedFnArgs) {
           expect(parser[fnName]).toHaveBeenCalledTimes(0)
