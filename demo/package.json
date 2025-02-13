@@ -10,7 +10,6 @@
     "start": "ng serve",
     "build": "ng build --configuration development",
     "build:prod": "ng build --base-href /http-z/",
-    "make-docs": " pnpm build:prod && rm -rf ../docs && mv dist/browser ../docs",
     "lint": "ng lint --fix",
     "prettify": "prettier --write \"src/**/*.ts\"",
     "format": "pnpm lint && pnpm prettify"
