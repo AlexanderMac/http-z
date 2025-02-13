@@ -46,7 +46,7 @@ jobs:
         with:
           node-version: 22
       - name: Install dependencies
-        run: pnpm -C demo install && pnpm -C demo add github:AlexanderMac/o2diff
+        run: pnpm -C demo install && pnpm -C demo add github:AlexanderMac/http-z
       - name: Build app
         run: pnpm -C demo run build:prod
       - name: Upload demo build as artifact
