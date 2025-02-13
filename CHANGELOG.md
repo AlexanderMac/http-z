@@ -1,5 +1,10 @@
 # Changelog
 
+## v8.0.0 (Feb. 13, 2025)
+- **BREAKING:** Drop support for Node versions prior v18.
+- Convert codebase to TypeScript. Replace Mocha + Should to Jest.
+- Delete Lodash dependency. Now http-z has zero dependencies!
+
 ## v7.1.3 (Jan. 22, 2025)
 - Fix building messages for `Transfer-Encoding: chunked`.
 

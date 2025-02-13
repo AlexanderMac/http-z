@@ -1,6 +1,6 @@
 {
   "name": "http-z",
-  "version": "8.0.0-alpha",
+  "version": "8.0.0",
   "description": "HTTP message parser and builder",
   "main": "dist/index.js",
   "browser": "dist/index.js",
