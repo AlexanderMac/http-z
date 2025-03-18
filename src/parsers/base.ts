@@ -1,4 +1,4 @@
-import { EOL, EOL2X, HttpContentApplicationType, HttpContentMultipartType, HttpHeader, regexps } from '../constants'
+import { EOL, EOL2X, HttpContentTypeApplication, HttpContentTypeMultipart, HttpHeader, regexps } from '../constants'
 import { HttpZError } from '../error'
 import { HttpZBody, HttpZHeader } from '../types'
 import { splitBy, prettifyHeaderName, head, tail, isNil, trim } from '../utils'
@@ -67,13 +67,13 @@ export class HttpZBaseParser {
       this.body.contentType = contentTypeHeader.toLowerCase().split(';')[0]
     }
     switch (this.body.contentType) {
-      case HttpContentMultipartType.formData:
-      case HttpContentMultipartType.alternative:
-      case HttpContentMultipartType.mixed:
-      case HttpContentMultipartType.related:
+      case HttpContentTypeMultipart.formData:
+      case HttpContentTypeMultipart.alternative:
+      case HttpContentTypeMultipart.mixed:
+      case HttpContentTypeMultipart.related:
         this._parseFormDataBody()
         break
-      case HttpContentApplicationType.xWwwFormUrlencoded:
+      case HttpContentTypeApplication.xWwwFormUrlencoded:
         this._parseUrlencodedBody()
         break
       default:

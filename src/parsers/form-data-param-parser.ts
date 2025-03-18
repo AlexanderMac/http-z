@@ -14,7 +14,7 @@ export class FormDataParamParser {
 
   // TODO: test it
   parse(): HttpZBodyParam {
-    this.paramGroup = this.paramGroup.replace(regexps.startNl, '').replace(regexps.endNl, '')
+    this.paramGroup = this.paramGroup.replace(regexps.nlStart, '').replace(regexps.nlEnd, '')
 
     const contentDispositionHeader = this._getContentDisposition()
     const contentType = this._getContentType()
@@ -89,8 +89,8 @@ export class FormDataParamParser {
 
   // TODO: test it
   private _getParamValue(): string | never {
-    if (this.paramGroup.match(regexps.startNl)) {
-      return this.paramGroup.replace(regexps.startNl, '')
+    if (this.paramGroup.match(regexps.nlStart)) {
+      return this.paramGroup.replace(regexps.nlStart, '')
     }
     throw HttpZError.get('Incorrect form-data parameter', this.paramGroup)
   }
