@@ -212,10 +212,19 @@ describe('parsers / request', () => {
       test(startRow, expected)
     })
 
-    it('should parse valid startRow when HTTP protocol is v2.0', () => {
-      const startRow = 'GET /features HTTP/2.0'
+    it('should parse valid startRow when HTTP protocol is v2', () => {
+      const startRow = 'GET /features HTTP/2'
       const expected = getExpected({
-        protocolVersion: HttpProtocolVersion.http20,
+        protocolVersion: HttpProtocolVersion.http2,
+      })
+
+      test(startRow, expected)
+    })
+
+    it('should parse valid startRow when HTTP protocol is v3', () => {
+      const startRow = 'GET /features HTTP/3'
+      const expected = getExpected({
+        protocolVersion: HttpProtocolVersion.http3,
       })
 
       test(startRow, expected)
