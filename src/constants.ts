@@ -1,16 +1,15 @@
 export const EOL = '\r\n'
 export const EOL2X = EOL + EOL
 
-const BASIC_LATIN = '[\\u0009\\u0020-\\u007E]'
 const HTTP_METHODS = '(CONNECT|OPTIONS|TRACE|GET|HEAD|POST|PUT|PATCH|DELETE)'
-const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2(\\.0){0,1})'
+const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2(\\.0){0,1}|3(\\.0){0,1})'
 
 export const regexps = {
   quote: /"/g,
   nlStart: new RegExp(`^${EOL}`),
   nlEnd: new RegExp(`${EOL}$`),
   requestStartRow: new RegExp(`^${HTTP_METHODS}\\s\\S*\\s${HTTP_PROTOCOL_VERSIONS}$`),
-  responseStartRow: new RegExp(`^${HTTP_PROTOCOL_VERSIONS}\\s\\d{3}\\s${BASIC_LATIN}*$`),
+  responseStartRow: new RegExp(`^${HTTP_PROTOCOL_VERSIONS}\\s\\d{3}\\s[^\r\n]*$`),
   // eslint-disable-next-line no-control-regex
   quotedHeaderValue: new RegExp('^"[\\u0009\\u0020\\u0021\\u0023-\\u007E]+"$'),
   boundary: new RegExp(`(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}`),
@@ -33,7 +32,8 @@ export enum HttpProtocol {
 export enum HttpProtocolVersion {
   http10 = 'HTTP/1.0',
   http11 = 'HTTP/1.1',
-  http20 = 'HTTP/2.0',
+  http2 = 'HTTP/2',
+  http3 = 'HTTP/3',
 }
 
 export enum HttpMethod {
