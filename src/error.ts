@@ -11,6 +11,8 @@ export class HttpZError extends Error {
     this.name = this.constructor.name
     this.details = details
 
-    Error.captureStackTrace(this, this.constructor)
+    if ('captureStackTrace' in Error) {
+      Error.captureStackTrace(this, this.constructor)
+    }
   }
 }
