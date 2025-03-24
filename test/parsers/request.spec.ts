@@ -212,10 +212,19 @@ describe('parsers / request', () => {
       test(startRow, expected)
     })
 
-    it('should parse valid startRow when HTTP protocol is v2.0', () => {
-      const startRow = 'GET /features HTTP/2.0'
+    it('should parse valid startRow when HTTP protocol is v2', () => {
+      const startRow = 'GET /features HTTP/2'
       const expected = getExpected({
-        protocolVersion: HttpProtocolVersion.http20,
+        protocolVersion: HttpProtocolVersion.http2,
+      })
+
+      test(startRow, expected)
+    })
+
+    it('should parse valid startRow when HTTP protocol is v3', () => {
+      const startRow = 'GET /features HTTP/3'
+      const expected = getExpected({
+        protocolVersion: HttpProtocolVersion.http3,
       })
 
       test(startRow, expected)
@@ -703,7 +712,7 @@ describe('parsers / request', () => {
         '',
         'John',
         '--111362:53119209',
-        'Content-Disposition: form-data; name="photo"; filename="photo1.jpg"',
+        'Content-Disposition: form-data; name="photo-㡣"; filename="photo-㡣1.jpg"',
         'Content-Type: application/octet-stream',
         '',
         '<binary-data>',
@@ -765,8 +774,8 @@ describe('parsers / request', () => {
             { name: 'user.data[firstName]', value: 'John' },
             {
               contentType: 'application/octet-stream',
-              name: 'photo',
-              fileName: 'photo1.jpg',
+              name: 'photo-㡣',
+              fileName: 'photo-㡣1.jpg',
               value: '<binary-data>',
             },
             {
@@ -777,7 +786,7 @@ describe('parsers / request', () => {
           ],
         },
         headersSize: 284,
-        bodySize: 367,
+        bodySize: 371,
       }
 
       const parser = getParserInstance(rawRequest)
@@ -877,7 +886,7 @@ describe('parsers / request', () => {
         'Content-Length: 301',
         '',
         '--11136253119209',
-        'Content-Disposition: attachment; filename="photo1.jpg"',
+        'Content-Disposition: attachment; filename="photo-㡣1.jpg"',
         'Content-Type: application/octet-stream',
         '',
         '<binary-data>',
@@ -932,13 +941,13 @@ describe('parsers / request', () => {
             {
               type: 'attachment',
               contentType: 'application/octet-stream',
-              fileName: 'photo1.jpg',
+              fileName: 'photo-㡣1.jpg',
               value: '<binary-data>',
             },
           ],
         },
         headersSize: 279,
-        bodySize: 149,
+        bodySize: 151,
       }
 
       const parser = getParserInstance(rawRequest)

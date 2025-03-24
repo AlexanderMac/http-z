@@ -1,5 +1,5 @@
 import { assertArray, assertNotEmptyString, assertString } from '../assertions'
-import { EOL, HttpContentApplicationType, HttpContentMultipartType, HttpHeader } from '../constants'
+import { EOL, HttpContentTypeApplication, HttpContentTypeMultipart, HttpHeader } from '../constants'
 import { HttpZBody, HttpZHeader, HttpZParam } from '../types'
 import { isEmpty, prettifyHeaderName, getEmptyStringForUndefined, arrayToPairs } from '../utils'
 
@@ -42,12 +42,12 @@ export class HttpZBaseBuilder {
     this._processTransferEncodingChunked()
 
     switch (this.body!.contentType) {
-      case HttpContentMultipartType.formData:
-      case HttpContentMultipartType.alternative:
-      case HttpContentMultipartType.mixed:
-      case HttpContentMultipartType.related:
+      case HttpContentTypeMultipart.formData:
+      case HttpContentTypeMultipart.alternative:
+      case HttpContentTypeMultipart.mixed:
+      case HttpContentTypeMultipart.related:
         return this._generateFormDataBody()
-      case HttpContentApplicationType.xWwwFormUrlencoded:
+      case HttpContentTypeApplication.xWwwFormUrlencoded:
         return this._generateUrlencodedBody()
       default:
         return this._generateTextBody()

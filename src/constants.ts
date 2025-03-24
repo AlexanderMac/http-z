@@ -1,25 +1,26 @@
 export const EOL = '\r\n'
 export const EOL2X = EOL + EOL
 
-const BASIC_LATIN = '[\\u0009\\u0020-\\u007E]'
-const PARAM_NAME = '[A-Za-z0-9_.\\[\\]-]' // TODO: extend
 const HTTP_METHODS = '(CONNECT|OPTIONS|TRACE|GET|HEAD|POST|PUT|PATCH|DELETE)'
-const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2(\\.0){0,1})'
+const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2(\\.0){0,1}|3(\\.0){0,1})'
 
 export const regexps = {
   quote: /"/g,
-  startNl: new RegExp(`^${EOL}`),
-  endNl: new RegExp(`${EOL}$`),
-  requestStartRow: new RegExp(`^${HTTP_METHODS} \\S* ${HTTP_PROTOCOL_VERSIONS}$`),
-  responseStartRow: new RegExp(`^${HTTP_PROTOCOL_VERSIONS} \\d{3} ${BASIC_LATIN}*$`),
+  nlStart: new RegExp(`^${EOL}`),
+  nlEnd: new RegExp(`${EOL}$`),
+  requestStartRow: new RegExp(`^${HTTP_METHODS}\\s\\S*\\s${HTTP_PROTOCOL_VERSIONS}$`),
+  responseStartRow: new RegExp(`^${HTTP_PROTOCOL_VERSIONS}\\s\\d{3}\\s[^\r\n]*$`),
   // eslint-disable-next-line no-control-regex
   quotedHeaderValue: new RegExp('^"[\\u0009\\u0020\\u0021\\u0023-\\u007E]+"$'),
-  boundary: /(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}/,
-  contentDisposition: new RegExp(`^Content-Disposition: *(form-data|inline|attachment)${BASIC_LATIN}*${EOL}`, 'i'),
+  boundary: new RegExp(`(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}`),
+  contentDisposition: new RegExp(
+    `^Content-Disposition:\\s*(form-data|inline|attachment)(?:\\s*;\\s*(name|filename)\\s*=\\s*(?:"([^"]+)"|([^;\\s]+)))*${EOL}`,
+    'i',
+  ),
   contentType: new RegExp(`^Content-Type:[\\S ]*${EOL}`, 'i'),
-  contentDispositionType: /(?<=Content-Disposition:) *(form-data|inline|attachment)/,
-  dispositionName: new RegExp(`(?<=name=)"${PARAM_NAME}+"`, 'i'),
-  dispositionFileName: new RegExp(`(?<=filename=)"${PARAM_NAME}+"`, 'i'),
+  contentDispositionType: new RegExp(`(?<=Content-Disposition:)\\s*(form-data|inline|attachment)`),
+  dispositionName: new RegExp(`(?<=name=)(?:"([^"]+)"|([^;\\s]+))+`, 'i'),
+  dispositionFileName: new RegExp(`(?<=filename=)(?:"([^"]+)"|([^;\\s]+))+`, 'i'),
   chunkRow: new RegExp(`^[0-9a-fA-F]+${EOL}`),
 }
 
@@ -31,7 +32,8 @@ export enum HttpProtocol {
 export enum HttpProtocolVersion {
   http10 = 'HTTP/1.0',
   http11 = 'HTTP/1.1',
-  http20 = 'HTTP/2.0',
+  http2 = 'HTTP/2',
+  http3 = 'HTTP/3',
 }
 
 export enum HttpMethod {
@@ -57,7 +59,7 @@ export enum HttpHeader {
   transferEncoding = 'Transfer-Encoding',
 }
 
-export enum HttpContentTextType {
+export enum HttpContentTypeText {
   any = 'text/',
   css = 'text/css',
   csv = 'text/csv',
@@ -67,7 +69,7 @@ export enum HttpContentTextType {
   xml = 'text/xml',
 }
 
-export enum HttpContentApplicationType {
+export enum HttpContentTypeApplication {
   any = 'application/',
   javascript = 'application/javascript',
   json = 'application/json',
@@ -81,7 +83,7 @@ export enum HttpContentApplicationType {
   zip = 'application/zip',
 }
 
-export enum HttpContentMultipartType {
+export enum HttpContentTypeMultipart {
   any = 'multipart/',
   alternative = 'multipart/alternative',
   formData = 'multipart/form-data',
@@ -89,7 +91,7 @@ export enum HttpContentMultipartType {
   related = 'multipart/related',
 }
 
-export enum HttpContentImageType {
+export enum HttpContentTypeImage {
   any = 'image/',
   gif = 'image/gif',
   jpeg = 'image/jpeg',
@@ -98,14 +100,14 @@ export enum HttpContentImageType {
   icon = 'image/x-icon',
 }
 
-export enum HttpContentAudioType {
+export enum HttpContentTypeAudio {
   any = 'audio/',
 }
 
-export enum HttpContentVideoType {
+export enum HttpContentTypeVideo {
   any = 'video/',
 }
 
-export enum HttpContentFonType {
+export enum HttpContentTypeFont {
   any = 'font/',
 }
