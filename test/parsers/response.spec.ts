@@ -124,12 +124,12 @@ describe('parsers / response', () => {
 
     it('should set instance fields when startRow has valid format (reason is not empty)', () => {
       const parser = getParserInstance()
-      parser['startRow'] = 'HTTP/1.1 201 Created'
+      parser['startRow'] = 'HTTP/3 500 Server Error'
 
       parser['_parseStartRow']()
-      expect(parser['protocolVersion']).toEqual('HTTP/1.1')
-      expect(parser['statusCode']).toEqual(201)
-      expect(parser['statusMessage']).toEqual('Created')
+      expect(parser['protocolVersion']).toEqual('HTTP/3')
+      expect(parser['statusCode']).toEqual(500)
+      expect(parser['statusMessage']).toEqual('Server Error')
     })
   })
 
