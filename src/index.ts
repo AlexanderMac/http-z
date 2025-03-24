@@ -5,5 +5,5 @@ export * from './parsers/index'
 export * as utils from './utils'
 
 export const getLibVersion = (): string => {
-  return '8.0.0'
+  return '8.1.0'
 }

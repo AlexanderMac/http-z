@@ -2,8 +2,8 @@ declare const EOL = "\r\n";
 declare const EOL2X: string;
 declare const regexps: {
     quote: RegExp;
-    startNl: RegExp;
-    endNl: RegExp;
+    nlStart: RegExp;
+    nlEnd: RegExp;
     requestStartRow: RegExp;
     responseStartRow: RegExp;
     quotedHeaderValue: RegExp;
@@ -22,7 +22,8 @@ declare enum HttpProtocol {
 declare enum HttpProtocolVersion {
     http10 = "HTTP/1.0",
     http11 = "HTTP/1.1",
-    http20 = "HTTP/2.0"
+    http2 = "HTTP/2",
+    http3 = "HTTP/3"
 }
 declare enum HttpMethod {
     connect = "CONNECT",
@@ -44,7 +45,7 @@ declare enum HttpHeader {
     setCookie = "Set-Cookie",
     transferEncoding = "Transfer-Encoding"
 }
-declare enum HttpContentTextType {
+declare enum HttpContentTypeText {
     any = "text/",
     css = "text/css",
     csv = "text/csv",
@@ -53,7 +54,7 @@ declare enum HttpContentTextType {
     plain = "text/plain",
     xml = "text/xml"
 }
-declare enum HttpContentApplicationType {
+declare enum HttpContentTypeApplication {
     any = "application/",
     javascript = "application/javascript",
     json = "application/json",
@@ -66,14 +67,14 @@ declare enum HttpContentApplicationType {
     xWwwFormUrlencoded = "application/x-www-form-urlencoded",
     zip = "application/zip"
 }
-declare enum HttpContentMultipartType {
+declare enum HttpContentTypeMultipart {
     any = "multipart/",
     alternative = "multipart/alternative",
     formData = "multipart/form-data",
     mixed = "multipart/mixed",
     related = "multipart/related"
 }
-declare enum HttpContentImageType {
+declare enum HttpContentTypeImage {
     any = "image/",
     gif = "image/gif",
     jpeg = "image/jpeg",
@@ -81,32 +82,32 @@ declare enum HttpContentImageType {
     tiff = "image/tiff",
     icon = "image/x-icon"
 }
-declare enum HttpContentAudioType {
+declare enum HttpContentTypeAudio {
     any = "audio/"
 }
-declare enum HttpContentVideoType {
+declare enum HttpContentTypeVideo {
     any = "video/"
 }
-declare enum HttpContentFonType {
+declare enum HttpContentTypeFont {
     any = "font/"
 }
 
 declare const constants_EOL: typeof EOL;
 declare const constants_EOL2X: typeof EOL2X;
-type constants_HttpContentApplicationType = HttpContentApplicationType;
-declare const constants_HttpContentApplicationType: typeof HttpContentApplicationType;
-type constants_HttpContentAudioType = HttpContentAudioType;
-declare const constants_HttpContentAudioType: typeof HttpContentAudioType;
-type constants_HttpContentFonType = HttpContentFonType;
-declare const constants_HttpContentFonType: typeof HttpContentFonType;
-type constants_HttpContentImageType = HttpContentImageType;
-declare const constants_HttpContentImageType: typeof HttpContentImageType;
-type constants_HttpContentMultipartType = HttpContentMultipartType;
-declare const constants_HttpContentMultipartType: typeof HttpContentMultipartType;
-type constants_HttpContentTextType = HttpContentTextType;
-declare const constants_HttpContentTextType: typeof HttpContentTextType;
-type constants_HttpContentVideoType = HttpContentVideoType;
-declare const constants_HttpContentVideoType: typeof HttpContentVideoType;
+type constants_HttpContentTypeApplication = HttpContentTypeApplication;
+declare const constants_HttpContentTypeApplication: typeof HttpContentTypeApplication;
+type constants_HttpContentTypeAudio = HttpContentTypeAudio;
+declare const constants_HttpContentTypeAudio: typeof HttpContentTypeAudio;
+type constants_HttpContentTypeFont = HttpContentTypeFont;
+declare const constants_HttpContentTypeFont: typeof HttpContentTypeFont;
+type constants_HttpContentTypeImage = HttpContentTypeImage;
+declare const constants_HttpContentTypeImage: typeof HttpContentTypeImage;
+type constants_HttpContentTypeMultipart = HttpContentTypeMultipart;
+declare const constants_HttpContentTypeMultipart: typeof HttpContentTypeMultipart;
+type constants_HttpContentTypeText = HttpContentTypeText;
+declare const constants_HttpContentTypeText: typeof HttpContentTypeText;
+type constants_HttpContentTypeVideo = HttpContentTypeVideo;
+declare const constants_HttpContentTypeVideo: typeof HttpContentTypeVideo;
 type constants_HttpHeader = HttpHeader;
 declare const constants_HttpHeader: typeof HttpHeader;
 type constants_HttpMethod = HttpMethod;
@@ -118,7 +119,7 @@ type constants_HttpProtocolVersion = HttpProtocolVersion;
 declare const constants_HttpProtocolVersion: typeof HttpProtocolVersion;
 declare const constants_regexps: typeof regexps;
 declare namespace constants {
-  export { constants_EOL as EOL, constants_EOL2X as EOL2X, constants_HttpContentApplicationType as HttpContentApplicationType, constants_HttpContentAudioType as HttpContentAudioType, constants_HttpContentFonType as HttpContentFonType, constants_HttpContentImageType as HttpContentImageType, constants_HttpContentMultipartType as HttpContentMultipartType, constants_HttpContentTextType as HttpContentTextType, constants_HttpContentVideoType as HttpContentVideoType, constants_HttpHeader as HttpHeader, constants_HttpMethod as HttpMethod, constants_HttpPostMethods as HttpPostMethods, constants_HttpProtocol as HttpProtocol, constants_HttpProtocolVersion as HttpProtocolVersion, constants_regexps as regexps };
+  export { constants_EOL as EOL, constants_EOL2X as EOL2X, constants_HttpContentTypeApplication as HttpContentTypeApplication, constants_HttpContentTypeAudio as HttpContentTypeAudio, constants_HttpContentTypeFont as HttpContentTypeFont, constants_HttpContentTypeImage as HttpContentTypeImage, constants_HttpContentTypeMultipart as HttpContentTypeMultipart, constants_HttpContentTypeText as HttpContentTypeText, constants_HttpContentTypeVideo as HttpContentTypeVideo, constants_HttpHeader as HttpHeader, constants_HttpMethod as HttpMethod, constants_HttpPostMethods as HttpPostMethods, constants_HttpProtocol as HttpProtocol, constants_HttpProtocolVersion as HttpProtocolVersion, constants_regexps as regexps };
 }
 
 type HttpZHeader = {

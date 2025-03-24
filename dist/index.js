@@ -214,23 +214,21 @@
 
     const EOL = '\r\n';
     const EOL2X = EOL + EOL;
-    const BASIC_LATIN = '[\\u0009\\u0020-\\u007E]';
-    const PARAM_NAME = '[A-Za-z0-9_.\\[\\]-]';
     const HTTP_METHODS = '(CONNECT|OPTIONS|TRACE|GET|HEAD|POST|PUT|PATCH|DELETE)';
-    const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2(\\.0){0,1})';
+    const HTTP_PROTOCOL_VERSIONS = '(HTTP)\\/(1\\.0|1\\.1|2(\\.0){0,1}|3(\\.0){0,1})';
     const regexps = {
         quote: /"/g,
-        startNl: new RegExp(`^${EOL}`),
-        endNl: new RegExp(`${EOL}$`),
-        requestStartRow: new RegExp(`^${HTTP_METHODS} \\S* ${HTTP_PROTOCOL_VERSIONS}$`),
-        responseStartRow: new RegExp(`^${HTTP_PROTOCOL_VERSIONS} \\d{3} ${BASIC_LATIN}*$`),
+        nlStart: new RegExp(`^${EOL}`),
+        nlEnd: new RegExp(`${EOL}$`),
+        requestStartRow: new RegExp(`^${HTTP_METHODS}\\s\\S*\\s${HTTP_PROTOCOL_VERSIONS}$`),
+        responseStartRow: new RegExp(`^${HTTP_PROTOCOL_VERSIONS}\\s\\d{3}\\s[^\r\n]*$`),
         quotedHeaderValue: new RegExp('^"[\\u0009\\u0020\\u0021\\u0023-\\u007E]+"$'),
-        boundary: /(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}/,
-        contentDisposition: new RegExp(`^Content-Disposition: *(form-data|inline|attachment)${BASIC_LATIN}*${EOL}`, 'i'),
+        boundary: new RegExp(`(?<=boundary=)"{0,1}[A-Za-z0-9'()+_,.:=?-]+"{0,1}`),
+        contentDisposition: new RegExp(`^Content-Disposition:\\s*(form-data|inline|attachment)(?:\\s*;\\s*(name|filename)\\s*=\\s*(?:"([^"]+)"|([^;\\s]+)))*${EOL}`, 'i'),
         contentType: new RegExp(`^Content-Type:[\\S ]*${EOL}`, 'i'),
-        contentDispositionType: /(?<=Content-Disposition:) *(form-data|inline|attachment)/,
-        dispositionName: new RegExp(`(?<=name=)"${PARAM_NAME}+"`, 'i'),
-        dispositionFileName: new RegExp(`(?<=filename=)"${PARAM_NAME}+"`, 'i'),
+        contentDispositionType: new RegExp(`(?<=Content-Disposition:)\\s*(form-data|inline|attachment)`),
+        dispositionName: new RegExp(`(?<=name=)(?:"([^"]+)"|([^;\\s]+))+`, 'i'),
+        dispositionFileName: new RegExp(`(?<=filename=)(?:"([^"]+)"|([^;\\s]+))+`, 'i'),
         chunkRow: new RegExp(`^[0-9a-fA-F]+${EOL}`),
     };
     var HttpProtocol;
@@ -242,7 +240,8 @@
     (function (HttpProtocolVersion) {
         HttpProtocolVersion["http10"] = "HTTP/1.0";
         HttpProtocolVersion["http11"] = "HTTP/1.1";
-        HttpProtocolVersion["http20"] = "HTTP/2.0";
+        HttpProtocolVersion["http2"] = "HTTP/2";
+        HttpProtocolVersion["http3"] = "HTTP/3";
     })(HttpProtocolVersion || (HttpProtocolVersion = {}));
     var HttpMethod;
     (function (HttpMethod) {
@@ -266,71 +265,71 @@
         HttpHeader["setCookie"] = "Set-Cookie";
         HttpHeader["transferEncoding"] = "Transfer-Encoding";
     })(HttpHeader || (HttpHeader = {}));
-    var HttpContentTextType;
-    (function (HttpContentTextType) {
-        HttpContentTextType["any"] = "text/";
-        HttpContentTextType["css"] = "text/css";
-        HttpContentTextType["csv"] = "text/csv";
-        HttpContentTextType["html"] = "text/html";
-        HttpContentTextType["javascript"] = "text/javascript";
-        HttpContentTextType["plain"] = "text/plain";
-        HttpContentTextType["xml"] = "text/xml";
-    })(HttpContentTextType || (HttpContentTextType = {}));
-    var HttpContentApplicationType;
-    (function (HttpContentApplicationType) {
-        HttpContentApplicationType["any"] = "application/";
-        HttpContentApplicationType["javascript"] = "application/javascript";
-        HttpContentApplicationType["json"] = "application/json";
-        HttpContentApplicationType["octetStream"] = "application/octet-stream";
-        HttpContentApplicationType["ogg"] = "application/ogg";
-        HttpContentApplicationType["pdf"] = "application/pdf";
-        HttpContentApplicationType["xhtml"] = "application/xhtml+xml";
-        HttpContentApplicationType["xml"] = "application/xml";
-        HttpContentApplicationType["xShockwaveFlash"] = "application/x-shockwave-flash";
-        HttpContentApplicationType["xWwwFormUrlencoded"] = "application/x-www-form-urlencoded";
-        HttpContentApplicationType["zip"] = "application/zip";
-    })(HttpContentApplicationType || (HttpContentApplicationType = {}));
-    var HttpContentMultipartType;
-    (function (HttpContentMultipartType) {
-        HttpContentMultipartType["any"] = "multipart/";
-        HttpContentMultipartType["alternative"] = "multipart/alternative";
-        HttpContentMultipartType["formData"] = "multipart/form-data";
-        HttpContentMultipartType["mixed"] = "multipart/mixed";
-        HttpContentMultipartType["related"] = "multipart/related";
-    })(HttpContentMultipartType || (HttpContentMultipartType = {}));
-    var HttpContentImageType;
-    (function (HttpContentImageType) {
-        HttpContentImageType["any"] = "image/";
-        HttpContentImageType["gif"] = "image/gif";
-        HttpContentImageType["jpeg"] = "image/jpeg";
-        HttpContentImageType["png"] = "image/png";
-        HttpContentImageType["tiff"] = "image/tiff";
-        HttpContentImageType["icon"] = "image/x-icon";
-    })(HttpContentImageType || (HttpContentImageType = {}));
-    var HttpContentAudioType;
-    (function (HttpContentAudioType) {
-        HttpContentAudioType["any"] = "audio/";
-    })(HttpContentAudioType || (HttpContentAudioType = {}));
-    var HttpContentVideoType;
-    (function (HttpContentVideoType) {
-        HttpContentVideoType["any"] = "video/";
-    })(HttpContentVideoType || (HttpContentVideoType = {}));
-    var HttpContentFonType;
-    (function (HttpContentFonType) {
-        HttpContentFonType["any"] = "font/";
-    })(HttpContentFonType || (HttpContentFonType = {}));
+    var HttpContentTypeText;
+    (function (HttpContentTypeText) {
+        HttpContentTypeText["any"] = "text/";
+        HttpContentTypeText["css"] = "text/css";
+        HttpContentTypeText["csv"] = "text/csv";
+        HttpContentTypeText["html"] = "text/html";
+        HttpContentTypeText["javascript"] = "text/javascript";
+        HttpContentTypeText["plain"] = "text/plain";
+        HttpContentTypeText["xml"] = "text/xml";
+    })(HttpContentTypeText || (HttpContentTypeText = {}));
+    var HttpContentTypeApplication;
+    (function (HttpContentTypeApplication) {
+        HttpContentTypeApplication["any"] = "application/";
+        HttpContentTypeApplication["javascript"] = "application/javascript";
+        HttpContentTypeApplication["json"] = "application/json";
+        HttpContentTypeApplication["octetStream"] = "application/octet-stream";
+        HttpContentTypeApplication["ogg"] = "application/ogg";
+        HttpContentTypeApplication["pdf"] = "application/pdf";
+        HttpContentTypeApplication["xhtml"] = "application/xhtml+xml";
+        HttpContentTypeApplication["xml"] = "application/xml";
+        HttpContentTypeApplication["xShockwaveFlash"] = "application/x-shockwave-flash";
+        HttpContentTypeApplication["xWwwFormUrlencoded"] = "application/x-www-form-urlencoded";
+        HttpContentTypeApplication["zip"] = "application/zip";
+    })(HttpContentTypeApplication || (HttpContentTypeApplication = {}));
+    var HttpContentTypeMultipart;
+    (function (HttpContentTypeMultipart) {
+        HttpContentTypeMultipart["any"] = "multipart/";
+        HttpContentTypeMultipart["alternative"] = "multipart/alternative";
+        HttpContentTypeMultipart["formData"] = "multipart/form-data";
+        HttpContentTypeMultipart["mixed"] = "multipart/mixed";
+        HttpContentTypeMultipart["related"] = "multipart/related";
+    })(HttpContentTypeMultipart || (HttpContentTypeMultipart = {}));
+    var HttpContentTypeImage;
+    (function (HttpContentTypeImage) {
+        HttpContentTypeImage["any"] = "image/";
+        HttpContentTypeImage["gif"] = "image/gif";
+        HttpContentTypeImage["jpeg"] = "image/jpeg";
+        HttpContentTypeImage["png"] = "image/png";
+        HttpContentTypeImage["tiff"] = "image/tiff";
+        HttpContentTypeImage["icon"] = "image/x-icon";
+    })(HttpContentTypeImage || (HttpContentTypeImage = {}));
+    var HttpContentTypeAudio;
+    (function (HttpContentTypeAudio) {
+        HttpContentTypeAudio["any"] = "audio/";
+    })(HttpContentTypeAudio || (HttpContentTypeAudio = {}));
+    var HttpContentTypeVideo;
+    (function (HttpContentTypeVideo) {
+        HttpContentTypeVideo["any"] = "video/";
+    })(HttpContentTypeVideo || (HttpContentTypeVideo = {}));
+    var HttpContentTypeFont;
+    (function (HttpContentTypeFont) {
+        HttpContentTypeFont["any"] = "font/";
+    })(HttpContentTypeFont || (HttpContentTypeFont = {}));
 
     var constants = /*#__PURE__*/Object.freeze({
         __proto__: null,
         EOL: EOL,
         EOL2X: EOL2X,
-        get HttpContentApplicationType () { return HttpContentApplicationType; },
-        get HttpContentAudioType () { return HttpContentAudioType; },
-        get HttpContentFonType () { return HttpContentFonType; },
-        get HttpContentImageType () { return HttpContentImageType; },
-        get HttpContentMultipartType () { return HttpContentMultipartType; },
-        get HttpContentTextType () { return HttpContentTextType; },
-        get HttpContentVideoType () { return HttpContentVideoType; },
+        get HttpContentTypeApplication () { return HttpContentTypeApplication; },
+        get HttpContentTypeAudio () { return HttpContentTypeAudio; },
+        get HttpContentTypeFont () { return HttpContentTypeFont; },
+        get HttpContentTypeImage () { return HttpContentTypeImage; },
+        get HttpContentTypeMultipart () { return HttpContentTypeMultipart; },
+        get HttpContentTypeText () { return HttpContentTypeText; },
+        get HttpContentTypeVideo () { return HttpContentTypeVideo; },
         get HttpHeader () { return HttpHeader; },
         get HttpMethod () { return HttpMethod; },
         HttpPostMethods: HttpPostMethods,
@@ -368,12 +367,12 @@
             }
             this._processTransferEncodingChunked();
             switch (this.body.contentType) {
-                case HttpContentMultipartType.formData:
-                case HttpContentMultipartType.alternative:
-                case HttpContentMultipartType.mixed:
-                case HttpContentMultipartType.related:
+                case HttpContentTypeMultipart.formData:
+                case HttpContentTypeMultipart.alternative:
+                case HttpContentTypeMultipart.mixed:
+                case HttpContentTypeMultipart.related:
                     return this._generateFormDataBody();
-                case HttpContentApplicationType.xWwwFormUrlencoded:
+                case HttpContentTypeApplication.xWwwFormUrlencoded:
                     return this._generateUrlencodedBody();
                 default:
                     return this._generateTextBody();
@@ -528,7 +527,7 @@
             this.paramGroup = paramGroup;
         }
         parse() {
-            this.paramGroup = this.paramGroup.replace(regexps.startNl, '').replace(regexps.endNl, '');
+            this.paramGroup = this.paramGroup.replace(regexps.nlStart, '').replace(regexps.nlEnd, '');
             const contentDispositionHeader = this._getContentDisposition();
             const contentType = this._getContentType();
             const dispositionType = this._getDispositionType(contentDispositionHeader);
@@ -585,8 +584,8 @@
             }
         }
         _getParamValue() {
-            if (this.paramGroup.match(regexps.startNl)) {
-                return this.paramGroup.replace(regexps.startNl, '');
+            if (this.paramGroup.match(regexps.nlStart)) {
+                return this.paramGroup.replace(regexps.nlStart, '');
             }
             throw HttpZError.get('Incorrect form-data parameter', this.paramGroup);
         }
@@ -644,13 +643,13 @@
                 this.body.contentType = contentTypeHeader.toLowerCase().split(';')[0];
             }
             switch (this.body.contentType) {
-                case HttpContentMultipartType.formData:
-                case HttpContentMultipartType.alternative:
-                case HttpContentMultipartType.mixed:
-                case HttpContentMultipartType.related:
+                case HttpContentTypeMultipart.formData:
+                case HttpContentTypeMultipart.alternative:
+                case HttpContentTypeMultipart.mixed:
+                case HttpContentTypeMultipart.related:
                     this._parseFormDataBody();
                     break;
-                case HttpContentApplicationType.xWwwFormUrlencoded:
+                case HttpContentTypeApplication.xWwwFormUrlencoded:
                     this._parseUrlencodedBody();
                     break;
                 default:
@@ -943,7 +942,7 @@
     }
 
     const getLibVersion = () => {
-        return '8.0.0';
+        return '8.1.0';
     };
 
     exports.HttpZError = HttpZError;

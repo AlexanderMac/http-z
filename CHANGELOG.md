@@ -1,5 +1,9 @@
 # Changelog
 
+## v8.1.0 (Mar. 24, 2025)
+- Add support for `HTTP/3` messages.
+- Fix `regexps.contentDisposition` to support all unicode characters.
+
 ## v8.0.0 (Feb. 13, 2025)
 - **BREAKING:** Drop support for Node versions prior v18.
 - Convert codebase to TypeScript. Replace Mocha + Should to Jest.
