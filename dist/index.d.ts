@@ -143,6 +143,11 @@ type HttpZBodyParam = {
     fileName?: string;
     contentType?: string;
 };
+type HttpZCookieParam = {
+    name: string;
+    value?: string;
+    params?: string[];
+};
 
 type HttpZBuilderOptions = {
     mandatoryHost?: boolean;
@@ -169,8 +174,23 @@ type HttpZParserModel = {
     headersSize?: number;
     bodySize?: number;
 };
+type HttpZParserRequestModel = HttpZParserModel & {
+    method: HttpMethod;
+    target: string;
+    host: string;
+    path: string;
+    protocolVersion: HttpProtocolVersion;
+    queryParams?: HttpZParam[];
+    cookies?: HttpZParam[];
+};
+type HttpZParserResponseModel = HttpZParserModel & {
+    protocolVersion: HttpProtocolVersion;
+    statusCode: number;
+    statusMessage: string;
+    cookies?: HttpZCookieParam[];
+};
 
-declare function parse(rawMessage: string, opts?: HttpZParserOptions): HttpZParserModel | never;
+declare function parse(rawMessage: string, opts?: HttpZParserOptions): HttpZParserRequestModel | HttpZParserResponseModel | never;
 
 type ParsedUrl = {
     protocol: string;

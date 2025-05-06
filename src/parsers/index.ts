@@ -3,9 +3,12 @@ import { HttpZError } from '../error'
 import { head, isNil, isString } from '../utils'
 import { HttpZRequestParser } from './request'
 import { HttpZResponseParser } from './response'
-import { HttpZParserModel, HttpZParserOptions } from './types'
+import { HttpZParserOptions, HttpZParserRequestModel, HttpZParserResponseModel } from './types'
 
-export function parse(rawMessage: string, opts: HttpZParserOptions = {}): HttpZParserModel | never {
+export function parse(
+  rawMessage: string,
+  opts: HttpZParserOptions = {},
+): HttpZParserRequestModel | HttpZParserResponseModel | never {
   if (isNil(rawMessage)) {
     throw HttpZError.get('rawMessage is required')
   }

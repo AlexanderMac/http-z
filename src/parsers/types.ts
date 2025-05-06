@@ -5,7 +5,7 @@ export type HttpZParserOptions = {
   mandatoryHost?: boolean
 }
 
-export type HttpZParserModel = {
+type HttpZParserModel = {
   headers: HttpZHeader[]
   body?: HttpZBody
   headersSize?: number
