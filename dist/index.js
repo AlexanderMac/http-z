@@ -944,7 +944,7 @@
     }
 
     const getLibVersion = () => {
-        return '8.1.0';
+        return '8.1.1';
     };
 
     exports.HttpZError = HttpZError;

@@ -1,5 +1,8 @@
 # Changelog
 
+## v8.1.1 (May. 6, 2025)
+- Fix typings.
+
 ## v8.1.0 (Mar. 24, 2025)
 - Add support for `HTTP/3` messages.
 - Fix `regexps.contentDisposition` to support all unicode characters.
